@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSCS 交通安全统筹系统 v2.0 企业版</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #e2e8f0; }
+.container { max-width: 900px; width: 90%; padding: 40px; }
+.logo { text-align: center; margin-bottom: 48px; }
+.logo h1 { font-size: 36px; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #38bdf8, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+.logo p { font-size: 16px; color: #94a3b8; }
+.logo .version { display: inline-block; background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 4px 12px; border-radius: 20px; font-size: 13px; margin-top: 12px; border: 1px solid rgba(59, 130, 246, 0.3); }
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 32px; }
+.card { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(71, 85, 105, 0.5); border-radius: 16px; padding: 28px; text-decoration: none; color: #e2e8f0; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+.card:hover { transform: translateY(-4px); border-color: #3b82f6; box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15); }
+.card .icon { font-size: 36px; margin-bottom: 16px; display: block; }
+.card h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #f1f5f9; }
+.card p { font-size: 14px; color: #94a3b8; line-height: 1.6; }
+.card .tag { display: inline-block; background: rgba(34, 197, 94, 0.15); color: #4ade80; padding: 2px 8px; border-radius: 6px; font-size: 12px; margin-top: 12px; }
+.card .tag.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.card .tag.orange { background: rgba(249, 115, 22, 0.15); color: #fb923c; }
+.card.full { grid-column: span 2; }
+.footer { text-align: center; margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(71, 85, 105, 0.3); }
+.footer p { font-size: 13px; color: #64748b; }
+@media (max-width: 640px) { .cards { grid-template-columns: 1fr; } .card.full { grid-column: span 1; } .logo h1 { font-size: 28px; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">
+    <h1>🫓 TSCS 交通安全统筹系统</h1>
+    <p>企业版 v2.0 · 产品展示中心</p>
+    <span class="version">Enterprise Edition v2.0</span>
+  </div>
+  <div class="cards">
+    <a href="prd-viewer.html" class="card full">
+      <span class="icon">📄</span>
+      <h3>PRD 产品需求文档</h3>
+      <p>完整的产品需求规格说明书，包含业务流程、功能清单、角色权限、数据架构、页面明细等全部内容。支持章节导航和全文搜索。</p>
+      <span class="tag">在线文档 · 18章节</span>
+    </a>
+    <a href="demo-enterprise.html" class="card">
+      <span class="icon">🏢</span>
+      <h3>企业端 Web Demo</h3>
+      <p>面向运输企业的管理后台，支持分司管理员、安全员、高管三角色切换。包含工作台、车辆管理、驾驶员管理、安全看板、案件管理、财务管理。</p>
+      <span class="tag blue">PC端 · 7大模块</span>
+    </a>
+    <a href="demo-platform.html" class="card">
+      <span class="icon">⚙️</span>
+      <h3>平台端 Web Demo</h3>
+      <p>统筹机构运营后台，支持调度员、给付员、财务、运营四角色切换。包含数据面板、企业管理、案件调度、互助给付、财务管理。</p>
+      <span class="tag blue">PC端 · 7大模块</span>
+    </a>
+    <a href="demo-mobile.html" class="card">
+      <span class="icon">📱</span>
+      <h3>现场端 App Demo</h3>
+      <p>核查员移动办公工具，支持任务接收、到达签到、现场拍照、笔录记录、损失核定、提交报告全流程。</p>
+      <span class="tag orange">移动端 · 8个页面</span>
+    </a>
+    <a href="demo-mobile.html" class="card">
+      <span class="icon">🚗</span>
+      <h3>驾驶员端小程序 Demo</h3>
+      <p>驾驶员轻量入口，支持一键事故申报、案件进度查询、驾驶评分查看、消息通知。微信小程序风格。</p>
+      <span class="tag orange">移动端 · 7个页面</span>
+    </a>
+  </div>
+  <div class="footer">
+    <p>TSCS Traffic Safety Coordination System · 2026</p>
+  </div>
+</div>
+</body>
+</html>
