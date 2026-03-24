@@ -725,9 +725,28 @@ function switchPage(page){
 // ===== ROLE SWITCHING =====
 var roleNames = {dispatcher:'调度员 · 张明',payer:'互助给付员 · 李婷',finance:'财务人员 · 王芳',operator:'运营人员 · 赵伟'};
 var roleAvatars = {dispatcher:'张',payer:'李',finance:'王',operator:'赵'};
+// ===== ROLE PERMISSIONS =====
+var roleMenus = {
+  dispatcher: ['dashboard','enterprise','insurance','cases'],
+  payer: ['dashboard','cases','mutual'],
+  finance: ['dashboard','insurance','finance'],
+  operator: ['dashboard','enterprise','insurance','cases','mutual','finance','config']
+};
+
 function switchRole(role){
   document.getElementById('roleLabel').textContent = roleNames[role]||role;
   document.querySelector('.avatar').textContent = roleAvatars[role]||'';
+  // 隐藏/显示菜单项
+  var allowed = roleMenus[role]||[];
+  document.querySelectorAll('.sidebar .nav-item[data-page]').forEach(function(el){
+    var page = el.getAttribute('data-page');
+    el.style.display = allowed.indexOf(page)>=0 ? '' : 'none';
+  });
+  // 如果当前页面被隐藏，切到第一个可见页面
+  var currentPage = document.querySelector('.sidebar .nav-item.active');
+  if(currentPage && currentPage.style.display==='none'){
+    switchPage(allowed[0]||'dashboard');
+  }
 }
 
 // ===== TAB SWITCHING =====
