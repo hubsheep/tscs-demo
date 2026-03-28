@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSCS 交通安全统筹系统 - 企业端</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:#f8fafc;color:#1e293b;font-size:14px;}
+:root{--primary:#2563eb;--primary-light:#dbeafe;--primary-dark:#1d4ed8;--success:#16a34a;--warning:#f59e0b;--danger:#dc2626;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a;--sidebar-w:200px;--topbar-h:56px;}
+
+/* ===== LOGIN PAGE ===== */
+#loginPage{position:fixed;inset:0;background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 50%,#3b82f6 100%);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.login-box{background:#fff;border-radius:16px;padding:48px 40px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.login-box h1{font-size:24px;color:var(--primary);text-align:center;margin-bottom:8px;}
+.login-box .subtitle{color:var(--gray-500);text-align:center;margin-bottom:32px;font-size:13px;}
+.login-box .form-group{margin-bottom:20px;}
+.login-box label{display:block;font-size:13px;color:var(--gray-600);margin-bottom:6px;font-weight:500;}
+.login-box input[type="text"],.login-box input[type="password"]{width:100%;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;font-size:14px;transition:border-color .2s;}
+.login-box input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);}
+.login-box .role-select{display:flex;gap:8px;margin-bottom:24px;}
+.login-box .role-btn{flex:1;padding:10px;border:2px solid var(--gray-200);border-radius:8px;background:#fff;cursor:pointer;text-align:center;font-size:13px;color:var(--gray-600);transition:all .2s;}
+.login-box .role-btn.active{border-color:var(--primary);background:var(--primary-light);color:var(--primary);font-weight:600;}
+.login-box .role-btn:hover{border-color:var(--primary);}
+.login-btn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;transition:background .2s;}
+.login-btn:hover{background:var(--primary-dark);}
+
+/* ===== APP LAYOUT ===== */
+#appLayout{display:none;height:100vh;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--gray-900);color:#fff;display:flex;flex-direction:column;z-index:100;}
+.sidebar .logo{padding:16px;font-size:16px;font-weight:700;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:8px;}
+.sidebar .logo span{background:var(--primary);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.sidebar nav{flex:1;overflow-y:auto;padding:12px 0;}
+.sidebar .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:rgba(255,255,255,.65);cursor:pointer;transition:all .2s;font-size:13px;white-space:nowrap;}
+.sidebar .nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
+.sidebar .nav-item.active{background:var(--primary);color:#fff;}
+.sidebar .nav-item .icon{width:18px;text-align:center;font-size:15px;}
+.sidebar .nav-divider{height:1px;background:rgba(255,255,255,.08);margin:8px 16px;}
+.sidebar .role-switcher{padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);}
+.sidebar .role-switcher .current-role{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.sidebar .role-switcher select{width:100%;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:var(--gray-800);color:#fff;font-size:12px;}
+
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:#fff;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:90;}
+.topbar .page-title{font-size:16px;font-weight:600;color:var(--gray-800);}
+.topbar .user-info{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--gray-600);}
+.topbar .user-info .avatar{width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+
+.main-content{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:24px;min-height:calc(100vh - var(--topbar-h));overflow-y:auto;}
+
+/* ===== CARDS & COMPONENTS ===== */
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:20px;margin-bottom:20px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-header h3{font-size:15px;font-weight:600;color:var(--gray-800);}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:20px;}
+.stat-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.stat-card .label{font-size:12px;color:var(--gray-500);margin-bottom:4px;}
+.stat-card .value{font-size:28px;font-weight:700;color:var(--gray-800);}
+.stat-card .change{font-size:12px;margin-top:4px;}
+.stat-card .change.up{color:var(--success);}
+.stat-card .change.down{color:var(--danger);}
+.stat-card .icon-box{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;}
+.stat-card .icon-box.blue{background:var(--primary-light);color:var(--primary);}
+.stat-card .icon-box.green{background:#dcfce7;color:var(--success);}
+.stat-card .icon-box.orange{background:#fef3c7;color:var(--warning);}
+.stat-card .icon-box.red{background:#fee2e2;color:var(--danger);}
+
+/* ===== TABLES ===== */
+.table-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+.table-toolbar input,.table-toolbar select{padding:8px 12px;border:1px solid var(--gray-200);border-radius:8px;font-size:13px;}
+.table-toolbar input:focus,.table-toolbar select:focus{outline:none;border-color:var(--primary);}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-dark);}
+.btn-success{background:var(--success);color:#fff;}.btn-success:hover{background:#15803d;}
+.btn-danger{background:var(--danger);color:#fff;}.btn-danger:hover{background:#b91c1c;}
+.btn-warning{background:var(--warning);color:#fff;}
+.btn-outline{background:#fff;color:var(--gray-600);border:1px solid var(--gray-200);}.btn-outline:hover{border-color:var(--primary);color:var(--primary);}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:6px;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--gray-50);}
+th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.3px;border-bottom:2px solid var(--gray-200);}
+td{padding:10px 14px;border-bottom:1px solid var(--gray-100);font-size:13px;}
+tr:nth-child(even){background:var(--gray-50);}
+tr:hover{background:var(--primary-light);}
+
+/* ===== BADGES ===== */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.badge-active{background:#dcfce7;color:#16a34a;}
+.badge-expiring{background:#fef3c7;color:#d97706;}
+.badge-expired{background:#fee2e2;color:#dc2626;}
+.badge-pending{background:#dbeafe;color:#2563eb;}
+.badge-processing{background:#fef3c7;color:#d97706;}
+.badge-approved{background:#dcfce7;color:#16a34a;}
+.badge-rejected{background:#fee2e2;color:#dc2626;}
+.badge-closed{background:#f1f5f9;color:#64748b;}
+.badge-urgent{background:#fee2e2;color:#dc2626;}
+.badge-normal{background:#dbeafe;color:#2563eb;}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;}
+.modal-overlay.show{display:flex;}
+.modal{background:#fff;border-radius:16px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-size:16px;font-weight:600;}
+.modal-close{width:32px;height:32px;border-radius:8px;border:none;background:var(--gray-100);cursor:pointer;font-size:18px;color:var(--gray-500);display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px;}
+
+/* ===== TIMELINE ===== */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--gray-200);}
+.timeline-item{position:relative;margin-bottom:20px;}
+.timeline-item::before{content:'';position:absolute;left:-20px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid #fff;box-shadow:0 0 0 2px var(--primary-light);}
+.timeline-item.done::before{background:var(--success);box-shadow:0 0 0 2px #dcfce7;}
+.timeline-item.rejected::before{background:var(--danger);box-shadow:0 0 0 2px #fee2e2;}
+.timeline-item.pending::before{background:var(--warning);box-shadow:0 0 0 2px #fef3c7;}
+.timeline-item .time{font-size:11px;color:var(--gray-400);margin-bottom:2px;}
+.timeline-item .title{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:2px;}
+.timeline-item .desc{font-size:12px;color:var(--gray-500);}
+
+/* ===== CHARTS (CSS/SVG) ===== */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:180px;padding:10px 0;}
+.bar-chart .bar{flex:1;border-radius:6px 6px 0 0;position:relative;min-width:30px;transition:height .6s ease;}
+.bar-chart .bar .val{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:600;color:var(--gray-600);}
+.bar-chart .bar .lbl{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gray-500);white-space:nowrap;}
+.progress-bar{height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;}
+.progress-bar .fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.donut-chart{width:120px;height:120px;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;}
+.donut-chart .center{position:absolute;width:80px;height:80px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;}
+
+/* ===== PAGE SECTIONS ===== */
+.page-section{display:none;}
+.page-section.active{display:block;}
+.todo-list{list-style:none;}
+.todo-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--gray-200);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:all .2s;}
+.todo-item:hover{border-color:var(--primary);background:var(--primary-light);}
+.todo-item .priority{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.todo-item .priority.urgent{background:var(--danger);}
+.todo-item .priority.important{background:var(--warning);}
+.todo-item .priority.normal{background:var(--primary);}
+.todo-item .info{flex:1;}
+.todo-item .info .title-text{font-size:13px;font-weight:500;color:var(--gray-800);}
+.todo-item .info .meta{font-size:11px;color:var(--gray-400);margin-top:2px;}
+.quick-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;}
+.quick-link{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;background:var(--gray-50);border-radius:12px;cursor:pointer;transition:all .2s;text-align:center;}
+.quick-link:hover{background:var(--primary-light);transform:translateY(-2px);box-shadow:0 4px 12px rgba(37,99,235,.15);}
+.quick-link .icon{width:40px;height:40px;border-radius:10px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.quick-link .text{font-size:12px;color:var(--gray-600);font-weight:500;}
+
+/* ===== SAFETY DASHBOARD ===== */
+.compare-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.compare-bar .company-name{width:100px;font-size:12px;color:var(--gray-600);text-align:right;flex-shrink:0;}
+.compare-bar .bar-bg{flex:1;height:24px;background:var(--gray-200);border-radius:4px;overflow:hidden;position:relative;}
+.compare-bar .bar-fill{height:100%;border-radius:4px;transition:width .6s;}
+.compare-bar .score{font-size:13px;font-weight:600;width:40px;flex-shrink:0;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){.stat-grid{grid-template-columns:repeat(2,1fr);}.sidebar{width:60px;}.sidebar .nav-item span{display:none;}.sidebar .logo span{display:none;}.main-content{margin-left:60px;}.topbar{left:60px;}}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+  <div class="login-box">
+    <h1>🛡️ TSCS 企业端</h1>
+    <p class="subtitle">交通安全统筹系统 · 企业管理平台</p>
+    <div class="form-group">
+      <label>企业名称</label>
+      <input type="text" id="loginCompany" value="北京畅达运输有限公司" />
+    </div>
+    <div class="form-group">
+      <label>账号</label>
+      <input type="text" id="loginUser" value="admin" />
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input type="password" id="loginPass" value="123456" />
+    </div>
+    <label style="font-size:13px;color:var(--gray-600);font-weight:500;display:block;margin-bottom:8px;">选择角色（演示）</label>
+    <div class="role-select">
+      <div class="role-btn active" onclick="selectLoginRole('admin')" data-role="admin">👤 分司管理员</div>
+      <div class="role-btn" onclick="selectLoginRole('safety')" data-role="safety">🦺 安全员</div>
+      <div class="role-btn" onclick="selectLoginRole('exec')" data-role="exec">👔 高管</div>
+    </div>
+    <button class="login-btn" onclick="doLogin()">登 录</button>
+  </div>
+</div>
+
+
+<!-- APP LAYOUT -->
+<div id="appLayout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo"><span>T</span> TSCS 企业端</div>
+    <nav id="sideNav">
+      <div class="nav-item active" data-page="workbench" onclick="switchPage('workbench')">
+        <span class="icon">📊</span><span>工作台</span>
+      </div>
+      <div class="nav-item" data-page="vehicles" onclick="switchPage('vehicles')">
+        <span class="icon">🚗</span><span>车辆管理</span>
+      </div>
+      <div class="nav-item" data-page="drivers" onclick="switchPage('drivers')">
+        <span class="icon">🧑‍✈️</span><span>驾驶员管理</span>
+      </div>
+      <div class="nav-item" data-page="safety" onclick="switchPage('safety')">
+        <span class="icon">🛡️</span><span>安全管理看板</span>
+      </div>
+      <div class="nav-item" data-page="cases" onclick="switchPage('cases')">
+        <span class="icon">📋</span><span>案件管理</span>
+      </div>
+      <div class="nav-item" data-page="finance" onclick="switchPage('finance')">
+        <span class="icon">💰</span><span>财务管理</span>
+      </div>
+    </nav>
+    <div class="role-switcher">
+      <div class="current-role">当前角色：<strong id="currentRoleName">分司管理员</strong></div>
+      <select id="roleSwitch" onchange="switchRole(this.value)">
+        <option value="admin">👤 分司管理员</option>
+        <option value="safety">🦺 安全员</option>
+        <option value="exec">👔 高管</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="page-title" id="pageTitle">工作台</div>
+    <div class="user-info">
+      <span>北京畅达运输有限公司</span>
+      <div class="avatar">管</div>
+      <span>管理员</span>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content" id="mainContent">
+
+
+<!-- ===== 工作台 ===== -->
+<div class="page-section active" id="page-workbench">
+  <!-- 待办事项 -->
+  <div class="card">
+    <div class="card-header"><h3>📌 待办事项</h3><span style="font-size:12px;color:var(--gray-400);" id="todoCount">4 项待处理</span></div>
+    <div id="todoList" class="todo-list"></div>
+  </div>
+
+  <!-- 今日统计 -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="icon-box blue">🚗</div>
+      <div class="label">在统车辆</div>
+      <div class="value">328</div>
+      <div class="change up">↑ 12 较上月</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box green">⭐</div>
+      <div class="label">企业平均评分</div>
+      <div class="value">82.5</div>
+      <div class="change up">↑ 3.2 较上月</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box orange">📋</div>
+      <div class="label">未结案件</div>
+      <div class="value">7</div>
+      <div class="change down">↑ 2 较上月</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box red">💰</div>
+      <div class="label">本月给付金额</div>
+      <div class="value">¥12.8万</div>
+      <div class="change down">↑ 35% 较上月</div>
+    </div>
+  </div>
+
+  <!-- 快捷入口 -->
+  <div class="card">
+    <div class="card-header"><h3>🔗 快捷入口</h3></div>
+    <div class="quick-links">
+      <div class="quick-link" onclick="switchPage('vehicles')"><div class="icon">🚗</div><div class="text">车辆管理</div></div>
+      <div class="quick-link" onclick="switchPage('drivers')"><div class="icon">🧑‍✈️</div><div class="text">驾驶员管理</div></div>
+      <div class="quick-link" onclick="switchPage('cases')"><div class="icon">📋</div><div class="text">案件查询</div></div>
+      <div class="quick-link" onclick="switchPage('safety')"><div class="icon">🛡️</div><div class="text">安全看板</div></div>
+      <div class="quick-link" onclick="switchPage('finance')"><div class="icon">💰</div><div class="text">财务管理</div></div>
+      <div class="quick-link" onclick="showToast('事故申报功能开发中')"><div class="icon">🚨</div><div class="text">事故申报</div></div>
+    </div>
+  </div>
+
+  <!-- 最新通知 -->
+  <div class="card">
+    <div class="card-header"><h3>📢 最新通知</h3></div>
+    <div style="font-size:13px;color:var(--gray-600);">
+      <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);">
+        <span style="color:var(--primary);font-weight:500;">【系统通知】</span> 平台将于3月28日进行系统维护升级
+        <span style="float:right;color:var(--gray-400);font-size:11px;">2026-03-24</span>
+      </div>
+      <div style="padding:8px 0;border-bottom:1px solid var(--gray-100);">
+        <span style="color:var(--warning);font-weight:500;">【续保提醒】</span> 本月有15辆车辆统筹即将到期，请及时处理
+        <span style="float:right;color:var(--gray-400);font-size:11px;">2026-03-23</span>
+      </div>
+      <div style="padding:8px 0;">
+        <span style="color:var(--success);font-weight:500;">【培训通知】</span> 4月份安全驾驶培训报名已开放，截止4月5日
+        <span style="float:right;color:var(--gray-400);font-size:11px;">2026-03-22</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== 车辆管理 ===== -->
+<div class="page-section" id="page-vehicles">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">在统车辆</div><div class="value" style="color:var(--success);">328</div></div>
+    <div class="stat-card"><div class="label">即将到期</div><div class="value" style="color:var(--warning);">15</div></div>
+    <div class="stat-card"><div class="label">已过期</div><div class="value" style="color:var(--danger);">8</div></div>
+    <div class="stat-card"><div class="label">待续保</div><div class="value" style="color:var(--primary);">22</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>🚗 车辆列表</h3><button class="btn btn-primary btn-sm" onclick="showToast('新增车辆功能开发中')">+ 新增车辆</button></div>
+    <div class="table-toolbar">
+      <input type="text" id="vehicleSearch" placeholder="🔍 搜索车牌号/车型..." oninput="filterVehicles()" style="width:220px;" />
+      <select id="vehicleStatusFilter" onchange="filterVehicles()">
+        <option value="">全部状态</option>
+        <option value="在统">在统</option>
+        <option value="即将到期">即将到期</option>
+        <option value="已过期">已过期</option>
+      </select>
+      <select id="vehicleTypeFilter" onchange="filterVehicles()">
+        <option value="">全部类型</option>
+        <option value="出租车">出租车</option>
+        <option value="网约车">网约车</option>
+        <option value="客运">客运</option>
+        <option value="租赁">租赁</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="showToast('导出功能演示')">📥 导出Excel</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>车牌号</th><th>车型</th><th>类型</th><th>归属</th><th>参保状态</th><th>绑定驾驶员</th><th>驾驶评分</th><th>操作</th></tr></thead>
+        <tbody id="vehicleTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== 驾驶员管理 ===== -->
+<div class="page-section" id="page-drivers">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">已绑定驾驶员</div><div class="value">456</div></div>
+    <div class="stat-card"><div class="label">平均评分</div><div class="value" style="color:var(--primary);">82.5</div></div>
+    <div class="stat-card"><div class="label">风险驾驶员</div><div class="value" style="color:var(--danger);">12</div></div>
+    <div class="stat-card"><div class="label">本月新增</div><div class="value" style="color:var(--success);">8</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>🧑‍✈️ 驾驶员列表</h3><button class="btn btn-primary btn-sm" onclick="showToast('批量导入功能演示')">📥 批量导入</button></div>
+    <div class="table-toolbar">
+      <input type="text" id="driverSearch" placeholder="🔍 搜索姓名/手机号..." oninput="filterDrivers()" style="width:220px;" />
+      <select id="driverStatusFilter" onchange="filterDrivers()">
+        <option value="">全部状态</option>
+        <option value="已绑定">已绑定</option>
+        <option value="未绑定">未绑定</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="showToast('生成邀请码')">🎫 生成邀请码</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>姓名</th><th>手机号</th><th>准驾车型</th><th>绑定车辆</th><th>班次</th><th>评分</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody id="driverTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== 安全管理看板 ===== -->
+<div class="page-section" id="page-safety">
+  <!-- 评分总览 -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="icon-box blue">⭐</div>
+      <div class="label">企业平均评分</div>
+      <div class="value">82.5</div>
+      <div class="change up">↑ 3.2 较上月</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box green">✅</div>
+      <div class="label">优秀（≥90分）</div>
+      <div class="value">186</div>
+      <div class="change up">占比 56.7%</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box orange">⚠️</div>
+      <div class="label">风险驾驶员（<70分）</div>
+      <div class="value">12</div>
+      <div class="change down">↑ 3 较上月</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon-box red">📊</div>
+      <div class="label">本月出险率</div>
+      <div class="value">2.7%</div>
+      <div class="change up">↓ 0.5% 较上月</div>
+    </div>
+  </div>
+
+  <!-- 评分分布 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div class="card">
+      <div class="card-header"><h3>📊 评分分布</h3></div>
+      <div style="padding:16px 0;">
+        <div style="margin-bottom:12px;"><span style="font-size:12px;color:var(--gray-600);display:flex;justify-content:space-between;margin-bottom:4px;"><span>优秀（≥90）</span><span>186人</span></span><div class="progress-bar"><div class="fill" style="width:56.7%;background:var(--success);"></div></div></div>
+        <div style="margin-bottom:12px;"><span style="font-size:12px;color:var(--gray-600);display:flex;justify-content:space-between;margin-bottom:4px;"><span>良好（80-89）</span><span>85人</span></span><div class="progress-bar"><div class="fill" style="width:25.9%;background:var(--primary);"></div></div></div>
+        <div style="margin-bottom:12px;"><span style="font-size:12px;color:var(--gray-600);display:flex;justify-content:space-between;margin-bottom:4px;"><span>一般（70-79）</span><span>45人</span></span><div class="progress-bar"><div class="fill" style="width:13.7%;background:var(--warning);"></div></div></div>
+        <div><span style="font-size:12px;color:var(--gray-600);display:flex;justify-content:space-between;margin-bottom:4px;"><span>较差（<70）</span><span>12人</span></span><div class="progress-bar"><div class="fill" style="width:3.7%;background:var(--danger);"></div></div></div>
+      </div>
+    </div>
+
+    <!-- 月度出险趋势 -->
+    <div class="card">
+      <div class="card-header"><h3>📈 月度出险趋势</h3></div>
+      <div class="bar-chart" id="accidentChart"></div>
+      <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--gray-400);">2025年4月 - 2026年3月</div>
+    </div>
+  </div>
+
+  <!-- 风险驾驶员预警 -->
+  <div class="card">
+    <div class="card-header"><h3>⚠️ 风险驾驶员预警（评分<70）</h3></div>
+    <table>
+      <thead><tr><th>驾驶员</th><th>绑定车辆</th><th>当前评分</th><th>评分趋势</th><th>出险次数</th><th>操作</th></tr></thead>
+      <tbody>
+        <tr><td>王大力</td><td>京B·67890</td><td><span style="color:var(--danger);font-weight:600;">52</span></td><td style="color:var(--danger);">↓ 持续下降</td><td>3</td><td><button class="btn btn-danger btn-sm">通知培训</button></td></tr>
+        <tr><td>赵小飞</td><td>京A·23456</td><td><span style="color:var(--danger);font-weight:600;">58</span></td><td style="color:var(--danger);">↓ 下降中</td><td>2</td><td><button class="btn btn-danger btn-sm">通知培训</button></td></tr>
+        <tr><td>陈建国</td><td>京C·90123</td><td><span style="color:var(--warning);font-weight:600;">65</span></td><td style="color:var(--warning);">→ 持平</td><td>1</td><td><button class="btn btn-warning btn-sm">关注</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 高管可见：跨分司对比 -->
+  <div class="card hidden" id="crossCompanyCompare">
+    <div class="card-header"><h3>🏢 跨分司安全对比</h3></div>
+    <div style="padding:8px 0;">
+      <div class="compare-bar"><div class="company-name">北京一分司</div><div class="bar-bg"><div class="bar-fill" style="width:82.5%;background:var(--success);"></div></div><div class="score" style="color:var(--success);">82.5</div></div>
+      <div class="compare-bar"><div class="company-name">北京二分司</div><div class="bar-bg"><div class="bar-fill" style="width:78.3%;background:var(--primary);"></div></div><div class="score" style="color:var(--primary);">78.3</div></div>
+      <div class="compare-bar"><div class="company-name">上海分司</div><div class="bar-bg"><div class="bar-fill" style="width:85.1%;background:var(--success);"></div></div><div class="score" style="color:var(--success);">85.1</div></div>
+      <div class="compare-bar"><div class="company-name">广州分司</div><div class="bar-bg"><div class="bar-fill" style="width:71.8%;background:var(--warning);"></div></div><div class="score" style="color:var(--warning);">71.8</div></div>
+      <div class="compare-bar"><div class="company-name">深圳分司</div><div class="bar-bg"><div class="bar-fill" style="width:80.2%;background:var(--primary);"></div></div><div class="score" style="color:var(--primary);">80.2</div></div>
+      <div class="compare-bar"><div class="company-name">成都分司</div><div class="bar-bg"><div class="bar-fill" style="width:68.5%;background:var(--danger);"></div></div><div class="score" style="color:var(--danger);">68.5</div></div>
+    </div>
+    <div style="margin-top:12px;padding:12px;background:var(--gray-50);border-radius:8px;font-size:12px;color:var(--gray-600);">
+      📌 <strong>行业平均：75.3分</strong> · 本企业综合排名：<strong style="color:var(--success);">2/6</strong> · 较上月上升1位
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== 案件管理 ===== -->
+<div class="page-section" id="page-cases">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">案件总数（近6月）</div><div class="value">47</div></div>
+    <div class="stat-card"><div class="label">处理中</div><div class="value" style="color:var(--warning);">8</div></div>
+    <div class="stat-card"><div class="label">已结案</div><div class="value" style="color:var(--success);">36</div></div>
+    <div class="stat-card"><div class="label">待审核</div><div class="value" style="color:var(--danger);">3</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>📋 案件列表</h3></div>
+    <div class="table-toolbar">
+      <input type="text" id="caseSearch" placeholder="🔍 搜索案件号/车牌号..." oninput="filterCases()" style="width:220px;" />
+      <select id="caseStatusFilter" onchange="filterCases()">
+        <option value="">全部状态</option>
+        <option value="待审核">待审核</option>
+        <option value="审核通过">审核通过</option>
+        <option value="审核驳回">审核驳回</option>
+        <option value="处理中">处理中</option>
+        <option value="已结案">已结案</option>
+        <option value="已关闭">已关闭</option>
+      </select>
+      <select id="caseLevelFilter" onchange="filterCases()">
+        <option value="">全部级别</option>
+        <option value="紧急">紧急</option>
+        <option value="一般">一般</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="showToast('导出功能演示')">📥 导出</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>案件号</th><th>车牌号</th><th>事故类型</th><th>级别</th><th>金额(元)</th><th>状态</th><th>日期</th><th>操作</th></tr></thead>
+        <tbody id="caseTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===== 财务管理 ===== -->
+<div class="page-section" id="page-finance">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="icon-box blue">💳</div><div class="label">年度统筹费总额</div><div class="value">¥486万</div></div>
+    <div class="stat-card"><div class="icon-box green">✅</div><div class="label">已缴费</div><div class="value" style="color:var(--success);">¥432万</div></div>
+    <div class="stat-card"><div class="icon-box orange">⏳</div><div class="label">待缴费</div><div class="value" style="color:var(--warning);">¥54万</div></div>
+    <div class="stat-card"><div class="icon-box red">📉</div><div class="label">年度退费总额</div><div class="value">¥18.6万</div></div>
+  </div>
+
+  <!-- 缴费单列表 -->
+  <div class="card">
+    <div class="card-header"><h3>💳 缴费单列表</h3></div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>缴费单号</th><th>车辆数</th><th>金额(元)</th><th>缴费状态</th><th>缴费日期</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>PAY-2026-001</td><td>86</td><td>¥128,600</td><td><span class="badge badge-active">已缴费</span></td><td>2026-01-15</td><td><button class="btn btn-outline btn-sm" onclick="showToast('查看缴费单详情')">详情</button></td></tr>
+          <tr><td>PAY-2026-002</td><td>42</td><td>¥63,000</td><td><span class="badge badge-active">已缴费</span></td><td>2026-02-10</td><td><button class="btn btn-outline btn-sm" onclick="showToast('查看缴费单详情')">详情</button></td></tr>
+          <tr><td>PAY-2026-003</td><td>98</td><td>¥147,000</td><td><span class="badge badge-active">已缴费</span></td><td>2026-03-05</td><td><button class="btn btn-outline btn-sm" onclick="showToast('查看缴费单详情')">详情</button></td></tr>
+          <tr><td>PAY-2026-004</td><td>35</td><td>¥52,500</td><td><span class="badge badge-expiring">待缴费</span></td><td>—</td><td><button class="btn btn-primary btn-sm" onclick="showToast('去缴费功能演示')">去缴费</button></td></tr>
+          <tr><td>PAY-2026-005</td><td>67</td><td>¥100,500</td><td><span class="badge badge-pending">待确认</span></td><td>—</td><td><button class="btn btn-outline btn-sm" onclick="showToast('确认缴费单')">确认</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 退费记录 -->
+  <div class="card">
+    <div class="card-header"><h3>📉 退费记录</h3></div>
+    <table>
+      <thead><tr><th>退费单号</th><th>车牌号</th><th>退费原因</th><th>退费金额(元)</th><th>退费状态</th><th>申请日期</th></tr></thead>
+      <tbody>
+        <tr><td>REF-2026-001</td><td>京A·11111</td><td>车辆报废</td><td>¥3,200</td><td><span class="badge badge-active">已退费</span></td><td>2026-02-20</td></tr>
+        <tr><td>REF-2026-002</td><td>京B·34567</td><td>车辆转出</td><td>¥5,800</td><td><span class="badge badge-active">已退费</span></td><td>2026-03-01</td></tr>
+        <tr><td>REF-2026-003</td><td>京C·78901</td><td>车辆报废</td><td>¥4,100</td><td><span class="badge badge-processing">处理中</span></td><td>2026-03-18</td></tr>
+        <tr><td>REF-2026-004</td><td>京A·56789</td><td>企业退统</td><td>¥2,900</td><td><span class="badge badge-expired">已驳回</span></td><td>2026-03-10</td></tr>
+        <tr><td>REF-2026-005</td><td>京D·23456</td><td>车辆转出</td><td>¥2,600</td><td><span class="badge badge-processing">处理中</span></td><td>2026-03-22</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+  </div><!-- end main-content -->
+</div><!-- end app-layout -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">详情</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;top:80px;right:24px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;z-index:9999;pointer-events:none;"></div>
+
+
+<script>
+// ===== MOCK DATA =====
+const vehicleData = [
+  { plate:'京A·12345', model:'大众朗逸', type:'出租车', owner:'自有', status:'在统', driver:'张伟', shift:'白班', score:91, vin:'LSVAU2189N2101234', regDate:'2022-03-15', expiry:'2027-03-14' },
+  { plate:'京A·23456', model:'丰田卡罗拉', type:'出租车', owner:'自有', status:'在统', driver:'赵小飞', shift:'白班', score:58, vin:'LVSHDFAL5KN123456', regDate:'2023-01-20', expiry:'2028-01-19' },
+  { plate:'京B·34567', model:'比亚迪秦PLUS', type:'网约车', owner:'自有', status:'在统', driver:'李强', shift:'全天', score:88, vin:'LGXC16DF2N0123456', regDate:'2023-06-10', expiry:'2028-06-09' },
+  { plate:'京B·45678', model:'广汽埃安S', type:'网约车', owner:'挂靠', status:'即将到期', driver:'刘洋', shift:'白班', score:79, vin:'LGBH12E10NY123456', regDate:'2022-08-01', expiry:'2027-07-31' },
+  { plate:'京B·56789', model:'本田雅阁', type:'租赁', owner:'自有', status:'已过期', driver:'陈磊', shift:'夜班', score:85, vin:'LHGCV2645NB123456', regDate:'2021-11-20', expiry:'2026-11-19' },
+  { plate:'京C·67890', model:'大众帕萨特', type:'客运', owner:'自有', status:'在统', driver:'王大力', shift:'全天', score:52, vin:'LSVAU2190N2123456', regDate:'2022-05-08', expiry:'2027-05-07' },
+  { plate:'京C·78901', model:'丰田凯美瑞', type:'客运', owner:'挂靠', status:'在统', driver:'孙明', shift:'白班', score:92, vin:'4T1BZ1HK5NU123456', regDate:'2023-09-12', expiry:'2028-09-11' },
+  { plate:'京A·89012', model:'比亚迪宋PLUS', type:'租赁', owner:'自有', status:'即将到期', driver:'周鑫', shift:'全天', score:76, vin:'LGXC74DF5P0123456', regDate:'2022-12-01', expiry:'2027-11-30' },
+  { plate:'京D·90123', model:'吉利帝豪', type:'出租车', owner:'自有', status:'在统', driver:'陈建国', shift:'夜班', score:65, vin:'LBVRR9012N0123456', regDate:'2023-03-22', expiry:'2028-03-21' },
+  { plate:'京D·01234', model:'长安逸动', type:'网约车', owner:'挂靠', status:'已过期', driver:'吴涛', shift:'白班', score:73, vin:'LS4ASB2R0N0123456', regDate:'2021-07-15', expiry:'2026-07-14' },
+];
+
+const driverData = [
+  { name:'张伟', phone:'138****1234', license:'C1', vehicle:'京A·12345', shift:'白班', score:91, status:'已绑定' },
+  { name:'李强', phone:'139****5678', license:'C1', vehicle:'京B·34567', shift:'全天', score:88, status:'已绑定' },
+  { name:'刘洋', phone:'136****9012', license:'C1', vehicle:'京B·45678', shift:'白班', score:79, status:'已绑定' },
+  { name:'陈磊', phone:'137****3456', license:'B2', vehicle:'京B·56789', shift:'夜班', score:85, status:'已绑定' },
+  { name:'王大力', phone:'135****7890', license:'A2', vehicle:'京C·67890', shift:'全天', score:52, status:'已绑定' },
+  { name:'孙明', phone:'158****2345', license:'C1', vehicle:'京C·78901', shift:'白班', score:92, status:'已绑定' },
+  { name:'赵小飞', phone:'186****6789', license:'C1', vehicle:'京A·23456', shift:'白班', score:58, status:'已绑定' },
+  { name:'周鑫', phone:'152****0123', license:'C1', vehicle:'京A·89012', shift:'全天', score:76, status:'已绑定' },
+  { name:'陈建国', phone:'133****4567', license:'A1', vehicle:'京D·90123', shift:'夜班', score:65, status:'已绑定' },
+  { name:'吴涛', phone:'155****8901', license:'C1', vehicle:'京D·01234', shift:'白班', score:73, status:'已绑定' },
+];
+
+const caseData = [
+  { id:'CASE-2026-001', plate:'京A·12345', type:'追尾碰撞', level:'一般', amount:12500, status:'已结案', date:'2026-01-08' },
+  { id:'CASE-2026-002', plate:'京C·67890', type:'侧翻事故', level:'紧急', amount:86000, status:'处理中', date:'2026-01-22' },
+  { id:'CASE-2026-003', plate:'京B·34567', type:'剐蹭', level:'一般', amount:3200, status:'已结案', date:'2026-02-05' },
+  { id:'CASE-2026-004', plate:'京A·23456', type:'追尾碰撞', level:'紧急', amount:45000, status:'待审核', date:'2026-02-18' },
+  { id:'CASE-2026-005', plate:'京D·90123', type:'行人碰撞', level:'紧急', amount:120000, status:'待审核', date:'2026-02-28' },
+  { id:'CASE-2026-006', plate:'京B·45678', type:'剐蹭', level:'一般', amount:5800, status:'已结案', date:'2026-03-02' },
+  { id:'CASE-2026-007', plate:'京C·78901', type:'玻璃破损', level:'一般', amount:2800, status:'审核通过', date:'2026-03-08' },
+  { id:'CASE-2026-008', plate:'京A·89012', type:'追尾碰撞', level:'一般', amount:18500, status:'处理中', date:'2026-03-10' },
+  { id:'CASE-2026-009', plate:'京B·56789', type:'多车连环', level:'紧急', amount:230000, status:'待审核', date:'2026-03-14' },
+  { id:'CASE-2026-010', plate:'京D·01234', type:'剐蹭', level:'一般', amount:4100, status:'已结案', date:'2026-03-16' },
+  { id:'CASE-2026-011', plate:'京A·12345', type:'倒车碰撞', level:'一般', amount:6500, status:'审核驳回', date:'2026-03-18' },
+  { id:'CASE-2026-012', plate:'京C·67890', type:'货物散落', level:'一般', amount:9200, status:'处理中', date:'2026-03-20' },
+];
+
+const accidentChartMonths = ['4月','5月','6月','7月','8月','9月','10月','11月','12月','1月','2月','3月'];
+const accidentChartData = [5, 3, 7, 4, 6, 2, 5, 8, 3, 6, 9, 4];
+</script>
+
+
+<script>
+// ===== STATE =====
+let currentRole = 'admin';
+let currentPage = 'workbench';
+
+// ===== ROLE DEFINITIONS =====
+const roleConfig = {
+  admin: { name:'分司管理员', avatar:'管', pages:['workbench','vehicles','drivers','safety','cases','finance'], navItems:['workbench','vehicles','drivers','safety','cases','finance'] },
+  safety: { name:'安全员', avatar:'安', pages:['workbench','vehicles','drivers','safety','cases'], navItems:['workbench','safety','cases','vehicles','drivers'] },
+  exec: { name:'高管', avatar:'高', pages:['workbench','safety','cases','finance'], navItems:['workbench','safety','finance','cases'] }
+};
+
+// ===== LOGIN =====
+function selectLoginRole(role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.toggle('active', b.dataset.role === role));
+}
+
+function doLogin() {
+  const role = document.querySelector('.role-btn.active')?.dataset.role || 'admin';
+  currentRole = role;
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appLayout').style.display = 'block';
+  document.getElementById('roleSwitch').value = role;
+  applyRole();
+  switchPage('workbench');
+  renderAll();
+}
+
+function applyRole() {
+  const cfg = roleConfig[currentRole];
+  document.getElementById('currentRoleName').textContent = cfg.name;
+  document.querySelectorAll('.topbar .avatar')[0].textContent = cfg.avatar;
+
+  // Show/hide nav items
+  document.querySelectorAll('#sideNav .nav-item').forEach(item => {
+    const page = item.dataset.page;
+    item.style.display = cfg.navItems.includes(page) ? 'flex' : 'none';
+  });
+
+  // Show/hide cross-company compare for exec
+  const cc = document.getElementById('crossCompanyCompare');
+  if (cc) cc.classList.toggle('hidden', currentRole !== 'exec');
+
+  // Render todos based on role
+  renderTodos();
+}
+
+function switchRole(role) {
+  currentRole = role;
+  applyRole();
+  showToast('已切换为：' + roleConfig[role].name);
+  // Navigate to first available page if current is not accessible
+  if (!roleConfig[role].pages.includes(currentPage)) {
+    switchPage(roleConfig[role].pages[0]);
+  }
+  renderAll();
+}
+
+// ===== NAVIGATION =====
+function switchPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('#sideNav .nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  const titles = { workbench:'工作台', vehicles:'车辆管理', drivers:'驾驶员管理', safety:'安全管理看板', cases:'案件管理', finance:'财务管理' };
+  document.getElementById('pageTitle').textContent = titles[page] || '';
+}
+
+// ===== RENDER ALL =====
+function renderAll() {
+  renderVehicles();
+  renderDrivers();
+  renderCases();
+  renderAccidentChart();
+  renderTodos();
+}
+
+// ===== TODO LIST =====
+function renderTodos() {
+  const list = document.getElementById('todoList');
+  if (!list) return;
+  let todos = [];
+  if (currentRole === 'admin') {
+    todos = [
+      { priority:'urgent', title:'3辆车辆统筹即将到期（3天内）', meta:'紧急 · 统筹管理', page:'vehicles' },
+      { priority:'important', title:'案件CASE-2026-004待补充材料', meta:'重要 · 案件管理', page:'cases' },
+      { priority:'normal', title:'缴费单PAY-2026-004待缴费', meta:'普通 · 财务管理', page:'finance' },
+      { priority:'normal', title:'5名驾驶员评分下降需关注', meta:'普通 · 安全管理', page:'safety' },
+    ];
+  } else if (currentRole === 'safety') {
+    todos = [
+      { priority:'urgent', title:'事故申报CASE-2026-005待审核（行人碰撞）', meta:'紧急 · 事故申报审核', page:'cases' },
+      { priority:'urgent', title:'事故申报CASE-2026-009待审核（多车连环）', meta:'紧急 · 事故申报审核', page:'cases' },
+      { priority:'important', title:'事故申报CASE-2026-004待审核（追尾碰撞）', meta:'重要 · 事故申报审核', page:'cases' },
+      { priority:'normal', title:'王大力评分持续下降至52分', meta:'普通 · 风险预警', page:'safety' },
+    ];
+  } else {
+    todos = [
+      { priority:'urgent', title:'CASE-2026-009大额互助给付确认（¥230,000）', meta:'紧急 · 给付确认', page:'cases' },
+      { priority:'important', title:'退统申请REF-2026-004待审批', meta:'重要 · 退统审批', page:'finance' },
+      { priority:'normal', title:'3月安全报告已生成，请查阅', meta:'普通 · 报告', page:'safety' },
+    ];
+  }
+  document.getElementById('todoCount').textContent = todos.length + ' 项待处理';
+  list.innerHTML = todos.map(t => `
+    <div class="todo-item" onclick="switchPage('${t.page}')">
+      <div class="priority ${t.priority}"></div>
+      <div class="info">
+        <div class="title-text">${t.title}</div>
+        <div class="meta">${t.meta}</div>
+      </div>
+      <span style="color:var(--gray-400);font-size:16px;">›</span>
+    </div>
+  `).join('');
+}
+
+// ===== VEHICLES =====
+function renderVehicles(data) {
+  const tbody = document.getElementById('vehicleTableBody');
+  if (!tbody) return;
+  const rows = data || vehicleData;
+  tbody.innerHTML = rows.map(v => {
+    const statusBadge = v.status === '在统' ? 'badge-active' : v.status === '即将到期' ? 'badge-expiring' : 'badge-expired';
+    const scoreColor = v.score >= 90 ? 'var(--success)' : v.score >= 70 ? 'var(--primary)' : 'var(--danger)';
+    return `<tr>
+      <td><strong>${v.plate}</strong></td>
+      <td>${v.model}</td>
+      <td>${v.type}</td>
+      <td><span class="badge ${v.owner==='自有'?'badge-active':'badge-pending'}">${v.owner}</span></td>
+      <td><span class="badge ${statusBadge}">${v.status}</span></td>
+      <td>${v.driver}</td>
+      <td><span style="color:${scoreColor};font-weight:600;">${v.score}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="showVehicleDetail('${v.plate}')">详情</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterVehicles() {
+  const q = document.getElementById('vehicleSearch').value.toLowerCase();
+  const status = document.getElementById('vehicleStatusFilter').value;
+  const type = document.getElementById('vehicleTypeFilter').value;
+  const filtered = vehicleData.filter(v => {
+    if (q && !v.plate.toLowerCase().includes(q) && !v.model.toLowerCase().includes(q)) return false;
+    if (status && v.status !== status) return false;
+    if (type && v.type !== type) return false;
+    return true;
+  });
+  renderVehicles(filtered);
+}
+
+function showVehicleDetail(plate) {
+  const v = vehicleData.find(x => x.plate === plate);
+  if (!v) return;
+  document.getElementById('modalTitle').textContent = '车辆详情 - ' + v.plate;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div><span style="color:var(--gray-400);font-size:12px;">车牌号</span><div style="font-weight:600;">${v.plate}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">车型</span><div style="font-weight:600;">${v.model}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">车辆类型</span><div>${v.type}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">车辆归属</span><div>${v.owner}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">VIN码</span><div style="font-size:12px;font-family:monospace;">${v.vin}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">注册日期</span><div>${v.regDate}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">参保状态</span><div>${v.status}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">驾驶评分</span><div style="font-weight:700;color:${v.score>=90?'var(--success)':v.score>=70?'var(--primary)':'var(--danger)'};">${v.score}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">绑定驾驶员</span><div>${v.driver}（${v.shift}）</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">到期日期</span><div>${v.expiry}</div></div>
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    ${currentRole==='admin'?'<button class="btn btn-primary btn-sm" onclick="showToast(\'编辑功能演示\')">编辑车辆</button>':''}
+    ${currentRole==='admin'?'<button class="btn btn-outline btn-sm" onclick="showToast(\'退统申请演示\')">退统申请</button>':''}
+    <button class="btn btn-outline btn-sm" onclick="closeModal()">关闭</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+// ===== DRIVERS =====
+function renderDrivers(data) {
+  const tbody = document.getElementById('driverTableBody');
+  if (!tbody) return;
+  const rows = data || driverData;
+  tbody.innerHTML = rows.map(d => {
+    const scoreColor = d.score >= 90 ? 'var(--success)' : d.score >= 70 ? 'var(--primary)' : 'var(--danger)';
+    const canBind = currentRole === 'admin';
+    const canUnbind = currentRole === 'admin' && d.status === '已绑定';
+    return `<tr>
+      <td><strong>${d.name}</strong></td>
+      <td>${d.phone}</td>
+      <td>${d.license}</td>
+      <td>${d.status === '已绑定' ? d.vehicle : '—'}</td>
+      <td>${d.status === '已绑定' ? d.shift : '—'}</td>
+      <td><span style="color:${scoreColor};font-weight:600;">${d.score}</span></td>
+      <td><span class="badge ${d.status==='已绑定'?'badge-active':'badge-pending'}">${d.status}</span></td>
+      <td>
+        ${canBind && d.status==='未绑定'?'<button class="btn btn-primary btn-sm" onclick="showToast(\'绑定车辆功能演示\')">绑定</button>':''}
+        ${canUnbind?'<button class="btn btn-danger btn-sm" onclick="showToast(\'解绑功能演示\')">解绑</button>':''}
+        <button class="btn btn-outline btn-sm" onclick="showDriverDetail('${d.name}')">详情</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterDrivers() {
+  const q = document.getElementById('driverSearch').value.toLowerCase();
+  const status = document.getElementById('driverStatusFilter').value;
+  const filtered = driverData.filter(d => {
+    if (q && !d.name.includes(q) && !d.phone.includes(q)) return false;
+    if (status && d.status !== status) return false;
+    return true;
+  });
+  renderDrivers(filtered);
+}
+
+function showDriverDetail(name) {
+  const d = driverData.find(x => x.name === name);
+  if (!d) return;
+  document.getElementById('modalTitle').textContent = '驾驶员详情 - ' + d.name;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div><span style="color:var(--gray-400);font-size:12px;">姓名</span><div style="font-weight:600;">${d.name}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">手机号</span><div>${d.phone}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">准驾车型</span><div>${d.license}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">绑定车辆</span><div>${d.vehicle}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">班次</span><div>${d.shift}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">驾驶评分</span><div style="font-weight:700;font-size:20px;color:${d.score>=90?'var(--success)':d.score>=70?'var(--primary)':'var(--danger)'};">${d.score}</div></div>
+    </div>
+    <div style="margin-top:16px;padding:12px;background:var(--gray-50);border-radius:8px;">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:8px;">评分趋势（近6月）</div>
+      <div style="display:flex;align-items:end;gap:4px;height:60px;">
+        ${[65,70,68,74,78,d.score].map((s,i) => `<div style="flex:1;background:${s>=80?'var(--success)':s>=70?'var(--primary)':'var(--warning)'};height:${Math.max(10,s/100*60)}px;border-radius:3px 3px 0 0;" title="${s}"></div>`).join('')}
+      </div>
+      <div style="display:flex;gap:4px;margin-top:4px;">${['10月','11月','12月','1月','2月','3月'].map(m => `<div style="flex:1;font-size:9px;color:var(--gray-400);text-align:center;">${m}</div>`).join('')}</div>
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = '<button class="btn btn-outline btn-sm" onclick="closeModal()">关闭</button>';
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+// ===== CASES =====
+function renderCases(data) {
+  const tbody = document.getElementById('caseTableBody');
+  if (!tbody) return;
+  const rows = data || caseData;
+  tbody.innerHTML = rows.map(c => {
+    const statusBadge = {
+      '待审核':'badge-pending','审核通过':'badge-approved','审核驳回':'badge-rejected',
+      '处理中':'badge-processing','已结案':'badge-closed','已关闭':'badge-closed'
+    }[c.status] || 'badge-pending';
+    const levelBadge = c.level === '紧急' ? 'badge-urgent' : 'badge-normal';
+    const canReview = currentRole === 'safety' && c.status === '待审核';
+    return `<tr>
+      <td><strong>${c.id}</strong></td>
+      <td>${c.plate}</td>
+      <td>${c.type}</td>
+      <td><span class="badge ${levelBadge}">${c.level}</span></td>
+      <td>¥${c.amount.toLocaleString()}</td>
+      <td><span class="badge ${statusBadge}">${c.status}</span></td>
+      <td>${c.date}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="showCaseDetail('${c.id}')">详情</button>
+        ${canReview ? `<button class="btn btn-success btn-sm" onclick="reviewCase('${c.id}','通过')">通过</button><button class="btn btn-danger btn-sm" onclick="reviewCase('${c.id}','驳回')">驳回</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterCases() {
+  const q = document.getElementById('caseSearch').value.toLowerCase();
+  const status = document.getElementById('caseStatusFilter').value;
+  const level = document.getElementById('caseLevelFilter').value;
+  const filtered = caseData.filter(c => {
+    if (q && !c.id.toLowerCase().includes(q) && !c.plate.includes(q)) return false;
+    if (status && c.status !== status) return false;
+    if (level && c.level !== level) return false;
+    return true;
+  });
+  renderCases(filtered);
+}
+
+function showCaseDetail(id) {
+  const c = caseData.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('modalTitle').textContent = '案件详情 - ' + c.id;
+  document.getElementById('modalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      <div><span style="color:var(--gray-400);font-size:12px;">案件号</span><div style="font-weight:600;">${c.id}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">车牌号</span><div style="font-weight:600;">${c.plate}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">事故类型</span><div>${c.type}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">事故级别</span><div><span class="badge ${c.level==='紧急'?'badge-urgent':'badge-normal'}">${c.level}</span></div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">预计金额</span><div style="font-weight:700;font-size:18px;color:var(--danger);">¥${c.amount.toLocaleString()}</div></div>
+      <div><span style="color:var(--gray-400);font-size:12px;">当前状态</span><div><span class="badge ${{'待审核':'badge-pending','审核通过':'badge-approved','审核驳回':'badge-rejected','处理中':'badge-processing','已结案':'badge-closed','已关闭':'badge-closed'}[c.status]}">${c.status}</span></div></div>
+    </div>
+    <h4 style="font-size:14px;margin-bottom:12px;">📋 处理时间线</h4>
+    <div class="timeline">
+      <div class="timeline-item done"><div class="time">${c.date} 08:30</div><div class="title">事故发生</div><div class="desc">${c.plate} 发生${c.type}，驾驶员已报警并报保险</div></div>
+      <div class="timeline-item done"><div class="time">${c.date} 09:15</div><div class="title">事故申报提交</div><div class="desc">驾驶员通过小程序提交事故申报，上传现场照片</div></div>
+      <div class="timeline-item ${c.status==='审核驳回'?'rejected':c.status==='待审核'?'pending':'done'}"><div class="time">${c.date} 10:00</div><div class="title">企业内部审核</div><div class="desc">${c.status==='待审核'?'等待安全员审核':c.status==='审核驳回'?'审核驳回 - 材料不完整':'审核通过'}</div></div>
+      <div class="timeline-item ${c.status==='处理中'||c.status==='已结案'?'done':'pending'}"><div class="time">${c.status==='处理中'||c.status==='已结案'?c.date+' 14:00':'待定'}</div><div class="title">平台受理</div><div class="desc">${c.status==='处理中'||c.status==='已结案'?'平台已受理，指派处理员':'等待平台受理'}</div></div>
+      <div class="timeline-item ${c.status==='已结案'?'done':'pending'}"><div class="time">${c.status==='已结案'?'${c.date} +5天':'待定'}</div><div class="title">损失评估与给付</div><div class="desc">${c.status==='已结案'?'评估完成，互助给付已打款':'等待处理'}</div></div>
+    </div>
+  `;
+  const canReview = currentRole === 'safety' && c.status === '待审核';
+  document.getElementById('modalFooter').innerHTML = `
+    ${canReview ? '<button class="btn btn-success btn-sm" onclick="reviewCase(\''+c.id+'\',\'通过\')">✅ 审核通过</button><button class="btn btn-danger btn-sm" onclick="reviewCase(\''+c.id+'\',\'驳回\')">❌ 审核驳回</button>' : ''}
+    <button class="btn btn-outline btn-sm" onclick="closeModal()">关闭</button>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function reviewCase(id, action) {
+  const c = caseData.find(x => x.id === id);
+  if (c) {
+    c.status = action === '通过' ? '审核通过' : '审核驳回';
+    renderCases();
+    renderTodos();
+    closeModal();
+    showToast(`案件 ${id} 已${action}`);
+  }
+}
+
+// ===== ACCIDENT CHART =====
+function renderAccidentChart() {
+  const chart = document.getElementById('accidentChart');
+  if (!chart) return;
+  const max = Math.max(...accidentChartData);
+  chart.innerHTML = accidentChartData.map((val, i) => {
+    const h = (val / max * 140) + 10;
+    const color = val >= 7 ? 'var(--danger)' : val >= 5 ? 'var(--warning)' : 'var(--primary)';
+    return `<div class="bar" style="height:${h}px;background:${color};"><div class="val">${val}</div><div class="lbl">${accidentChartMonths[i]}</div></div>`;
+  }).join('');
+}
+
+// ===== MODAL =====
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ===== TOAST =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  setTimeout(() => toast.style.opacity = '0', 2000);
+}
+</script>
+</body>
+</html>
+
