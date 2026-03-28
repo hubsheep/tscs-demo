@@ -1,0 +1,529 @@
+
+          <button class="btn" onclick="showPage('enterprise','ent-home')">取消</button>
+          <button class="btn btn-primary" onclick="toast('提交成功，已通知平台')">提交报案</button>
+        </div>
+      </div>
+    </div>
+    <!-- 财务管理 -->
+    <div id="ent-finance" class="page">
+      <div class="section-title">财务管理</div>
+      <div class="stat-grid stat-grid-3">
+        <div class="stat-card"><div class="label">本年度已缴统筹费</div><div class="value" style="color:var(--accent-enterprise)">¥12,800,000</div></div>
+        <div class="stat-card"><div class="label">本年度给付总额</div><div class="value">¥1,280,000</div></div>
+        <div class="stat-card"><div class="label">给付率</div><div class="value">10%</div><div class="sub text-success">低于均值</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">缴费单列表</div>
+        <table>
+          <thead><tr><th>缴费单号</th><th>车辆数</th><th>总金额</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>ZF-2026-001</td><td>3,200辆</td><td>¥12,800,000</td><td><span class="badge badge-green">已缴</span></td><td>2026-01-05</td><td><button class="btn btn-sm">详情</button></td></tr>
+            <tr><td>ZF-2025-002</td><td>2,800辆</td><td>¥10,500,000</td><td><span class="badge badge-gray">已过期</span></td><td>2025-01-10</td><td><button class="btn btn-sm">详情</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 续统管理 -->
+    <div id="ent-renew" class="page">
+      <div class="section-title">续统管理</div>
+      <div class="card">
+        <div class="section-title">即将到期车辆（未来30天）</div>
+        <table>
+          <thead><tr><th><input type="checkbox"> 全选</th><th>车牌</th><th>车型</th><th>当前方案</th><th>到期日期</th><th>预估新费</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox" checked></td><td>京C·66789</td><td>轻型厢式货车</td><td>标准方案</td><td>2026-04-10</td><td>¥4,212</td></tr>
+            <tr><td><input type="checkbox" checked></td><td>京E·11230</td><td>中型普通客车</td><td>基础方案</td><td>2026-04-15</td><td>¥3,510</td></tr>
+            <tr><td><input type="checkbox"></td><td>京F·33880</td><td>大型普通客车</td><td>标准方案</td><td>2026-04-20</td><td>¥5,860</td></tr>
+          </tbody>
+        </table>
+        <div class="flex gap-8 mt-16">
+          <button class="btn btn-primary" onclick="toast('续统缴费单已生成，请确认后对公转账')">生成续统缴费单</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== DRIVER (驾驶员端) ========== -->
+<div id="term-driver" class="layout term-content" data-term="driver" style="display:none">
+  <div class="sidebar" style="background:#fff5e6">
+    <div class="sidebar-header">
+      <div class="name" style="color:var(--accent-driver)">驾驶员端</div>
+      <div class="sub">欢迎，张伟</div>
+    </div>
+    <div class="sidebar-item active" onclick="showPage('driver','drv-home')">🏠 首页</div>
+    <div class="sidebar-item" onclick="showPage('driver','drv-report')">📋 事故报案</div>
+    <div class="sidebar-item" onclick="showPage('driver','drv-case')">📂 案件查询</div>
+    <div class="sidebar-item" onclick="showPage('driver','drv-score')">📊 驾驶评分</div>
+    <div class="sidebar-item" onclick="showPage('driver','drv-msg')">🔔 消息通知</div>
+  </div>
+  <div class="main">
+    <!-- 登录 -->
+    <div id="drv-login" class="page">
+      <div style="display:flex;justify-content:center;align-items:center;min-height:70vh">
+        <div class="card" style="width:320px;text-align:center">
+          <div style="font-size:40px;margin-bottom:8px">🚗</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:24px">驾驶员端</div>
+          <div class="form-group"><input class="form-control" placeholder="请输入手机号" value="138****5678"></div>
+          <div class="form-group" style="display:flex;gap:8px">
+            <input class="form-control" placeholder="验证码" style="flex:1">
+            <button class="btn" style="white-space:nowrap">获取验证码</button>
+          </div>
+          <button class="btn btn-orange" style="width:100%;justify-content:center" onclick="showPage('driver','drv-home')">登 录</button>
+        </div>
+      </div>
+    </div>
+    <!-- 首页 -->
+    <div id="drv-home" class="page active">
+      <div class="section-title">我的车辆</div>
+      <div class="card" style="border-left:4px solid var(--accent-driver)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:20px;font-weight:700;margin-bottom:4px">京A·88888</div>
+            <div style="font-size:12px;color:var(--text2)">绑定车辆 · 大型普通客车</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:28px;font-weight:700;color:var(--accent-driver)">78</div>
+            <div style="font-size:11px;color:var(--text2)">驾驶评分</div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-grid stat-grid-3 mt-16">
+        <div class="stat-card" style="cursor:pointer" onclick="showPage('driver','drv-case')"><div class="label">我的案件</div><div class="value" style="color:var(--accent-driver)">1</div><div class="sub">处理中</div></div>
+        <div class="stat-card"><div class="label">本月安全驾驶</div><div class="value" style="color:#52C41A">92</div><div class="sub">优秀</div></div>
+        <div class="stat-card"><div class="label">车队排名</div><div class="value">前15%</div><div class="sub">/ 3,200人</div></div>
+      </div>
+      <div class="card mt-16">
+        <div class="section-title">快捷功能</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="flow-card" onclick="showPage('driver','drv-report')">
+            <div class="fc-icon" style="background:rgba(250,140,22,.15)">📋</div>
+            <div class="fc-info"><div class="fc-title">事故报案</div><div class="fc-desc">发生事故？一键快速报案</div></div>
+          </div>
+          <div class="flow-card" onclick="showPage('driver','drv-score')">
+            <div class="fc-icon" style="background:rgba(82,196,26,.1)">📊</div>
+            <div class="fc-info"><div class="fc-title">驾驶评分</div><div class="fc-desc">查看详细评分与排名</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 事故报案 -->
+    <div id="drv-report" class="page">
+      <div class="section-title">事故报案</div>
+      <div class="card">
+        <div class="step-indicator">
+          <div class="step-dot active">1</div><div class="step-line"></div>
+          <div class="step-dot pending">2</div><div class="step-line"></div>
+          <div class="step-dot pending">3</div>
+        </div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:16px">Step 1 · 选择事故车辆</div>
+        <div class="form-group"><div class="form-label">事故车辆 *</div>
+          <select class="form-control"><option selected>京A·88888 - 张伟</option></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><div class="form-label">事故时间 *</div><input class="form-control" type="datetime-local" value="2026-03-28T09:15"></div>
+          <div class="form-group"><div class="form-label">事故地点 *</div><input class="form-control" placeholder="点击获取GPS定位" value="北京市朝阳区京通快速路"></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">责任划分 *</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> 全责</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp" checked> 主责</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> 同责</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> 次责</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> 无责</label>
+          </div>
+        </div>
+        <div class="form-group"><div class="form-label">事故描述</div><textarea class="form-control" rows="3" placeholder="请简要描述事故经过...">前车突然变道导致追尾，前车右后保险杠受损，本车前保险杠受损，无人伤。</textarea></div>
+        <div class="form-group">
+          <div class="form-label">现场照片（必填：全景1+双方受损部位各1）</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">📷</div>
+            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">📷</div>
+            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">📷</div>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">已上传 0/9 张</div>
+        </div>
+        <div class="flex gap-8 mt-16">
+          <button class="btn btn-orange" style="width:100%;justify-content:center" onclick="toast('报案提交成功！案件号：TSCS-2026-0328-0088')">提交报案</button>
+        </div>
+      </div>
+    </div>
+    <!-- 案件查询 -->
+    <div id="drv-case" class="page">
+      <div class="section-title">我的案件</div>
+      <div class="card">
+        <table>
+          <thead><tr><th>报案号</th><th>时间</th><th>车辆</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28</td><td>京A·88888</td>
+              <td><span class="badge badge-orange">处理中</span></td>
+              <td><button class="btn btn-sm btn-orange">查看</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- 驾驶评分 -->
+    <div id="drv-score" class="page">
+      <div class="section-title">驾驶评分详情</div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:56px;font-weight:700;color:var(--accent-driver)">78</div>
+        <span class="badge badge-orange" style="font-size:14px;padding:4px 12px">B级 · 良好</span>
+        <div style="font-size:12px;color:var(--text2);margin-top:8px">超过 85% 的同类车型驾驶员</div>
+      </div>
+      <div class="card mt-16">
+        <div class="section-title">各维度得分</div>
+        <canvas id="drv-chart" height="160"></canvas>
+      </div>
+      <div class="card mt-16">
+        <div class="section-title">近6个月趋势</div>
+        <canvas id="drv-trend" height="100"></canvas>
+      </div>
+    </div>
+    <!-- 消息通知 -->
+    <div id="drv-msg" class="page">
+      <div class="section-title">消息通知</div>
+      <div class="card">
+        <div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(22,119,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">📋</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;margin-bottom:3px">案件进展通知</div>
+            <div style="font-size:11px;color:var(--text2)">报案号 TSCS-2026-0328-0088 已受理，核损员赵强正在处理中。</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:4px">2026-03-28 10:30</div>
+          </div>
+          <span class="badge badge-orange">新</span>
+        </div>
+        <div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(82,196,26,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">📊</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600;margin-bottom:3px">驾驶评分更新</div>
+            <div style="font-size:11px;color:var(--text2)">您的驾驶评分已更新为78分，较上月提升2分。</div>
+            <div style="font-size:10px;color:var(--text2);margin-top:4px">2026-03-27 08:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FIELD (现场端) ========== -->
+<div id="term-field" class="layout term-content" data-term="field" style="display:none">
+  <div class="sidebar" style="background:#f5f0ff">
+    <div class="sidebar-header">
+      <div class="name" style="color:var(--accent-field)">现场端</div>
+      <div class="sub">核损员 · 赵强</div>
+    </div>
+    <div class="sidebar-item active" onclick="showPage('field','field-home')">📋 工作台</div>
+    <div class="sidebar-item" onclick="showPage('field','field-task')">📝 任务详情</div>
+    <div class="sidebar-item" onclick="showPage('field','field-checkin')">✔️ 到达签到</div>
+    <div class="sidebar-item" onclick="showPage('field','field-photo')">📷 现场拍照</div>
+    <div class="sidebar-item" onclick="showPage('field','field-record')">📄 笔录定责</div>
+    <div class="sidebar-item" onclick="showPage('field','field-eval')">💰 损失评估</div>
+    <div class="sidebar-item" onclick="showPage('field','field-approval')">✅ 审批中心</div>
+  </div>
+  <div class="main">
+    <!-- 工作台 -->
+    <div id="field-home" class="page active">
+      <div class="section-title">工作台</div>
+      <div class="stat-grid stat-grid-3">
+        <div class="stat-card"><div class="label">今日任务</div><div class="value" style="color:var(--accent-field)">3</div><div class="sub">待处理</div></div>
+        <div class="stat-card"><div class="label">本月完成</div><div class="value">48</div><div class="sub">平均4.2小时/件</div></div>
+        <div class="stat-card"><div class="label">平均处理时长</div><div class="value">4.2h</div></div>
+      </div>
+      <div class="section-title">待处理任务</div>
+      <div class="flow-card" onclick="showPage('field','field-task')">
+        <div class="fc-icon" style="background:rgba(114,46,209,.15)">🚨</div>
+        <div class="fc-info">
+          <div class="fc-title">TSCS-2026-0328-0088 <span class="badge badge-red">紧急</span></div>
+          <div class="fc-desc">京A·88888 · 北京市朝阳区京通快速路 · 财产损失</div>
+          <div class="fc-badge"><span class="badge badge-orange">待出发</span> 分配时间：10:30</div>
+        </div>
+      </div>
+      <div class="flow-card" onclick="showPage('field','field-task')">
+        <div class="fc-icon" style="background:rgba(114,46,209,.1)">⚠️</div>
+        <div class="fc-info">
+          <div class="fc-title">TSCS-2026-0327-0087 <span class="badge badge-yellow">标准</span></div>
+          <div class="fc-desc">京B·66666 · 北京市海淀区学院路 · 财产损失</div>
+          <div class="fc-badge"><span class="badge badge-orange">待出发</span> 分配时间：17:00（昨日）</div>
+        </div>
+      </div>
+    </div>
+    <!-- 任务详情 -->
+    <div id="field-task" class="page">
+      <div class="section-title">任务详情</div>
+      <div class="card">
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">报案号</div><div class="info-value">TSCS-2026-0328-0088</div></div>
+          <div class="info-item"><div class="info-label">事故地点</div><div class="info-value">北京市朝阳区京通快速路</div></div>
+          <div class="info-item"><div class="info-label">事故车辆</div><div class="info-value">京A·88888</div></div>
+          <div class="info-item"><div class="info-label">保障方案</div><div class="info-value">标准方案 · 第三者100万/车辆50万</div></div>
+          <div class="info-item"><div class="info-label">报案人</div><div class="info-value">张伟 138****5678</div></div>
+          <div class="info-item"><div class="info-label">责任划分</div><div class="info-value"><span class="badge badge-yellow">主责 70%</span></div></div>
+        </div>
+      </div>
+      <div class="flex gap-8 mt-16">
+        <button class="btn" onclick="showPage('field','field-home')">返回</button>
+        <button class="btn btn-purple" onclick="showPage('field','field-checkin')">接受任务并导航</button>
+      </div>
+    </div>
+    <!-- 到达签到 -->
+    <div id="field-checkin" class="page">
+      <div class="section-title">到达签到</div>
+      <div class="card">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:48px;margin-bottom:12px">📍</div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:8px">北京市朝阳区京通快速路</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:20px">GPS定位成功</div>
+          <button class="btn btn-purple" style="width:200px;justify-content:center" onclick="toast('签到成功！时间：11:15')">确认到达签到</button>
+        </div>
+      </div>
+      <div class="flex gap-8 mt-16">
+        <button class="btn" onclick="showPage('field','field-home')">返回工作台</button>
+        <button class="btn btn-purple" style="margin-left:auto" onclick="showPage('field','field-photo')">下一步：现场拍照</button>
+      </div>
+    </div>
+    <!-- 现场拍照 -->
+    <div id="field-photo" class="page">
+      <div class="section-title">现场拍照取证</div>
+      <div class="card">
+        <div class="section-title" style="font-size:13px;margin-bottom:12px">已拍照片（8/20）</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">🖼️</div>
+          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">🖼️</div>
+          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">🖼️</div>
+          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">🖼️</div>
+        </div>
+        <div class="info-box" style="background:#fafafa;border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:16px">
+          <b>拍照要求：</b>必须包含：①现场全景照1张 ②涉事车辆全景（正侧面45度）各1张 ③受损部位特写（含参照物）各1张 ④道路环境照 ⑤如有认定书需拍摄认定书
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn" style="flex:1;justify-content:center">📷 拍照</button>
+          <button class="btn" style="flex:1;justify-content:center">🖼️ 相册</button>
+        </div>
+      </div>
+      <div class="flex gap-8 mt-16">
+        <button class="btn" onclick="showPage('field','field-checkin')">上一步</button>
+        <button class="btn btn-purple" style="margin-left:auto" onclick="showPage('field','field-record')">下一步：笔录定责</button>
+      </div>
+    </div>
+    <!-- 笔录定责 -->
+    <div id="field-record" class="page">
+      <div class="section-title">当事人笔录与初步定责</div>
+      <div class="card">
+        <div class="form-group"><div class="form-label">当事人姓名 *</div><input class="form-control" placeholder="请输入"></div>
+        <div class="form-row">
+          <div class="form-group"><div class="form-label">驾驶证号 *</div><input class="form-control" placeholder="请输入"></div>
+          <div class="form-group"><div class="form-label">联系方式 *</div><input class="form-control" placeholder="请输入"></div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">事故经过（口述自动转文字）</div>
+          <div style="display:flex;gap:8px">
+            <textarea class="form-control" rows="3" placeholder="请描述事故经过..." style="flex:1">前车突然变道，我躲避不及追尾，前车右后保险杠受损，我方前保险杠受损，无人伤。</textarea>
+            <button class="btn" style="align-self:flex-end;white-space:nowrap">🎤 语音</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">初步定责 *</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> 全部责任</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp" checked> 主要责任</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> 同等责任</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> 次要责任</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> 无责任</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">电子签名</div>
+          <div style="height:60px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text2);cursor:pointer">点击签名（当事人）</div>
+        </div>
+      </div>
+      <div class="flex gap-8 mt-16">
+        <button class="btn" onclick="showPage('field','field-photo')">上一步</button>
+        <button class="btn btn-purple" style="margin-left:auto" onclick="showPage('field','field-eval')">下一步：损失评估</button>
+      </div>
+    </div>
+    <!-- 损失评估 -->
+    <div id="field-eval" class="page">
+      <div class="section-title">损失评估</div>
+      <div class="card">
+        <div class="section-title" style="font-size:13px">逐项损失评估</div>
+        <table>
+          <thead><tr><th>损失部位</th><th>损失类型</th><th>预估金额</th></tr></thead>
+          <tbody>
+            <tr><td>前保险杠</td><td>钣金修复 + 喷漆</td><td>¥3,200</td></tr>
+            <tr><td>左前大灯</td><td>更换零件</td><td>¥4,800</td></tr>
+            <tr><td>前舱盖</td><td>钣金修复</td><td>¥2,100</td></tr>
+            <tr><td>水箱框架</td><td>更换零件</td><td>¥1,800</td></tr>
+          </tbody>
+          <tfoot><tr style="background:#fafafa"><td colspan="2" style="font-weight:700">合计</td><td style="font-weight:700;color:var(--accent-field)">¥11,900</td></tr></tfoot>
+        </table>
+        <div class="form-group mt-16"><div class="form-label">评估备注</div><textarea class="form-control" rows="2" placeholder="如有特殊情况请说明..."></textarea></div>
+        <div class="flex gap-8 mt-16">
+          <button class="btn" onclick="showPage('field','field-record')">上一步</button>
+          <button class="btn btn-purple" style="margin-left:auto" onclick="toast('核查报告已提交！');showPage('field','field-home')">提交核查报告</button>
+        </div>
+      </div>
+    </div>
+    <!-- 审批中心 -->
+    <div id="field-approval" class="page">
+      <div class="section-title">审批中心</div>
+      <div class="card">
+        <table>
+          <thead><tr><th>案件</th><th>类型</th><th>金额</th><th>审批状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr><td>TSCS-2026-0327-0087</td><td>损失评估</td><td>¥9,800</td><td><span class="badge badge-orange">待审核</span></td><td><button class="btn btn-sm btn-purple">审核</button></td></tr>
+            <tr><td>TSCS-2026-0326-0086</td><td>人伤给付</td><td>¥186,000</td><td><span class="badge badge-orange">待审批</span></td><td><button class="btn btn-sm btn-purple">审批</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- MODAL (案件详情) -->
+<div id="modal-case" class="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span>案件详情 - TSCS-2026-0328-0088</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">报案信息</div>
+        <div class="info-grid mb-12">
+          <div class="info-item"><div class="info-label">报案号</div><div class="info-value">TSCS-2026-0328-0088</div></div>
+          <div class="info-item"><div class="info-label">企业</div><div class="info-value">鹏程运输</div></div>
+          <div class="info-item"><div class="info-label">车牌</div><div class="info-value">京A·88888</div></div>
+          <div class="info-item"><div class="info-label">责任</div><div class="info-value"><span class="badge badge-yellow">主责 70%</span></div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:10px">处理进度</div>
+        <div class="timeline">
+          <div class="timeline-item done"><div class="timeline-time">09:15</div><div class="timeline-title">驾驶员报案</div></div>
+          <div class="timeline-item done"><div class="timeline-time">10:02</div><div class="timeline-title">企业审核</div></div>
+          <div class="timeline-item done"><div class="timeline-time">10:30</div><div class="timeline-title">任务分配</div></div>
+          <div class="timeline-item active"><div class="timeline-time">11:15</div><div class="timeline-title">现场核查</div></div>
+          <div class="timeline-item pending"><div class="timeline-time">—</div><div class="timeline-title">互助给付</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn" onclick="closeModal()">关闭</button><button class="btn btn-primary">查看完整详情</button></div>
+  </div>
+</div>
+
+<script>
+// Navigation
+let currentTerm = 'platform';
+
+function switchTerm(term) {
+  currentTerm = term;
+  document.querySelectorAll('.term-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.term-tab[data-term="${term}"]`).classList.add('active');
+  document.querySelectorAll('.term-content').forEach(el => el.style.display = 'none');
+  document.getElementById(`term-${term}`).style.display = 'flex';
+  document.querySelectorAll(`#term-${term} .page`).forEach(p => p.classList.remove('active'));
+  // Show first page of this term
+  const firstPage = document.querySelector(`#term-${term} .page`);
+  if (firstPage) firstPage.classList.add('active');
+  // Init charts if needed
+  if (term === 'platform') initPlatformCharts();
+  if (term === 'enterprise') initEnterpriseCharts();
+  if (term === 'driver') initDriverCharts();
+}
+
+function showPage(term, pageId) {
+  document.querySelectorAll(`#term-${term} .page`).forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  document.querySelectorAll(`#term-${term} .sidebar-item`).forEach(i => i.classList.remove('active'));
+  const idx = Array.from(document.querySelectorAll(`#term-${term} .sidebar-item`)).findIndex(i => i.textContent.includes(document.getElementById(pageId).querySelector('.section-title')?.textContent || ''));
+  if (idx >= 0) document.querySelectorAll(`#term-${term} .sidebar-item`)[idx]?.classList.add('active');
+}
+
+function toast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function closeModal() {
+  document.getElementById('modal-case').classList.remove('show');
+}
+
+// Charts
+function initPlatformCharts() {
+  if (document.getElementById('chart-company')) {
+    new Chart(document.getElementById('chart-company'), {
+      type:'bar',
+      data:{labels:['鹏程','星辰','华通','顺捷','鑫安'],datasets:[{label:'给附率%',data:[34,52,91,67,42],backgroundColor:['#52C41A','#52C41A','#ff4d4f','#fa8c16','#52C41A']}]},
+      options:{responsive:true,plugins:{legend:{display:false}}}
+    });
+  }
+  if (document.getElementById('chart-trend')) {
+    new Chart(document.getElementById('chart-trend'), {
+      type:'line',
+      data:{labels:['10月','11月','12月','1月','2月','3月'],datasets:[{label:'给付额(万元)',data:[280,310,290,340,360,384],borderColor:'#1677FF',backgroundColor:'rgba(22,119,255,.1)',fill:true,tension:.4}]},
+      options:{responsive:true}
+    });
+  }
+  if (document.getElementById('chart-risk')) {
+    new Chart(document.getElementById('chart-risk'), {
+      type:'radar',
+      data:{labels:['给附率','评分','续约年限','挂靠比例','赔付速度'],datasets:[{label:'鹏程',data:[85,78,90,95,88],backgroundColor:'rgba(22,119,255,.2)'},{label:'华通',data:[30,45,70,50,60],backgroundColor:'rgba(255,77,79,.2)'}]},
+      options:{responsive:true}
+    });
+  }
+}
+
+function initEnterpriseCharts() {
+  if (document.getElementById('ent-chart-score')) {
+    new Chart(document.getElementById('ent-chart-score'), {
+      type:'bar',
+      data:{labels:['一分司','二分司','三分司','四分司'],datasets:[{label:'评分',data:[82,78,75,71],backgroundColor:'#52C41A'}]},
+      options:{responsive:true,plugins:{legend:{display:false}}}
+    });
+  }
+  if (document.getElementById('ent-chart-dist')) {
+    new Chart(document.getElementById('ent-chart-dist'), {
+      type:'doughnut',
+      data:{labels:['优秀(90+)','良好(80+)','一般(70+)','较差(60+)','差(<60)'],datasets:[{data:[320,1100,1400,480,110],backgroundColor:['#52C41A','#73d13d','#fa8c16','#ff7a45','#ff4d4f']}]},
+      options:{responsive:true}
+    });
+  }
+  if (document.getElementById('ent-chart-trend')) {
+    new Chart(document.getElementById('ent-chart-trend'), {
+      type:'line',
+      data:{labels:['10月','11月','12月','1月','2月','3月'],datasets:[{label:'均分',data:[75,76,74,77,76.2,78.5],borderColor:'#52C41A',backgroundColor:'rgba(82,196,26,.1)',fill:true,tension:.4}]},
+      options:{responsive:true}
+    });
+  }
+}
+
+function initDriverCharts() {
+  if (document.getElementById('drv-chart')) {
+    new Chart(document.getElementById('drv-chart'), {
+      type:'radar',
+      data:{labels:['安全驾驶','事故记录','合规记录'],datasets:[{label:'张伟',data:[85,90,95],backgroundColor:'rgba(250,140,22,.2)',borderColor:'#FA8C16'}]},
+      options:{responsive:true,scales:{r:{min:0,max:100}}}
+    });
+  }
+  if (document.getElementById('drv-trend')) {
+    new Chart(document.getElementById('drv-trend'), {
+      type:'line',
+      data:{labels:['10月','11月','12月','1月','2月','3月'],datasets:[{label:'评分',data:[72,74,76,75,76,78],borderColor:'#FA8C16',backgroundColor:'rgba(250,140,22,.1)',fill:true,tension:.4}]},
+      options:{responsive:true}
+    });
+  }
+}
+
+// Init
+switchTerm('platform');
+</script>
+</body>
+</html>
