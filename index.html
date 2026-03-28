@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSCS v2.0 业务流程演示</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+:root {
+  --sidebar-bg: #1a1f36;
+  --sidebar-hover: #252b48;
+  --sidebar-active: #3a4099;
+  --main-bg: #f0f2f8;
+  --card-bg: #ffffff;
+  --text-primary: #1a1f36;
+  --text-secondary: #5a6380;
+  --text-light: #a0a8c0;
+  --accent-blue: #4f6ef7;
+  --accent-orange: #ff7c43;
+  --accent-green: #2ecda7;
+  --accent-red: #ff5757;
+  --accent-purple: #9b59f3;
+  --border: #e2e6f0;
+  --shadow: 0 4px 24px rgba(26,31,54,0.08);
+  --radius: 12px;
+  --sidebar-width: 260px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  background: var(--main-bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+}
+::selection { background: var(--accent-blue); color: #fff; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0; top: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-logo h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.sidebar-logo span {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.sidebar-nav {
+  padding: 16px 12px;
+  flex: 1;
+}
+.nav-label {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  padding: 8px 12px 4px;
+  margin-top: 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.65);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 400;
+  user-select: none;
+  border: 1px solid transparent;
+}
+.nav-item:hover {
+  background: var(--sidebar-hover);
+  color: #fff;
+}
+.nav-item.active {
+  background: var(--sidebar-active);
+  color: #fff;
+  font-weight: 500;
+  border-color: rgba(255,255,255,0.1);
+}
+.nav-item .icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  opacity: 0.8;
+}
+.nav-item .step-count {
+  margin-left: auto;
+  font-size: 11px;
+  background: rgba(255,255,255,0.1);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+.sidebar-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  padding: 32px 40px;
+  min-height: 100vh;
+}
+.page-header {
+  margin-bottom: 28px;
+}
+.page-header h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.page-header p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ===== FLOWCHART CARD ===== */
+.flow-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  transition: opacity 0.3s;
+}
+.flow-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.flow-card h3::before {
+  content: '';
+  width: 3px; height: 16px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+}
+.flow-diagram {
+  overflow-x: auto;
+  padding: 10px 0;
+}
+.flow-diagram svg {
+  max-width: 100%;
+  display: block;
+}
+
+/* ===== TABS ===== */
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.tab-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+.tab-btn.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: #fff;
+}
+
+/* ===== STEP CARDS ===== */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.step-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent-blue);
+}
+.step-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(26,31,54,0.14);
+}
+.step-card.highlight::before {
+  background: var(--accent-orange);
+}
+.step-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-card.highlight .step-num { background: var(--accent-orange); }
+.step-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.step-card-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 40px;
+}
+.step-card-sub span {
+  display: block;
+}
+.step-tag {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+.tag-blue { background: #eef0ff; color: #4f6ef7; }
+.tag-orange { background: #fff1ea; color: #ff7c43; }
+.tag-green { background: #e8faf5; color: #2ecda7; }
+.tag-red { background: #ffeaea; color: #ff5757; }
+.tag-purple { background: #f5efff; color: #9b59f3; }
+
+/* ===== DETAIL PANEL ===== */
+.detail-panel {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: all 0.3s;
+  margin-bottom: 24px;
+}
+.detail-panel.hidden { display: none; }
+.detail-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.detail-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-close {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--main-bg);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.detail-close:hover { background: var(--accent-red); color: #fff; }
+.detail-body {
+  padding: 24px;
+}
+.detail-section {
+  margin-bottom: 20px;
+}
+.detail-section:last-child { margin-bottom: 0; }
+.detail-section h5 {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.detail-actors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.actor-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--main-bg);
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+.detail-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--main-bg);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.rule-item .rule-label { color: var(--text-secondary); }
+.rule-item .rule-value { font-weight: 600; color: var(--text-primary); }
+.sub-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sub-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--main-bg);
+}
+.sub-step::before {
+  content: '→';
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+/* ===== CASE CARD ===== */
+.case-card {
+  background: linear-gradient(135deg, var(--sidebar-bg), #2a3270);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  color: #fff;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+.case-card .label { font-size: 11px; opacity: 0.5; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+.case-card .value { font-size: 15px; font-weight: 600; }
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(255,255,255,0.15);
+}
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ===== CALCULATOR ===== */
+.calc-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 24px;
+}
+.calc-card h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calc-formula {
+  background: var(--main-bg);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  border-left: 3px solid var(--accent-blue);
+  line-height: 1.8;
+}
+.calc-formula strong { color: var(--accent-blue); }
+.calc-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.calc-field label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.calc-field input[type="range"] {
+  width: 100%;
+  margin-bottom: 4px;
+  accent-color: var(--accent-blue);
+}
+.calc-field .range-val {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+.calc-result {
+  background: linear-gradient(135deg, #eef0ff, #f5f0ff);
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: center;
+}
+.calc-result .result-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.calc-result .result-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+.calc-breakdown {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.calc-breakdown div { padding: 2px 0; }
+
+/* ===== FULL FLOW OVERVIEW ===== */
+.overview-flow {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  padding: 24px;
+  overflow-x: auto;
+}
+.overview-flow h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.flow-nodes {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: nowrap;
+  min-width: 800px;
+}
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.flow-node:hover { transform: scale(1.05); }
+.flow-node-box {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  border: 2px solid;
+}
+.flow-node-box.cat-entry { background: #e8edff; border-color: #4f6ef7; color: #4f6ef7; }
+.flow-node-box.cat-core { background: #fff1ea; border-color: #ff7c43; color: #e06020; }
+.flow-node-box.cat-end { background: #e8faf5; border-color: #2ecda7; color: #1a9a7a; }
+.flow-node-box.cat-error { background: #ffeaea; border-color: #ff5757; color: #cc3333; }
+.flow-node-box.cat-special { background: #f5efff; border-color: #9b59f3; color: #7a3ecf; }
+.flow-node-num {
+  font-size: 10px;
+  color: var(--text-light);
+}
+.flow-arrow {
+  font-size: 16px;
+  color: var(--text-light);
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+.highlight-flow .flow-node-box { box-shadow: 0 0 0 3px rgba(255,124,67,0.4); }
+
+/* ===== TRANSITIONS ===== */
+.fade-enter { opacity: 0; transform: translateY(8px); }
+.fade-enter-active { opacity: 1; transform: translateY(0); transition: all 0.3s ease; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .sidebar { width: 200px; }
+  .main { margin-left: 200px; padding: 20px; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .case-card { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h1>TSCS</h1>
+    <span>v2.0 业务流程</span>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-label">概览</div>
+    <div class="nav-item active" data-tab="overview" onclick="switchTab('overview', this)">
+      <span class="icon">🏠</span> 全流程总览
+    </div>
+    <div class="nav-label">业务流程</div>
+    <div class="nav-item" data-tab="cantong" onclick="switchTab('cantong', this)">
+      <span class="icon">📋</span> 参统流程
+      <span class="step-count">3步</span>
+    </div>
+    <div class="nav-item" data-tab="baoan" onclick="switchTab('baoan', this)">
+      <span class="icon">🚨</span> 事故报案
+      <span class="step-count">3步</span>
+    </div>
+    <div class="nav-item" data-tab="核查评估" onclick="switchTab('核查评估', this)">
+      <span class="icon">🔍</span> 核查评估
+      <span class="step-count">6步</span>
+    </div>
+    <div class="nav-item" data-tab="huzhu" onclick="switchTab('huzhu', this)">
+      <span class="icon">💰</span> 互助给付
+      <span class="step-count">5步</span>
+    </div>
+    <div class="nav-item" data-tab="xutong" onclick="switchTab('xutong', this)">
+      <span class="icon">🔄</span> 续统流程
+      <span class="step-count">8步</span>
+    </div>
+    <div class="nav-item" data-tab="tuitong" onclick="switchTab('tuitong', this)">
+      <span class="icon">↩️</span> 退统流程
+      <span class="step-count">5步</span>
+    </div>
+  </div>
+  <div class="sidebar-footer">TSCS v2.0 · 交通安全统筹系统</div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="main" id="mainContent">
+  <!-- Dynamic content injected here -->
+</main>
+
+<script>
+// ===== DATA =====
+const PROCESS_DATA = {
+  overview: {
+    title: 'TSCS v2.0 全业务流程总览',
+    desc: '交通安全统筹系统完整业务闭环，点击任意节点查看详情',
+    render: function() {
+      return `
+        <div class="page-header">
+          <h2>${this.title}</h2>
+          <p>${this.desc}</p>
+        </div>
+        <div class="overview-flow">
+          <h3>完整流程链路</h3>
+          <div class="flow-nodes" id="flowNodes">
+            <div class="flow-node" onclick="showNodeDetail('入驻签约')"><div class="flow-node-box cat-entry">企业入驻签约</div><div class="flow-node-num">入口</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('批量参统')"><div class="flow-node-box cat-entry">批量参统</div><div class="flow-node-num">入口</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('日常运营')"><div class="flow-node-box cat-core">日常运营</div><div class="flow-node-num">核心</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('事故报案')"><div class="flow-node-box cat-core">事故报案</div><div class="flow-node-num">核心</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('受理调度')"><div class="flow-node-box cat-core">受理调度</div><div class="flow-node-num">核心</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('现场核查')"><div class="flow-node-box cat-core">现场核查</div><div class="flow-node-num">核心</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('损失评估')"><div class="flow-node-box cat-core">损失评估</div><div class="flow-node-num">核心</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('互助给付')"><div class="flow-node-box cat-core">互助给付</div><div class="flow-node-num">核心</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('结案')"><div class="flow-node-box cat-end">结案</div><div class="flow-node-num">结束</div></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showNodeDetail('续统/退统')"><div class="flow-node-box cat-special">续统/退统</div><div class="flow-node-num">特殊</div></div>
+          </div>
+        </div>
+        <div id="nodeDetail"></div>
+      `;
+    }
+  },
+  cantong: {
+    title: '参统流程',
+    desc: '企业入驻并完成参统登记的完整流程',
+    steps: [
+      {
+        num: 1, tag: 'tag-blue', tagText: '协议签订',
+        title: '协议签订',
+        sub: '企业预览协议 → 填写车辆数据 → 机构审核 → 签约成功发放账号',
+        actors: ['企业负责人', '平台运营', '系统'],
+        rules: ['企业须完成实名认证', '车辆数据须与运营证一致', '协议审核周期 ≤ 3工作日'],
+        subSteps: ['企业预览协议条款', '填写车辆基础数据', '提交机构审核', '审核通过后发放登录账号']
+      },
+      {
+        num: 2, tag: 'tag-orange', tagText: '确认缴费',
+        title: '确认缴费',
+        sub: '企业对公转账 → 财务确认 → 凭证激活 → 开通权限',
+        actors: ['企业财务', '平台财务', '系统'],
+        rules: ['对公转账凭证必传', '财务确认周期 ≤ 1工作日', '凭证激活后即时生效'],
+        subSteps: ['企业对公账户转账', '上传银行回单凭证', '财务核对确认', '系统激活参统凭证', '自动开通业务权限']
+      },
+      {
+        num: 3, tag: 'tag-purple', tagText: '开通权限',
+        title: '开通权限',
+        sub: '企业给分司/安全部/高管开户',
+        actors: ['企业管理员', '分司负责人', '安全部长', '高管'],
+        rules: ['子账号须实名认证', '权限分级：管理员/操作员/查看者', '每个企业最多50个子账号'],
+        subSteps: ['管理员创建子账号', '分配角色：分司/安全部/高管', '设置操作权限等级', '发送账号通知']
+      }
+    ]
+  },
+  baoan: {
+    title: '事故报案流程',
+    desc: '从事故发生到完成报案的完整流程',
+    steps: [
+      {
+        num: 1, tag: 'tag-blue', tagText: '驾驶员一键报案',
+        title: '驾驶员一键报案',
+        sub: '选车辆 → 填时间地点 → 拍照 → 提交',
+        actors: ['事故驾驶员', '系统'],
+        rules: ['须在事故发生后24小时内报案', '拍照不少于3张', '支持离线缓存补传'],
+        subSteps: ['从绑定车辆列表选择', '填写事故时间地点', '现场拍照上传', '简要描述事故经过', '提交报案']
+      },
+      {
+        num: 2, tag: 'tag-orange', tagText: '企业最终报案',
+        title: '企业最终报案',
+        sub: '分司/安全部赶赴现场 → 补充资料 → 提交',
+        actors: ['分公司外勤', '安全部人员', '企业负责人'],
+        rules: ['须有人员赶赴现场', '补充材料：现场图、笔录、监控', '提交后不可撤销'],
+        subSteps: ['分司/安全部赶赴现场', '补充现场照片', '采集当事人笔录', '调取监控视频', '企业负责人确认提交']
+      },
+      {
+        num: 3, tag: 'tag-purple', tagText: '受理与调度',
+        title: '受理与调度',
+        sub: '三通道受理 + 自动/人工调度',
+        actors: ['平台调度中心', '核损员', '系统AI'],
+        rules: ['快速通道：估损≤2000元', '标准通道：2001-5万元', '大案人伤通道：>5万或有人伤', '自动调度失败转人工'],
+        subSteps: ['系统自动分类通道', 'AI辅助初步定损', '自动派单给核损员', '核损员确认接单', '任务下发现场核查']
+      }
+    ]
+  },
+  '核查评估': {
+    title: '核查损失评估流程',
+    desc: '核损员现场核查到损失评估完成的完整流程',
+    steps: [
+      {
+        num: 1, tag: 'tag-blue', tagText: '任务接收',
+        title: '任务接收',
+        sub: '核损员接受/拒绝任务',
+        actors: ['核损员', '系统'],
+        rules: ['接单后30分钟内响应', '拒绝须填写理由并重新派单', '连续2次拒绝降优先权'],
+        subSteps: ['收到任务推送通知', '查看案件基本信息', '确认接受或申请转派', '接受后开始准备']
+      },
+      {
+        num: 2, tag: 'tag-orange', tagText: '到达签到',
+        title: '到达签到',
+        sub: '核损员到达现场后签到',
+        actors: ['核损员', '系统', '企业现场人员'],
+        rules: ['接单后2小时内须签到', '超时自动发送提醒', '迟到超过4小时触发升级'],
+        subSteps: ['到达事故现场', '手机端GPS签到', '系统记录到达时间', '超时自动催单']
+      },
+      {
+        num: 3, tag: 'tag-blue', tagText: '现场取证',
+        title: '现场取证',
+        sub: '拍照5~20张，时间水印',
+        actors: ['核损员', '当事人'],
+        rules: ['不少于5张，不超过20张', '每张照片自动附加时间水印', '包含远景、近景、细节'],
+        subSteps: ['拍摄车辆全貌（远景）', '拍摄损伤部位（近景）', '拍摄细节特写', '拍摄车牌号', '拍摄周围环境', '系统自动加水印']
+      },
+      {
+        num: 4, tag: 'tag-orange', tagText: '笔录与定责',
+        title: '当事人笔录 + 初步定责',
+        sub: '采集笔录并初定责任比例',
+        actors: ['核损员', '当事人', '交警（如在场）'],
+        rules: ['责任认定：全责/主责/同责/次责/无责', '初步定责须双方签字确认', '有争议转人工审核'],
+        subSteps: ['采集驾驶员笔录', '记录事故经过', '初步判定责任比例', '双方当事人签字确认', '如有交警在场参考认定书']
+      },
+      {
+        num: 5, tag: 'tag-purple', tagText: '损失评估',
+        title: '损失评估 + 分级审批',
+        sub: '系统评估 + 人工审批，按金额分级',
+        actors: ['系统', '主管', '经理'],
+        rules: ['≤5000元：系统自动审批', '5001-3万元：主管审批', '>3万元：经理审批', '审批时效 ≤ 1工作日'],
+        subSteps: ['系统根据配件价格评估', '自动生成损失清单', '≤5000自动通过', '5001-3万提交主管', '>3万提交经理']
+      },
+      {
+        num: 6, tag: 'tag-green', tagText: '修理厂报价',
+        title: '修理厂报价',
+        sub: '修理厂报价与评估价对比审核',
+        actors: ['修理厂', '平台审核', '企业确认'],
+        rules: ['报价 ≤ 评估价×1.1：直接通过', '报价 > 评估价×1.1：需说明原因', '超评估价×1.3：需重新评估'],
+        subSteps: ['修理厂提交维修报价单', '系统对比评估价格', '符合1.1系数自动通过', '异常报价提交人工复核', '企业确认最终价格']
+      }
+    ]
+  },
+  huzhu: {
+    title: '互助给付流程',
+    desc: '从材料上传到互助金支付的完整流程，含实时理算计算器',
+    steps: [
+      {
+        num: 1, tag: 'tag-blue', tagText: '材料上传',
+        title: '材料上传',
+        sub: '事故认定书 + 发票 + 维修清单',
+        actors: ['企业经办人', '系统'],
+        rules: ['认定书须为交警出具', '发票须与维修清单一致', '清单须列明配件及工时'],
+        subSteps: ['上传事故认定书', '上传维修发票', '上传维修清单明细', '系统OCR识别校验', '材料补传通知']
+      },
+      {
+        num: 2, tag: 'tag-orange', tagText: '材料审核',
+        title: '材料审核',
+        sub: '真伪核验 + 一致性校验 + 合理性判断',
+        actors: ['审核专员', '系统AI'],
+        rules: ['发票真伪可联机查验', '清单与发票金额一致', '配件价格合理性校验'],
+        subSteps: ['系统OCR结构化提取', '发票联机验真', '清单与发票一致性校验', '配件价格区间比对', '审核通过进入理算']
+      },
+      {
+        num: 3, tag: 'tag-purple', tagText: '互助理算',
+        title: '互助理算（实时计算器）',
+        sub: '按公式计算互助给付金额',
+        actors: ['系统', '企业'],
+        rules: ['公式：给付额 = (损失额 × 责任比例 − 免给付额) × (1 − 协议扣除比例)'],
+        subSteps: ['输入损失总额', '输入责任比例', '输入免给付额阈值', '系统自动计算结果']
+      },
+      {
+        num: 4, tag: 'tag-blue', tagText: '分级审批',
+        title: '分级审批 + 企业确认',
+        sub: '按金额分级审批，企业最终确认',
+        actors: ['系统', '主管', '经理', '总经理', '企业负责人'],
+        rules: ['≤2000元：系统自动审批', '2001-5万元：企业确认', '5-10万元：经理审批', '>10万元：总经理审批'],
+        subSteps: ['系统按金额分流', '≤2000自动放行', '2001-5万发送企业确认', '5-10万提交经理', '>10万提交总经理']
+      },
+      {
+        num: 5, tag: 'tag-green', tagText: '支付执行',
+        title: '支付执行 + 结案',
+        sub: '财务支付 → 企业收款 → 结案归档',
+        actors: ['平台财务', '企业', '系统'],
+        rules: ['支付方式：对公转账', '支付周期 ≤ 3工作日', '结案后自动更新案件状态'],
+        subSteps: ['财务发起支付', '对公账户转账', '企业查收到账', '系统更新案件状态', '档案自动归档']
+      }
+    ]
+  },
+  xutong: {
+    title: '续统流程',
+    desc: '企业参统到期前的续统提醒与办理流程',
+    steps: [
+      {
+        num: 1, tag: 'tag-red', tagText: '多级提醒',
+        title: '到期前多级提醒',
+        sub: '到期前30/15/7/1天多渠道提醒',
+        actors: ['系统', '企业负责人'],
+        rules: ['30天：邮件/短信提醒', '15天：增加微信推送', '7天：增加电话回访', '1天：最后通牒'],
+        subSteps: ['系统自动计算到期日', '30天前发送邮件', '15天前增加微信', '7天前电话回访', '1天前最后通知']
+      },
+      {
+        num: 2, tag: 'tag-blue', tagText: '确认清单',
+        title: '确认参统清单',
+        sub: '核对参统车辆清单，确认续统范围',
+        actors: ['企业管理员', '系统'],
+        rules: ['可增减车辆', '新增车辆须重新审核', '确认后生成续统方案'],
+        subSteps: ['查看当前参统车辆', '勾选续统车辆', '申请新增车辆（如需）', '确认续统总金额', '提交续统申请']
+      },
+      {
+        num: 3, tag: 'tag-orange', tagText: '调整方案',
+        title: '调整统筹方案',
+        sub: '根据需求调整保障方案和费率',
+        actors: ['企业', '平台运营'],
+        rules: ['可调整保障额度', '费率随方案调整', '调整后需重新确认'],
+        subSteps: ['选择保障方案档次', '调整统筹额度', '查看新费率', '确认方案调整', '系统更新方案']
+      },
+      {
+        num: 4, tag: 'tag-purple', tagText: '生成缴费单',
+        title: '生成缴费单',
+        sub: '系统生成续统缴费单，企业确认',
+        actors: ['系统', '企业财务'],
+        rules: ['缴费单有效期15天', '逾期需重新生成', '可分批缴费'],
+        subSteps: ['系统计算续统费用', '生成缴费单', '发送至企业', '企业确认金额', '进入转账流程']
+      },
+      {
+        num: 5, tag: 'tag-blue', tagText: '对公转账',
+        title: '企业对公转账',
+        sub: '企业通过对公账户转账缴费',
+        actors: ['企业财务', '银行'],
+        rules: ['须从对公账户转出', '备注填写缴费单号', '转账凭证须上传'],
+        subSteps: ['企业登录网银', '对公账户转账', '备注填写单号', '下载回单', '上传转账凭证']
+      },
+      {
+        num: 6, tag: 'tag-orange', tagText: '上传凭证',
+        title: '上传凭证',
+        sub: '上传银行转账回单',
+        actors: ['企业财务', '系统'],
+        rules: ['凭证须清晰可辨', '金额须与缴费单一致', '系统OCR自动识别'],
+        subSteps: ['拍照/扫描回单', '上传至系统', 'OCR识别金额', '系统核对金额', '进入财务确认']
+      },
+      {
+        num: 7, tag: 'tag-green', tagText: '财务确认',
+        title: '财务确认到账',
+        sub: '平台财务核对转账凭证，确认到账',
+        actors: ['平台财务'],
+        rules: ['财务确认周期 ≤ 1工作日', '确认后即时生效', '凭证存档备查'],
+        subSteps: ['财务核查银行流水', '确认金额一致', '确认账户信息', '点击确认到账', '系统记录到账时间']
+      },
+      {
+        num: 8, tag: 'tag-green', tagText: '新凭证生效',
+        title: '新凭证生效',
+        sub: '新参统凭证生效（=旧凭证到期次日）',
+        actors: ['系统', '企业'],
+        rules: ['新凭证生效时间 = 旧凭证到期次日零点', '无缝衔接保障不断档', '自动发放新凭证'],
+        subSteps: ['系统自动计算日期衔接', '新凭证自动激活', '发送新凭证至企业', '旧凭证状态变更为已续期', '续统完成']
+      }
+    ]
+  },
+  tultong: {
+    title: '退统流程',
+    desc: '企业申请退出交通安全统筹的完整流程',
+    steps: [
+      {
+        num: 1, tag: 'tag-blue', tagText: '申请发起',
+        title: '申请发起',
+        sub: '企业负责人发起退统申请',
+        actors: ['企业负责人', '系统'],
+        rules: ['须为企业负责人发起', '申请后有冷静期7天', '冷静期可撤销'],
+        subSteps: ['企业负责人登录', '进入退统申请页面', '填写退统原因', '确认退统范围', '提交退统申请', '进入7天冷静期']
+      },
+      {
+        num: 2, tag: 'tag-orange', tagText: '平台审核',
+        title: '平台运营审核',
+        sub: '平台运营人员审核退统申请',
+        actors: ['平台运营', '系统'],
+        rules: ['审核周期 ≤ 5工作日', '审核不通过需重新申请', '有未结案件不可退统'],
+        subSteps: ['运营收到退统通知', '核查企业资质', '核查是否有未结案件', '核查是否有欠费', '审核通过/驳回']
+      },
+      {
+        num: 3, tag: 'tag-purple', tagText: '计算退费',
+        title: '计算退费金额',
+        sub: '系统根据已生效时长计算应退金额',
+        actors: ['系统', '财务'],
+        rules: ['退费 = 已缴金额 − 已生效期间费用', '已生效不足整月按日折算', '扣除违约金（如有）'],
+        subSteps: ['系统读取原始缴费记录', '计算已生效期间', '计算应扣除费用', '扣除违约金', '生成退费金额']
+      },
+      {
+        num: 4, tag: 'tag-blue', tagText: '财务退款',
+        title: '财务退款',
+        sub: '平台财务执行退款操作',
+        actors: ['平台财务', '企业账户'],
+        rules: ['退款周期 ≤ 10工作日', '退款至企业对公账户', '退款后发送回执'],
+        subSteps: ['财务发起退款', '填写退款金额', '提交审批', '对公账户退款', '发送退款回执']
+      },
+      {
+        num: 5, tag: 'tag-green', tagText: '完成退统',
+        title: '完成退统',
+        sub: '退统完成，账户和权限关闭',
+        actors: ['系统'],
+        rules: ['所有子账号一并关闭', '历史数据保留备查', '退统后6个月内不可重新参统'],
+        subSteps: ['系统关闭企业账号', '关闭所有子账号', '更新参统状态为已退统', '归档历史记录', '发送退统完成通知']
+      }
+    ]
+  }
+};
+
+// Sample case data
+const SAMPLE_CASE = {
+  id: 'TSCS-2026-0318-0088',
+  plate: '京A·88888',
+  type: '交通事故（双方）',
+  amount: 15800,
+  status: '核查评估中',
+  reportDate: '2026-03-18 09:23',
+  handler: '张核损'
+};
+
+// Node detail data for overview
+const NODE_DETAILS = {
+  '入驻签约': { actors: ['企业负责人', '平台运营'], rules: ['企业须完成实名认证', '协议审核≤3工作日'] },
+  '批量参统': { actors: ['企业', '系统'], rules: ['批量导入车辆数据', '系统自动校验'] },
+  '日常运营': { actors: ['企业各部门', '分司'], rules: ['日常监控运营状态', '定期数据上报'] },
+  '事故报案': { actors: ['驾驶员', '企业安全部'], rules: ['24小时内必须报案', '拍照不少于3张'] },
+  '受理调度': { actors: ['平台调度', '核损员'], rules: ['三通道自动分流', '自动派单'] },
+  '现场核查': { actors: ['核损员', '企业现场'], rules: ['2小时到场签到', '5~20张现场照片'] },
+  '损失评估': { actors: ['系统', '主管', '经理'], rules: ['≤5000自动/5001-3万主管/>3万经理'] },
+  '互助给付': { actors: ['系统', '财务', '企业'], rules: ['公式计算', '分级审批'] },
+  '结案': { actors: ['系统'], rules: ['自动更新案件状态', '档案归档'] },
+  '续统/退统': { actors: ['企业', '平台'], rules: ['到期前30/15/7/1天提醒', '退统有冷静期'] }
+};
+
+// ===== RENDER =====
+function renderPage(tabId) {
+  const main = document.getElementById('mainContent');
+  const data = PROCESS_DATA[tabId];
+  if (!data) return;
+
+  let html = `<div class="page-header">
+    <h2>${data.title}</h2>
+    <p>${data.desc}</p>
+  </div>`;
+
+  // Case card for huzhu
+  if (tabId === 'huzhu' || tabId === 'overview') {
+    html += renderCaseCard();
+  }
+
+  if (tabId === 'overview') {
+    html += data.render();
+    main.innerHTML = html;
+    initMermaid();
+    return;
+  }
+
+  // Steps
+  if (data.steps) {
+    html += `<div class="steps-grid" id="stepsGrid">`;
+    data.steps.forEach((step, i) => {
+      html += `<div class="step-card" data-step="${i}" onclick="openDetail('${tabId}', ${i})">
+        <div class="step-card-header">
+          <div class="step-num">${step.num}</div>
+          <div>
+            <div class="step-card-title">${step.title}</div>
+            <span class="step-tag ${step.tag}">${step.tagText}</span>
+          </div>
+        </div>
+        <div class="step-card-sub">${step.sub}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Calculator for huzhu
+  if (tabId === 'huzhu') {
+    html += renderCalculator();
+  }
+
+  main.innerHTML = html;
+
+  // Scroll top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderCaseCard() {
+  return `
+    <div class="case-card">
+      <div>
+        <div class="label">案件编号</div>
+        <div class="value">${SAMPLE_CASE.id}</div>
+      </div>
+      <div>
+        <div class="label">车牌号</div>
+        <div class="value">${SAMPLE_CASE.plate}</div>
+      </div>
+      <div>
+        <div class="label">事故类型</div>
+        <div class="value">${SAMPLE_CASE.type}</div>
+      </div>
+      <div>
+        <div class="label">估损金额</div>
+        <div class="value">¥${SAMPLE_CASE.amount.toLocaleString()}</div>
+      </div>
+      <div>
+        <div class="label">案件状态</div>
+        <div class="value"><span class="status-badge"><span class="status-dot"></span>${SAMPLE_CASE.status}</span></div>
+      </div>
+      <div>
+        <div class="label">报案时间</div>
+        <div class="value">${SAMPLE_CASE.reportDate}</div>
+      </div>
+    </div>`;
+}
+
+function renderCalculator() {
+  return `
+    <div class="calc-card">
+      <h4>💰 互助给付理算计算器</h4>
+      <div class="calc-formula">
+        <strong>互助给付额</strong> = ( 损失额 × 责任比例 − 免给付额 ) × ( 1 − 协议扣除比例 )
+      </div>
+      <div class="calc-inputs">
+        <div class="calc-field">
+          <label>损失额（元）</label>
+          <input type="range" id="lossAmt" min="500" max="50000" value="15800" step="100" oninput="calcResult()">
+          <div class="range-val">¥<span id="lossAmtVal">15,800</span></div>
+        </div>
+        <div class="calc-field">
+          <label>责任比例（%）</label>
+          <input type="range" id="respRate" min="0" max="100" value="70" step="5" oninput="calcResult()">
+          <div class="range-val"><span id="respRateVal">70</span>%</div>
+        </div>
+        <div class="calc-field">
+          <label>免给付额（元）</label>
+          <input type="range" id="exemptAmt" min="0" max="2000" value="500" step="50" oninput="calcResult()">
+          <div class="range-val">¥<span id="exemptAmtVal">500</span></div>
+        </div>
+        <div class="calc-field">
+          <label>协议扣除比例（%）</label>
+          <input type="range" id="deductRate" min="0" max="30" value="10" step="1" oninput="calcResult()">
+          <div class="range-val"><span id="deductRateVal">10</span>%</div>
+        </div>
+      </div>
+      <div class="calc-result">
+        <div class="result-label">预计互助给付金额</div>
+        <div class="result-value" id="calcResultVal">¥9,504</div>
+        <div class="calc-breakdown" id="calcBreakdown"></div>
+      </div>
+    </div>`;
+}
+
+// ===== CALCULATOR LOGIC =====
+function calcResult() {
+  const loss = parseFloat(document.getElementById('lossAmt').value);
+  const resp = parseFloat(document.getElementById('respRate').value) / 100;
+  const exempt = parseFloat(document.getElementById('exemptAmt').value);
+  const deduct = parseFloat(document.getElementById('deductRate').value) / 100;
+
+  document.getElementById('lossAmtVal').textContent = loss.toLocaleString();
+  document.getElementById('respRateVal').textContent = Math.round(resp * 100);
+  document.getElementById('exemptAmtVal').textContent = exempt.toLocaleString();
+  document.getElementById('deductRateVal').textContent = Math.round(deduct * 100);
+
+  const afterResp = loss * resp - exempt;
+  const afterDeduct = afterResp * (1 - deduct);
+  const final = Math.max(0, afterDeduct);
+
+  document.getElementById('calcResultVal').textContent = '¥' + Math.round(final).toLocaleString();
+
+  const breakdown = document.getElementById('calcBreakdown');
+  breakdown.innerHTML = `
+    <div>① 损失额 × 责任比例 = ¥${loss.toLocaleString()} × ${Math.round(resp*100)}% = <strong>¥${(loss*resp).toLocaleString()}</strong></div>
+    <div>② ① − 免给付额 = <strong>¥${(loss*resp - exempt).toLocaleString()}</strong></div>
+    <div>③ ② × (1 − 扣除比例) = <strong>¥${(loss*resp - exempt).toLocaleString()}</strong> × ${Math.round((1-deduct)*100)}% = <strong style="color:#4f6ef7">¥${Math.round(final).toLocaleString()}</strong></div>
+  `;
+
+  // Approval level
+  let level = '系统自动审批';
+  if (final > 100000) level = '总经理审批';
+  else if (final > 50000) level = '经理审批';
+  else if (final > 2000) level = '企业确认';
+  breakdown.innerHTML += `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">📋 审批级别：<strong>${level}</strong></div>`;
+}
+
+// ===== DETAIL PANEL =====
+function openDetail(tabId, stepIndex) {
+  const data = PROCESS_DATA[tabId];
+  if (!data || !data.steps) return;
+  const step = data.steps[stepIndex];
+
+  // Mark active step
+  document.querySelectorAll('.step-card').forEach(c => c.classList.remove('highlight'));
+  document.querySelector(`.step-card[data-step="${stepIndex}"]`).classList.add('highlight');
+
+  const actorsHtml = step.actors.map(a => `<span class="actor-chip">👤 ${a}</span>`).join('');
+  const rulesHtml = step.rules.map(r => `<div class="rule-item"><span class="rule-label">•</span><span class="rule-value">${r}</span></div>`).join('');
+  const subStepsHtml = step.subSteps.map(s => `<div class="sub-step">${s}</div>`).join('');
+
+  const detail = document.getElementById('detailPanel');
+  if (!detail) {
+    const grid = document.getElementById('stepsGrid');
+    const panel = document.createElement('div');
+    panel.className = 'detail-panel';
+    panel.id = 'detailPanel';
+    panel.innerHTML = `
+      <div class="detail-header">
+        <h4><span class="step-tag ${step.tag}">${step.tagText}</span> ${step.title}</h4>
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <h5>步骤描述</h5>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7">${step.sub}</p>
+        </div>
+        <div class="detail-section">
+          <h5>参与角色</h5>
+          <div class="detail-actors">${actorsHtml}</div>
+        </div>
+        <div class="detail-section">
+          <h5>业务规则 / 阈值</h5>
+          <div class="detail-rules">${rulesHtml}</div>
+        </div>
+        <div class="detail-section">
+          <h5>子步骤分解</h5>
+          <div class="sub-steps">${subStepsHtml}</div>
+        </div>
+      </div>
+    `;
+    grid.insertAdjacentElement('afterend', panel);
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    detail.innerHTML = `
+      <div class="detail-header">
+        <h4><span class="step-tag ${step.tag}">${step.tagText}</span> ${step.title}</h4>
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <h5>步骤描述</h5>
+          <p style="font-size:13px;color:var(--text-secondary);line-height:1.7">${step.sub}</p>
+        </div>
+        <div class="detail-section">
+          <h5>参与角色</h5>
+          <div class="detail-actors">${actorsHtml}</div>
+        </div>
+        <div class="detail-section">
+          <h5>业务规则 / 阈值</h5>
+          <div class="detail-rules">${rulesHtml}</div>
+        </div>
+        <div class="detail-section">
+          <h5>子步骤分解</h5>
+          <div class="sub-steps">${subStepsHtml}</div>
+        </div>
+      </div>
+    `;
+    detail.classList.remove('hidden');
+    detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function closeDetail() {
+  const panel = document.getElementById('detailPanel');
+  if (panel) panel.classList.add('hidden');
+  document.querySelectorAll('.step-card').forEach(c => c.classList.remove('highlight'));
+}
+
+// ===== OVERVIEW NODE DETAIL =====
+function showNodeDetail(nodeName) {
+  const info = NODE_DETAILS[nodeName];
+  if (!info) return;
+  const actorsHtml = info.actors.map(a => `<span class="actor-chip">👤 ${a}</span>`).join('');
+  const rulesHtml = info.rules.map(r => `<div class="rule-item"><span class="rule-label">•</span><span class="rule-value">${r}</span></div>`).join('');
+
+  document.getElementById('nodeDetail').innerHTML = `
+    <div class="detail-panel">
+      <div class="detail-header">
+        <h4>📍 ${nodeName}</h4>
+        <button class="detail-close" onclick="this.closest('.detail-panel').remove()">✕</button>
+      </div>
+      <div class="detail-body">
+        <div class="detail-section">
+          <h5>参与角色</h5>
+          <div class="detail-actors">${actorsHtml}</div>
+        </div>
+        <div class="detail-section">
+          <h5>关键规则</h5>
+          <div class="detail-rules">${rulesHtml}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tabId, el) {
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  // Render
+  renderPage(tabId);
+}
+
+// ===== MERMAID =====
+function initMermaid() {
+  if (typeof mermaid !== 'undefined') {
+    mermaid.init({ theme: 'base', themeVariables: {
+      primaryColor: '#e8edff',
+      primaryTextColor: '#4f6ef7',
+      primaryBorderColor: '#4f6ef7',
+      lineColor: '#a0a8c0',
+      secondaryColor: '#fff1ea',
+      tertiaryColor: '#f0f2f8',
+      fontSize: '13px'
+    }}, document.querySelector('.mermaid'));
+  }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  renderPage('overview');
+  // Init calculator if already on page
+  setTimeout(calcResult, 300);
+});
+</script>
+</body>
+</html>
