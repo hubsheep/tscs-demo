@@ -1,1321 +1,441 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TSCS ?????????????v2.0 - ?????????</title>
+<meta charset="UTF-8>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TSCS v2.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root{
---bg:#F0F2F5;--card:#fff;--text:#262626;--text2:#595959;--border:#d9d9d9;
---shadow:0 1px 3px rgba(0,0,0,.08);--shadow-lg:0 4px 16px rgba(0,0,0,.12);
---accent:#1677FF;--accent-rgb:22,119,255;
---accent-enterprise:#52C41A;
---accent-driver:#FA8C16;
---accent-field:#722ED1;
---radius:8px;--radius-lg:12px;
-}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans SC',sans-serif;background:var(--bg);color:var(--text);font-size:14px;overflow-x:hidden}
-
-/* TOP NAV */
-.top-nav{background:#fff;height:56px;display:flex;align-items:center;padding:0 24px;box-shadow:var(--shadow);position:fixed;top:0;left:0;right:0;z-index:100}
-.top-nav .logo{font-weight:700;font-size:18px;color:#1a1a2e;margin-right:40px;white-space:nowrap}
-.top-nav .logo span{font-size:12px;color:var(--text2);font-weight:400}
-.term-tabs{display:flex;gap:6px}
-.term-tab{padding:6px 20px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s;border:2px solid transparent;background:transparent;color:var(--text2);font-family:inherit}
-.term-tab.active[data-term="platform"]{background:rgba(22,119,255,.1);color:var(--accent);border-color:var(--accent)}
-.term-tab.active[data-term="enterprise"]{background:rgba(82,196,26,.1);color:var(--accent-enterprise);border-color:var(--accent-enterprise)}
-.term-tab.active[data-term="driver"]{background:rgba(250,140,22,.1);color:var(--accent-driver);border-color:var(--accent-driver)}
-.term-tab.active[data-term="field"]{background:rgba(114,46,209,.1);color:var(--accent-field);border-color:var(--accent-field)}
-.term-tab:hover{opacity:.8}
-
-/* LAYOUT */
-.layout{display:flex;margin-top:56px;min-height:calc(100vh - 56px)}
-.sidebar{width:215px;background:#fff;border-right:1px solid var(--border);padding:16px 0;flex-shrink:0;overflow-y:auto;height:calc(100vh - 56px);position:fixed;top:56px;left:0}
-.sidebar-item{padding:9px 16px;cursor:pointer;font-size:12px;color:var(--text2);transition:all .15s;border-left:3px solid transparent;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidebar-item:hover{background:var(--bg);color:var(--text)}
-.sidebar-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(22,119,255,.05);font-weight:500}
-[data-term="enterprise"] .sidebar-item.active{color:var(--accent-enterprise);border-left-color:var(--accent-enterprise);background:rgba(82,196,26,.05)}
-[data-term="driver"] .sidebar-item.active{color:var(--accent-driver);border-left-color:var(--accent-driver);background:rgba(250,140,22,.05)}
-[data-term="field"] .sidebar-item.active{color:var(--accent-field);border-left-color:var(--accent-field);background:rgba(114,46,209,.05)}
-.sidebar-header{padding:0 16px 12px;border-bottom:1px solid var(--border);margin-bottom:12px}
-.sidebar-header .name{font-weight:700;font-size:13px;color:var(--text)}
-.sidebar-header .sub{font-size:11px;color:var(--text2);margin-top:2px}
-.main{flex:1;margin-left:215px;padding:20px;min-height:calc(100vh - 56px);transition:all .3s}
-.breadcrumb{font-size:12px;color:var(--text2);margin-bottom:14px}
-
-/* CARD */
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
-.stat-card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:4px}
-.stat-card .label{font-size:11px;color:var(--text2)}
-.stat-card .value{font-size:26px;font-weight:700}
-.stat-card .sub{font-size:10px;color:#52C41A}
-.stat-card .sub.red{color:#ff4d4f}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.section-title{font-size:15px;font-weight:700;margin-bottom:14px;color:var(--text);display:flex;align-items:center;gap:8px}
-.section-title::before{content:'';display:inline-block;width:3px;height:15px;background:var(--accent);border-radius:2px}
-
-/* TABLE */
-.table-wrap{overflow-x:auto}
+body{font-family:'Noto Sans SC',sans-serif;background:#F0F2F5;font-size:14px;color:#262626}
+:root{--bg:#F0F2F5;--c:#fff;--t:#262626;--t2:#595959;--bdr:#d9d9d9;--sh:0 1px 3px rgba(0,0,0,.08);--sh2:0 4px 16px rgba(0,0,0,.12);--a:#1677FF;--ae:#52C41A;--ad:#FA8C16;--af:#722ED1;--r:8px;--r2:12px}
+.top-nav{background:#fff;height:56px;display:flex;align-items:center;padding:0 24px;box-shadow:var(--sh);position:fixed;top:0;left:0;right:0;z-index:100}
+.logo{font-weight:700;font-size:18px;margin-right:40px}
+.tabs{display:flex;gap:6px}
+.tab{padding:6px 20px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;border:2px solid transparent;transition:all .2s}
+.tab:hover{opacity:.8}
+.tab.active[data-t="p"]{background:rgba(22,119,255,.1);color:var(--a);border-color:var(--a)}
+.tab.active[data-t="e"]{background:rgba(82,196,26,.1);color:var(--ae);border-color:var(--ae)}
+.tab.active[data-t="d"]{background:rgba(250,140,22,.1);color:var(--ad);border-color:var(--ad)}
+.tab.active[data-t="f"]{background:rgba(114,46,209,.1);color:var(--af);border-color:var(--af)}
+.lay{display:flex;margin-top:56px;min-height:calc(100vh - 56px)}
+.side{width:210px;background:#fff;border-right:1px solid var(--bdr);padding:16px 0;position:fixed;top:56px;left:0;bottom:0;overflow-y:auto}
+.si{padding:9px 16px;cursor:pointer;font-size:12px;color:var(--t2);border-left:3px solid transparent;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:all .15s}
+.si:hover{background:var(--bg)}
+.si.active{color:var(--a);border-left-color:var(--a);background:rgba(22,119,255,.05);font-weight:500}
+[data-t="e"] .si.active{color:var(--ae);border-left-color:var(--ae);background:rgba(82,196,26,.05)}
+[data-t="d"] .si.active{color:var(--ad);border-left-color:var(--ad);background:rgba(250,140,22,.05)}
+[data-t="f"] .si.active{color:var(--af);border-left-color:var(--af);background:rgba(114,46,209,.05)}
+.sh{padding:0 16px 12px;border-bottom:1px solid var(--bdr);margin-bottom:12px}
+.shn{font-weight:700;font-size:13px}
+.shs{font-size:11px;color:var(--t2);margin-top:2px}
+.main{flex:1;margin-left:210px;padding:20px;min-height:calc(100vh - 56px)}
+.c{background:var(--c);border-radius:var(--r);box-shadow:var(--sh);padding:20px;margin-bottom:16px}
+.sc{background:var(--c);border-radius:var(--r);box-shadow:var(--sh);padding:16px;display:flex;flex-direction:column;gap:4px}
+.scl{font-size:11px;color:var(--t2)}
+.scv{font-size:26px;font-weight:700}
+.scs{font-size:10px}
+.scs.r{color:#ff4d4f}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.sg2{grid-template-columns:repeat(2,1fr)}
+.sg3{grid-template-columns:repeat(3,1fr)}
+.st{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.st::before{content:'';display:inline-block;width:3px;height:15px;background:var(--a);border-radius:2px}
+[data-t="e"] .st::before{background:var(--ae)}
+[data-t="d"] .st::before{background:var(--ad)}
+[data-t="f"] .st::before{background:var(--af)}
+.tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--border)}
-th{background:#fafafa;font-weight:500;color:var(--text2);font-size:11px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--bdr)}
+th{background:#fafafa;font-weight:500;color:var(--t2);font-size:11px}
 tr:hover{background:#fafafa}
-.clickable-row{cursor:pointer}
-
-/* BADGE */
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
-.badge-blue{background:rgba(22,119,255,.1);color:var(--accent)}
-.badge-green{background:rgba(82,196,26,.1);color:var(--accent-enterprise)}
-.badge-orange{background:rgba(250,140,22,.1);color:var(--accent-driver)}
-.badge-purple{background:rgba(114,46,209,.1);color:var(--accent-field)}
-.badge-red{background:rgba(255,77,79,.1);color:#ff4d4f}
-.badge-yellow{background:rgba(250,140,22,.15);color:#d46b00}
-.badge-gray{background:#f0f0f0;color:var(--text2)}
-.badge-dark{background:#595959;color:#fff}
-
-/* BUTTON */
-.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--text);transition:all .15s;font-family:inherit}
+.cr{cursor:pointer}
+.bdg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+.bg{background:rgba(22,119,255,.1);color:var(--a)}
+.bge{background:rgba(82,196,26,.1);color:var(--ae)}
+.bgd{background:rgba(250,140,22,.1);color:var(--ad)}
+.bgf{background:rgba(114,46,209,.1);color:var(--af)}
+.br{background:rgba(255,77,79,.1);color:#ff4d4f}
+.by{background:rgba(250,140,22,.15);color:#d46b00}
+.bk{background:#f0f0f0;color:var(--t2)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--bdr);background:#fff;color:var(--t);transition:all .15s;font-family:inherit}
 .btn:hover{border-color:#40a9ff;color:#40a9ff}
-.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-.btn-primary:hover{background:#4098ff}
-.btn-success{background:#52C41A;color:#fff;border-color:#52C41A}
-.btn-success:hover{background:#73d13d}
-.btn-danger{background:#fff;color:#ff4d4f;border-color:#ff4d4f}
-.btn-danger:hover{background:#fff1f0}
-.btn-orange{background:var(--accent-driver);color:#fff;border-color:var(--accent-driver)}
-.btn-purple{background:var(--accent-field);color:#fff;border-color:var(--accent-field)}
-.btn-sm{padding:3px 9px;font-size:11px}
-.toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
-.search-input{padding:6px 10px;border:1px solid var(--border);border-radius:5px;font-size:12px;outline:none;font-family:inherit;width:180px}
-select.form-control,input.form-control,textarea.form-control{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;outline:none;transition:border-color .15s;background:#fff}
-input.form-control:focus,select.form-control:focus{border-color:#40a9ff}
-.form-group{margin-bottom:14px}
-.form-label{display:block;font-size:12px;font-weight:500;margin-bottom:5px;color:var(--text)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-
-/* TIMELINE */
-.timeline{position:relative;padding-left:22px}
-.timeline::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--border)}
-.timeline-item{position:relative;margin-bottom:18px}
-.timeline-item::before{content:'';position:absolute;left:-19px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--border);border:2px solid #fff}
-.timeline-item.done::before{background:#52C41A}
-.timeline-item.active::before{background:var(--accent);box-shadow:0 0 0 3px rgba(22,119,255,.2)}
-.timeline-item.pending::before{background:var(--border)}
-.timeline-time{font-size:10px;color:var(--text2);margin-bottom:1px}
-.timeline-title{font-weight:500;font-size:12px}
-.timeline-desc{font-size:11px;color:var(--text2);margin-top:1px}
-
-/* PAGE */
-.page{display:none;animation:fadeIn .25s ease}
-.page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
-
-/* MODAL */
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:200;display:none}
-.modal-overlay.show{display:flex}
-.modal{background:#fff;border-radius:var(--radius-lg);padding:22px;width:540px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .2s ease}
-.modal-lg{width:780px}
-@keyframes modalIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-.modal-header{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--border)}
-.modal-close{cursor:pointer;font-size:20px;color:var(--text2);line-height:1;background:none;border:none;font-family:inherit}
-.modal-close:hover{color:var(--text)}
-.modal-footer{margin-top:18px;display:flex;justify-content:flex-end;gap:10px;padding-top:12px;border-top:1px solid var(--border)}
-
-/* TOAST */
-.toast{position:fixed;top:76px;right:20px;background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:11px 18px;z-index:300;display:none;font-size:12px;max-width:280px;border-left:3px solid #52C41A}
-.toast.show{display:flex;align-items:center;gap:8px;animation:toastIn .3s ease}
-.toast.error{border-left-color:#ff4d4f}
-@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-
-/* HELPERS */
-.flex{display:flex}.flex-wrap{flex-wrap:wrap}
-.flex-between{display:flex;align-items:center;justify-content:space-between}
-.flex-center{display:flex;align-items:center;justify-content:center}
-.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}.gap-20{gap:20px}
-.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}
-.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
-.text-success{color:#52C41A}.text-error{color:#ff4d4f}.text-warning{color:#fa8c16}
-.text-muted{color:var(--text2);font-size:11px}.text-right{text-align:right}.text-center{text-align:center}
-.font-bold{font-weight:700}
-.divider{height:1px;background:var(--border);margin:14px 0}
-.empty-state{text-align:center;padding:40px 0;color:var(--text2)}
-.empty-state .icon{font-size:40px;margin-bottom:10px;opacity:.3}
-.pagination{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-top:14px}
-.page-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:5px;cursor:pointer;font-size:12px;background:#fff;font-family:inherit;transition:all .15s}
-.page-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.page-btn:hover:not(.active){border-color:#40a9ff;color:#40a9ff}
-.progress-bar{height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden}
-.progress-fill{height:100%;border-radius:4px;transition:width .5s ease}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.info-item{display:flex;flex-direction:column;gap:2px}
-.info-label{font-size:11px;color:var(--text2)}
-.info-value{font-size:13px;font-weight:500}
-.info-value.money{font-size:18px;font-weight:700;color:var(--text)}
-.info-value.money-lg{font-size:22px;font-weight:700;color:#52C41A}
-
-/* STEP INDICATOR */
-.step-indicator{display:flex;align-items:center;margin-bottom:20px}
-.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
-.step-dot.done{background:#52C41A;color:#fff}
-.step-dot.active{background:var(--accent);color:#fff}
-.step-dot.pending{background:#d9d9d9;color:#fff}
-.step-line{flex:1;height:2px;background:#d9d9d9}
-.step-line.done{background:#52C41A}
-
-/* FLOW CARDS */
-.flow-card{display:flex;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;cursor:pointer;transition:all .15s}
-.flow-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
-.flow-card .fc-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.flow-card .fc-info{flex:1;min-width:0}
-.flow-card .fc-title{font-weight:600;font-size:13px;margin-bottom:3px}
-.flow-card .fc-desc{font-size:11px;color:var(--text2)}
-.flow-card .fc-badge{margin-top:3px}
-
-/* CALC */
-.calc-result{background:#fafafa;border-radius:var(--radius);padding:14px;margin-top:12px}
-.calc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--text2)}
-.calc-row.total{font-size:14px;font-weight:700;color:var(--text);border-top:1px solid var(--border);margin-top:6px;padding-top:8px}
-.calc-row.total .val{color:#52C41A;font-size:18px}
-.chart-wrap{position:relative;height:200px}
-
-/* ????????*/
-[data-term="enterprise"] .section-title::before{background:var(--accent-enterprise)}
-[data-term="driver"] .section-title::before{background:var(--accent-driver)}
-[data-term="field"] .section-title::before{background:var(--accent-field)}
-[data-term="enterprise"] .btn-primary{background:var(--accent-enterprise);border-color:var(--accent-enterprise)}
-[data-term="driver"] .btn-primary{background:var(--accent-driver);border-color:var(--accent-driver)}
-[data-term="field"] .btn-primary{background:var(--accent-field);border-color:var(--accent-field)}
-
-/* PHONE FRAME */
-.phone-wrap{display:flex;justify-content:center;align-items:flex-start;padding:32px 20px;background:#d8d8d8;min-height:calc(100vh - 56px)}
-.phone-frame{width:390px;background:#fff;border-radius:36px;box-shadow:0 8px 40px rgba(0,0,0,.22),0 0 0 11px #1a1a1a;overflow:hidden;position:relative}
-.phone-notch{height:34px;background:#1a1a1a;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
-.phone-notch::after{content:'';width:90px;height:16px;background:#111;border-radius:0 0 10px 10px}
-.phone-body{height:calc(100vh - 90px);overflow-y:auto;background:#fff}
-.phone-bottom-bar{position:absolute;bottom:0;left:0;right:0;height:58px;background:#fff;border-top:1px solid #eee;display:flex}
-.phone-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;color:#999;cursor:pointer;transition:color .15s}
-.phone-tab .icon{font-size:20px}
-.driver-phone .phone-tab.active{color:#FA8C16}
-.field-phone .phone-tab.active{color:#722ED1}
-.driver-phone .phone-bottom-bar{background:#fffaf5}
-.field-phone .phone-bottom-bar{background:#f5f0ff}
+.bp{background:var(--a);color:#fff;border-color:var(--a)}
+.bp:hover{background:#4098ff}
+.be{background:var(--ae);color:#fff;border-color:var(--ae)}
+.bd2{background:var(--ad);color:#fff;border-color:var(--ad)}
+.bf2{background:var(--af);color:#fff;border-color:var(--af)}
+.bsm{padding:3px 9px;font-size:11px}
+.tbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.srch{padding:6px 10px;border:1px solid var(--bdr);border-radius:5px;font-size:12px;outline:none;font-family:inherit;width:180px}
+.srch:focus{border-color:#40a9ff}
+.frm{width:100%;padding:7px 10px;border:1px solid var(--bdr);border-radius:5px;font-size:12px;font-family:inherit;outline:none;background:#fff;transition:border-color .15s}
+.frm:focus{border-color:#40a9ff}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:12px;font-weight:500;margin-bottom:5px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tl{position:relative;padding-left:22px}
+.tl::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--bdr)}
+.ti{position:relative;margin-bottom:18px}
+.ti::before{content:'';position:absolute;left:-19px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--bdr);border:2px solid #fff}
+.ti.d::before{background:#52C41A}
+.ti.a::before{background:var(--a);box-shadow:0 0 0 3px rgba(22,119,255,.2)}
+.ti.p::before{background:var(--bdr)}
+.tt{font-size:10px;color:var(--t2);margin-bottom:1px}
+.ti .ttl{font-weight:500;font-size:12px}
+.ti .td{font-size:11px;color:var(--t2);margin-top:1px}
+.pg{display:none;animation:fade .25s ease}
+.pg.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+.mo{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:200;display:none}
+.mo.s{display:flex}
+.mb{background:#fff;border-radius:var(--r2);padding:22px;width:540px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:var(--sh2);animation:mo .2s ease}
+.mb.lg{width:780px}
+@keyframes mo{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.mh{font-size:15px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid var(--bdr)}
+.mx{cursor:pointer;font-size:20px;color:var(--t2);background:none;border:none;font-family:inherit}
+.mf{margin-top:18px;display:flex;justify-content:flex-end;gap:10px;padding-top:12px;border-top:1px solid var(--bdr)}
+.tst{position:fixed;top:76px;right:20px;background:#fff;border-radius:var(--r);box-shadow:var(--sh2);padding:11px 18px;z-index:300;display:none;font-size:12px;max-width:280px;border-left:3px solid #52C41A}
+.tst.s{display:flex;align-items:center;gap:8px;animation:tst .3s ease}
+.tst.e{border-left-color:#ff4d4f}
+@keyframes tst{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.fx{display:flex}.fxw{flex-wrap:wrap}
+.fxb{display:flex;align-items:center;justify-content:space-between}
+.g8{gap:8px}.g12{gap:12px}.g16{gap:16px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.ts{color:#52C41A}.te{color:#ff4d4f}.tw2{color:#fa8c16}
+.tm{color:var(--t2);font-size:11px}.tr{text-align:right}.tc{text-align:center}
+.fb{font-weight:700}
+.dv{height:1px;background:var(--bdr);margin:14px 0}
+.es{text-align:center;padding:40px 0;color:var(--t2)}
+.pgn{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-top:14px}
+.pb{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bdr);border-radius:5px;cursor:pointer;font-size:12px;background:#fff;font-family:inherit;transition:all .15s}
+.pb.on{background:var(--a);color:#fff;border-color:var(--a)}
+.pb:hover:not(.on){border-color:#40a9ff;color:#40a9ff}
+.pb2{height:7px;background:#f0f0f0;border-radius:4px;overflow:hidden}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ii{display:flex;flex-direction:column;gap:2px}
+.il{font-size:11px;color:var(--t2)}
+.iv{font-size:13px;font-weight:500}
+.iv.m{font-size:18px;font-weight:700}
+.iv.l{font-size:22px;font-weight:700;color:#52C41A}
+.fc{display:flex;gap:12px;padding:12px;border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:10px;cursor:pointer;transition:all .15s}
+.fc:hover{border-color:var(--a);box-shadow:var(--sh)}
+.fc .fci{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fc .fcn{flex:1;min-width:0}
+.fc .fct{font-weight:600;font-size:13px;margin-bottom:3px}
+.fc .fcd{font-size:11px;color:var(--t2)}
+.ap{display:flex;align-items:center;margin:16px 0}
+.an{flex:1;text-align:center;padding:10px 6px;background:#fafafa;border-radius:8px}
+.an .al{font-size:11px;color:var(--t2);margin-bottom:4px}
+.an .av{font-size:14px;font-weight:700}
+.an .as{font-size:10px;color:var(--t2)}
+.aa{font-size:14px;color:var(--bdr);flex-shrink:0}
+.si2{display:flex;align-items:center;margin-bottom:20px}
+.sd{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.sd.d{background:#52C41A;color:#fff}
+.sd.a{background:var(--a);color:#fff}
+.sd.p{background:#d9d9d9;color:#fff}
+.sl{flex:1;height:2px;background:#d9d9d9}
+.sl.d{background:#52C41A}
+.cr2{background:#fafafa;border-radius:var(--r);padding:14px;margin-top:12px}
+.cr3{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--t2)}
+.cr3.t{font-size:14px;font-weight:700;color:var(--t);border-top:1px solid var(--bdr);margin-top:6px;padding-top:8px}
+.cr3.t .v{color:#52C41A;font-size:18px}
+.cwrap{position:relative;height:200px}
+.pw{display:flex;justify-content:center;align-items:flex-start;padding:32px 20px;background:#d8d8d8;min-height:calc(100vh - 56px)}
+.pf{width:390px;background:#fff;border-radius:36px;box-shadow:0 8px 40px rgba(0,0,0,.22),0 0 0 11px #1a1a1a;overflow:hidden;position:relative}
+.pn{height:34px;background:#1a1a1a;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.pn::after{content:'';width:90px;height:16px;background:#111;border-radius:0 0 10px 10px}
+.pb2{height:calc(100vh - 90px);overflow-y:auto;background:#fff}
+.pbb{position:absolute;bottom:0;left:0;right:0;height:58px;background:#fff;border-top:1px solid #eee;display:flex}
+.pt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;color:#999;cursor:pointer;transition:color .15s}
+.pt .ic{font-size:20px}
+.dp .pt.on{color:#FA8C16}
+.fp .pt.on{color:#722ED1}
+.dp .pbb{background:#fffaf5}
+.fp .pbb{background:#f5f0ff}
+.ph{padding:10px 14px 8px;display:flex;align-items:center;gap:8px}
+.ph .bk{font-size:16px;cursor:pointer;width:24px}
+.ph .ttl2{font-size:13px;font-weight:600}
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<nav class="top-nav">
-  <div class="logo">TSCS <span>v2.0 ??????</span></div>
-  <div class="term-tabs">
-    <div class="term-tab active" data-term="platform" onclick="switchTerm('platform')">?????????/div>
-    <div class="term-tab" data-term="enterprise" onclick="switchTerm('enterprise')">?? ?????/div>
-    <div class="term-tab" data-term="driver" onclick="switchTerm('driver')">?? ??????</div>
-    <div class="term-tab" data-term="field" onclick="switchTerm('field')">?? ?????/div>
-  </div>
-</nav>
+<nav class="top-nav"><div class="logo">TSCS <span>v2.0</span></div><div class="tabs"><div class="tab active" data-t="p" onclick="st('p')">&#128692; &#26426;&#26500;&#31471;</div><div class="tab" data-t="e" onclick="st('e')">&#128739; &#20225;&#19994;&#31471;</div><div class="tab" data-t="d" onclick="st('d')">&#128663; &#39550;&#39542;&#21592;&#31471;</div><div class="tab" data-t="f" onclick="st('f')">&#128241; &#29616;&#22330;&#31471;</div></div></nav>
 
-<!-- ========== PLATFORM (????? ========== -->
-<div id="term-platform" class="layout term-content" data-term="platform">
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="name">?????/div>
-      <div class="sub">TSCS ????????????</div>
-    </div>
-    <div class="sidebar-item active" onclick="showPage('platform','plat-home')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-enterprise-list')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-insurance-list')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-case-list')">??? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-case-detail')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-payment')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-finance')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-risk')">??????????</div>
-    <div class="sidebar-item" onclick="showPage('platform','plat-users')">?? ??????</div>
-  </div>
-  <div class="main">
-    <!-- ?????-->
-    <div id="plat-login" class="page">
-      <div style="display:flex;justify-content:center;align-items:center;height:60vh">
-        <div class="card" style="width:360px;text-align:center">
-          <div style="font-size:32px;margin-bottom:8px">????/div>
-          <div style="font-size:20px;font-weight:700;margin-bottom:4px">TSCS ?????/div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:24px">????????????</div>
-          <div class="form-group"><input class="form-control" placeholder="???????? value="admin"></div>
-          <div class="form-group"><input class="form-control" type="password" placeholder="???????? value="******"></div>
-          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="showPage('platform','plat-home')">????/button>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-home" class="page active">
-      <div class="section-title">?????????</div>
-      <div class="stat-grid">
-        <div class="stat-card"><div class="label">?????????</div><div class="value" style="color:var(--accent)">18</div><div class="sub">?????+2</div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value">28,634</div><div class="sub">??????</div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value" style="color:#ff4d4f">127</div><div class="sub red">???????12</div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value" style="color:#ff4d4f">?3,842,600</div><div class="sub red">???????8%</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="card">
-          <div class="section-title">??????????????/div>
-          <canvas id="chart-company" height="120"></canvas>
-        </div>
-        <div class="card">
-          <div class="section-title">???????????????</div>
-          <canvas id="chart-trend" height="120"></canvas>
-        </div>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">??? ??????</div>
-        <table>
-          <thead><tr><th>??????</th><th>???</th><th>???</th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td><span class="badge badge-red">??????</span></td><td>???????/td><td>??2??????91%?????0%???</td><td><button class="btn btn-sm btn-primary" onclick="showPage('platform','plat-risk')">???</button></td></tr>
-            <tr><td><span class="badge badge-yellow">????????/span></td><td>??????</td><td>????????????28???????????/td><td><button class="btn btn-sm btn-primary">???</button></td></tr>
-            <tr><td><span class="badge badge-orange">??????</span></td><td>??????</td><td>?????????????2?????????????0??/td><td><button class="btn btn-sm btn-primary">???</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-enterprise-list" class="page">
-      <div class="section-title">??????</div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="?????????...">
-        <select class="form-control" style="width:140px">
-          <option>???????/option><option>???</option><option>?????/option><option>???</option>
-        </select>
-        <button class="btn btn-primary">+ ??????</button>
-      </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>??????</th><th>???</th><th>??????</th><th>??????</th><th>????/th><th>???</th></tr></thead>
-            <tbody>
-              <tr class="clickable-row" onclick="showPage('platform','plat-enterprise-detail')"><td><b>??????</b></td><td>??????</td><td>3,200??/td><td>2025-03-15</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-              <tr><td>??????</td><td>???</td><td>1,850??/td><td>2025-05-20</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-              <tr><td>???????/td><td>??????</td><td>2,100??/td><td>2025-01-10</td><td><span class="badge badge-red">?????/span></td><td><button class="btn btn-sm">???</button></td></tr>
-              <tr><td>??????</td><td>???</td><td>960??/td><td>2025-08-01</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-              <tr><td>??????</td><td>??????</td><td>420??/td><td>2025-11-15</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-enterprise-detail" class="page">
-      <div class="section-title">?????? - ??????</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="card">
-          <div class="section-title">??????</div>
-          <div class="info-grid">
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">????????????</div></div>
-            <div class="info-item"><div class="info-label">????????????</div><div class="info-value">91110105MA0xxxxxx</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">??????</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">???</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">138-0013-8000</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">?????????xx??x??/div></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="section-title">??????</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-            <div class="stat-card"><div class="label">??????</div><div class="value" style="color:var(--accent)">3,200</div></div>
-            <div class="stat-card"><div class="label">????????/div><div class="value">3,410</div></div>
-            <div class="stat-card"><div class="label">??????????/div><div class="value">78.5</div><div class="sub">B????????/div></div>
-            <div class="stat-card"><div class="label">????????/div><div class="value">34.2%</div><div class="sub text-success">???40%</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">????????????????</div>
-        <table>
-          <thead><tr><th>?????/th><th>???</th><th>???</th><th>??????</th><th>??????</th><th>????/th></tr></thead>
-          <tbody>
-            <tr><td>PC-2026-001</td><td>???88888</td><td>??????</td><td>2026-01-01</td><td>2026-12-31</td><td><span class="badge badge-green">?????/span></td></tr>
-            <tr><td>PC-2026-002</td><td>???12345</td><td>??????</td><td>2026-01-01</td><td>2026-12-31</td><td><span class="badge badge-green">?????/span></td></tr>
-            <tr><td>PC-2026-003</td><td>???66789</td><td>??????</td><td>2026-01-01</td><td>2026-12-31</td><td><span class="badge badge-green">?????/span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-insurance-list" class="page">
-      <div class="section-title">??????</div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="?????????...">
-        <select class="form-control" style="width:140px"><option>???????/option><option>?????/option><option>?????/option><option>???</option></select>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>??????</th><th>?????/th><th>????????/th><th>??????</th><th>????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td>??????</td><td>3,200??/td><td>?12,800,000</td><td>2026-01-01~2026-12-31</td><td><span class="badge badge-green">?????/span></td><td><button class="btn btn-sm">?????/button></td></tr>
-            <tr><td>??????</td><td>1,850??/td><td>?6,650,000</td><td>2026-01-01~2026-12-31</td><td><span class="badge badge-green">?????/span></td><td><button class="btn btn-sm">?????/button></td></tr>
-            <tr><td>???????/td><td>2,100??/td><td>?8,400,000</td><td>2026-01-01~2026-12-31</td><td><span class="badge badge-yellow">??????</span></td><td><button class="btn btn-sm">?????/button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ????????? -->
-    <div id="plat-case-list" class="page">
-      <div class="section-title">?????????</div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="???????????...">
-        <select class="form-control" style="width:130px"><option>??????</option><option>???????</option><option>??????</option><option>??????</option></select>
-        <select class="form-control" style="width:130px"><option>???????/option><option>?????/option><option>?????/option><option>?????/option></select>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>?????/th><th>???</th><th>???</th><th>???</th><th>???</th><th>??????</th><th>????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr class="clickable-row" onclick="showPage('platform','plat-case-detail')">
-              <td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28 09:15</td><td>??????</td><td>???88888</td>
-              <td><span class="badge badge-blue">??????</span></td><td>?15,800</td>
-              <td><span class="badge badge-orange">?????/span></td>
-              <td><button class="btn btn-sm btn-primary">???</button></td>
-            </tr>
-            <tr>
-              <td>TSCS-2026-0327-0087</td><td>2026-03-27 16:42</td><td>??????</td><td>???66666</td>
-              <td><span class="badge badge-green">???????</span></td><td>?1,800</td>
-              <td><span class="badge badge-purple">?????/span></td>
-              <td><button class="btn btn-sm btn-primary">???</button></td>
-            </tr>
-            <tr>
-              <td>TSCS-2026-0326-0086</td><td>2026-03-26 11:30</td><td>???????/td><td>???11222</td>
-              <td><span class="badge badge-red">??????</span></td><td>?186,000</td>
-              <td><span class="badge badge-orange">??????</span></td>
-              <td><button class="btn btn-sm btn-primary">???</button></td>
-            </tr>
-            <tr>
-              <td>TSCS-2026-0325-0085</td><td>2026-03-25 08:55</td><td>??????</td><td>???44555</td>
-              <td><span class="badge badge-blue">??????</span></td><td>?8,200</td>
-              <td><span class="badge badge-green">?????/span></td>
-              <td><button class="btn btn-sm btn-primary">???</button></td>
-            </tr>
-            <tr>
-              <td>TSCS-2026-0324-0084</td><td>2026-03-24 14:20</td><td>??????</td><td>???99001</td>
-              <td><span class="badge badge-green">???????</span></td><td>?960</td>
-              <td><span class="badge badge-green">?????/span></td>
-              <td><button class="btn btn-sm">???</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-case-detail" class="page">
-      <div class="section-title">?????? - TSCS-2026-0328-0088</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="card">
-          <div class="section-title">??????</div>
-          <div class="info-grid">
-            <div class="info-item"><div class="info-label">?????/div><div class="info-value">TSCS-2026-0328-0088</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">2026-03-28 09:15</div></div>
-            <div class="info-item"><div class="info-label">???</div><div class="info-value">??????</div></div>
-            <div class="info-item"><div class="info-label">???</div><div class="info-value">???88888</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value">?????????????????</div></div>
-            <div class="info-item"><div class="info-label">??????</div><div class="info-value"><span class="badge badge-yellow">??? 70%</span></div></div>
-            <div class="info-item" style="grid-column:1/-1"><div class="info-label">??????</div><div class="info-value">????????????????????????????????????????????????????/div></div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="section-title">?????????</div>
-          <div class="timeline">
-            <div class="timeline-item done">
-              <div class="timeline-time">2026-03-28 09:15</div>
-              <div class="timeline-title">???????????/div>
-              <div class="timeline-desc">??????????????/div>
-            </div>
-            <div class="timeline-item done">
-              <div class="timeline-time">2026-03-28 10:02</div>
-              <div class="timeline-title">??????????/div>
-              <div class="timeline-desc">?????????????????</div>
-            </div>
-            <div class="timeline-item done">
-              <div class="timeline-time">2026-03-28 10:30</div>
-              <div class="timeline-title">??????</div>
-              <div class="timeline-desc">????????????????????/div>
-            </div>
-            <div class="timeline-item active">
-              <div class="timeline-time">2026-03-28 11:15</div>
-              <div class="timeline-title">????????/div>
-              <div class="timeline-desc">????????????????????/div>
-            </div>
-            <div class="timeline-item pending">
-              <div class="timeline-time">??/div>
-              <div class="timeline-title">??????</div>
-              <div class="timeline-desc">???????????????</div>
-            </div>
-            <div class="timeline-item pending">
-              <div class="timeline-time">??/div>
-              <div class="timeline-title">??????</div>
-              <div class="timeline-desc">??????????????/div>
-            </div>
-            <div class="timeline-item pending">
-              <div class="timeline-time">??/div>
-              <div class="timeline-title">???</div>
-              <div class="timeline-desc">???????????/div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">?????????</div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:4px">????????/div>
-            <div style="font-weight:600">??? <span class="badge badge-blue">????????/span></div>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:4px">???????/div>
-            <div style="font-weight:600">?????? 11:15???</div>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--text2);margin-bottom:4px">?????/div>
-            <div style="font-weight:600">8/20 ??/div>
-          </div>
-          <button class="btn btn-primary" style="margin-left:auto" onclick="showPage('platform','plat-payment')">?????????</button>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-payment" class="page">
-      <div class="section-title">?????? - TSCS-2026-0328-0088</div>
-      <div class="stat-grid stat-grid-3">
-        <div class="stat-card"><div class="label">??????</div><div class="value">127</div><div class="sub">??????</div></div>
-        <div class="stat-card"><div class="label">?????/div><div class="value" style="color:#fa8c16">23</div><div class="sub">??????</div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value">?3,842,600</div><div class="sub">?????/div></div>
-      </div>
-      <div class="card">
-        <div class="section-title">??????</div>
-        <div class="info-grid mb-16">
-          <div class="info-item"><div class="info-label">?????????????????????</div><div class="info-value">?15,800</div></div>
-          <div class="info-item"><div class="info-label">??????</div><div class="info-value">??? ? 70%</div></div>
-          <div class="info-item"><div class="info-label">??????</div><div class="info-value">?500</div></div>
-          <div class="info-item"><div class="info-label">?????????</div><div class="info-value">0%</div></div>
-        </div>
-        <div class="calc-result">
-          <div class="calc-row"><span>?????? ??????</span><span>?15,800 ? 70% = ?11,060</span></div>
-          <div class="calc-row"><span>????????</span><span>?11,060 ???500 = ?10,560</span></div>
-          <div class="calc-row"><span>? (1 ????????)</span><span>?10,560 ? 1.0 = ?10,560</span></div>
-          <div class="calc-row total"><span>????????/span><span class="val">?10,560</span></div>
-        </div>
-        <div class="mt-16">
-          <div class="section-title" style="margin-bottom:12px">??????</div>
-          <div style="display:flex;align-items:center;gap:0">
-            <div class="approval-node" style="background:rgba(82,196,26,.1)"><div class="an-label">????????/div><div class="an-value text-success">????????</div></div>
-            <div class="approval-arrow">??/div>
-            <div class="approval-node" style="background:rgba(22,119,255,.1)"><div class="an-label">??????</div><div class="an-value" style="color:var(--accent)">?????/div><div class="an-sub">??????????</div></div>
-            <div class="approval-arrow">??/div>
-            <div class="approval-node"><div class="an-label">???????/div><div class="an-value">??????</div><div class="an-sub">????/div></div>
-            <div class="approval-arrow">??/div>
-            <div class="approval-node"><div class="an-label">??????</div><div class="an-value">?????/div></div>
-          </div>
-        </div>
-        <div class="flex gap-8 mt-16">
-          <button class="btn btn-success" onclick="toast('?????????????????')">?????? ?10,560</button>
-          <button class="btn" onclick="showPage('platform','plat-finance')">?????????</button>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-finance" class="page">
-      <div class="section-title">?????? - ????????/div>
-      <div class="stat-grid">
-        <div class="stat-card" style="border-left:4px solid #1677FF"><div class="label">????????????70%??/div><div class="value" style="color:#1677FF">?28,640,000</div><div class="sub">?????? ?12,800,000 ? ??? ?3,842,600</div></div>
-        <div class="stat-card" style="border-left:4px solid #fa8c16"><div class="label">?????????15%??/div><div class="value" style="color:#fa8c16">?6,140,000</div><div class="sub">??????</div></div>
-        <div class="stat-card" style="border-left:4px solid #52C41A"><div class="label">????????????15%??/div><div class="value" style="color:#52C41A">?6,140,000</div><div class="sub">?????? ?2,742,857</div></div>
-      </div>
-      <div class="card">
-        <div class="section-title">????????????</div>
-        <table>
-          <thead><tr><th>???</th><th>??????</th><th>??????70%??/th><th>??????15%??/th><th>??????15%??/th><th>??????</th><th>?????/th></tr></thead>
-          <tbody>
-            <tr><td>??????</td><td>?12,800,000</td><td>?8,960,000</td><td>?1,920,000</td><td>?1,920,000</td><td>?1,280,000</td><td><span class="text-success">?7,680,000</span></td></tr>
-            <tr><td>??????</td><td>?6,650,000</td><td>?4,655,000</td><td>?997,500</td><td>?997,500</td><td>?680,000</td><td><span class="text-success">?3,975,000</span></td></tr>
-            <tr><td>???????/td><td>?8,400,000</td><td>?5,880,000</td><td>?1,260,000</td><td>?1,260,000</td><td>?2,480,000</td><td><span class="text-error">?3,400,000</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-risk" class="page">
-      <div class="section-title">?????????</div>
-      <div class="card">
-        <table>
-          <thead><tr><th>???</th><th>???</th><th>?????/th><th>???????/th><th>??????</th><th>??????</th><th>??????</th></tr></thead>
-          <tbody>
-            <tr><td>??????</td><td><span class="badge badge-green">A??/span></td><td>34.2%</td><td>78.5</td><td>2??/td><td>15%</td><td>?????????????10%</td></tr>
-            <tr><td>??????</td><td><span class="badge badge-green">B??/span></td><td>52%</td><td>71</td><td>1??/td><td>32%</td><td>?????????????</td></tr>
-            <tr><td>???????/td><td><span class="badge badge-red">D??/span></td><td>91%</td><td>58</td><td>3??/td><td>62%</td><td>????????????????</td></tr>
-            <tr><td>??????</td><td><span class="badge badge-yellow">C??/span></td><td>67%</td><td>65</td><td>1??/td><td>45%</td><td>????????????????</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">???????????/div>
-        <canvas id="chart-risk" height="180"></canvas>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="plat-users" class="page">
-      <div class="section-title">??????</div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="??????/???...">
-        <select class="form-control" style="width:140px"><option>??????</option><option>?????/option><option>????????/option><option>???</option><option>???</option></select>
-        <button class="btn btn-primary">+ ??????</button>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>???</th><th>???</th><th>???</th><th>???</th><th>???????/th><th>????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td>???</td><td>linana</td><td><span class="badge badge-blue">?????/span></td><td>???</td><td>2026-03-28 09:00</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???</td><td>zhaoqiang</td><td><span class="badge badge-purple">?????/span></td><td>???</td><td>2026-03-28 11:20</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???</td><td>wangfang</td><td><span class="badge badge-orange">????????/span></td><td>???</td><td>2026-03-28 08:45</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???</td><td>chenwei</td><td><span class="badge badge-green">???</span></td><td>???</td><td>2026-03-28 10:30</td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+<div id="t-p" class="lay" data-t="p">
+<div class="side">
+<div class="sh"><div class="shn">&#26426;&#26500;&#31471;</div><div class="shs">TSCS&#24179;&#21488;&#36816;&#33829;&#31649;&#29702;&#31995;&#32479;</div></div>
+<div class="si active" onclick="sp('p','ph')">&#128202; &#25968;&#25454;&#38754;&#26495;</div>
+<div class="si" onclick="sp('p','pe')">&#128739; &#20225;&#19994;&#31649;&#29702;</div>
+<div class="si" onclick="sp('p','pi')">&#128209; &#21442;&#32479;&#31649;&#29702;</div>
+<div class="si" onclick="sp('p','pc')">&#9888; &#20107;&#25925;&#25253;&#26696;</div>
+<div class="si" onclick="sp('p','pcd')">&#128269; &#26696;&#20214;&#35780;&#24773;</div>
+<div class="si" onclick="sp('p','pp')">&#128176; &#20114;&#21161;&#32473;&#20184;</div>
+<div class="si" onclick="sp('p','pf')">&#128202; &#36130;&#21153;&#25253;&#34920;</div>
+<div class="si" onclick="sp('p','pr')">&#128736; &#39118;&#25511;&#35780;&#32423;</div>
+<div class="si" onclick="sp('p','pu')">&#128101; &#29992;&#25143;&#31649;&#29702;</div>
+</div>
+<div class="main">
+<div id="pp-l" class="pg"><div style="display:flex;justify-content:center;align-items:center;height:60vh"><div class="c" style="width:360px;text-align:center"><div style="font-size:32px;margin-bottom:8px">&#128692;</div><div style="font-size:20px;font-weight:700;margin-bottom:4px">TSCS&#26426;&#26500;&#31471;</div><div style="font-size:12px;color:var(--t2);margin-bottom:24px">&#24179;&#21488;&#36816;&#33829;&#31649;&#29702;&#31995;&#32479;</div><div class="fg"><input class="frm" placeholder="&#35831;&#36755;&#20837;&#36134;&#21495;" value="admin"></div><div class="fg"><input class="frm" type="password" placeholder="&#35831;&#36755;&#20837;&#23494;&#30721;" value="******"></div><button class="btn bp" style="width:100%;justify-content:center" onclick="sp('p','ph')">&#30331;&#24405;</button></div></div></div>
+<div id="ph" class="pg on"><div class="st">&#20840;&#23616;&#25968;&#25454;&#38754;&#26495;</div><div class="sg"><div class="sc"><div class="scl">&#38598;&#20250;&#20225;&#19994;&#24635;&#25968;</div><div class="scv" style="color:var(--a)">18</div><div class="scs">&#65288;&#26412;&#26376;+2&#65289;</div></div><div class="sc"><div class="scl">&#22312;&#32479;&#36710;&#36742;&#24635;&#25968;</div><div class="scv">28,634</div><div class="scs">&#27963;&#36291;&#20973;&#35777;</div></div><div class="sc"><div class="scl">&#26412;&#26376;&#26032;&#22686;&#26696;&#20214;</div><div class="scv" style="color:#ff4d4f">127</div><div class="scs r">&#65288;&#36742;&#36739;&#19978;&#26376;+12&#65289;</div></div><div class="sc"><div class="scl">&#26412;&#26376;&#32473;&#20184;&#37329;&#39069;</div><div class="scv" style="color:#ff4d4f">&#165;3,842,600</div><div class="scs r">&#65288;&#36742;&#36739;&#19978;&#26376;+8%&#65289;</div></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="c"><div class="st">&#21508;&#20225;&#19994;&#20851;&#38190;&#25351;&#26631;&#23545;&#27604;</div><canvas id="ccomp" height="120"></canvas></div><div class="c"><div class="st">&#26376;&#24230;&#32473;&#20184;&#36235;&#21183;&#65288;&#19975;&#20803;&#65289;</div><canvas id="ctrend" height="120"></canvas></div></div>
+<div class="c mt16"><div class="st">&#9888; &#39118;&#38556;&#39044;&#35686;</div><div class="tw"><table><thead><tr><th>&#39044;&#35686;&#31867;&#22411;</th><th>&#20225;&#19994;</th><th>&#35814;&#24773;</th><th>&#22788;&#29702;</th></tr></thead><tbody>
+<tr><td><span class="bdg br">&#39640;&#32473;&#20184;&#29575;</span></td><td>&#21326;&#36890;&#23458;&#36816;</td><td>&#36817;12&#26376;&#32473;&#20184;&#29575;91%&#65292;&#36229;&#36807;80%&#32418;&#32447;</td><td><button class="btn bsm bp" onclick="sp('p','pr')">&#26597;&#30475;</button></td></tr>
+<tr><td><span class="bdg by">&#36164;&#37329;&#27744;&#19981;&#36275;</span></td><td>&#40511;&#31243;&#36816;&#36755;</td><td>&#20114;&#21161;&#36164;&#37329;&#27744;&#20313;&#39069;&#165;128&#19975;&#65292;&#20302;&#20110;&#39044;&#35686;&#32447;</td><td><button class="btn bsm bp">&#22788;&#29702;</button></td></tr>
+<tr><td><span class="bdg bfd">&#35780;&#20998;&#36807;&#20302;</span></td><td>&#261星球&#29289;&#27969;</td><td>&#20225;&#19994;&#39550;&#39542;&#35780;&#20998;&#22343;&#20540;62&#20998;&#65292;&#24050;&#36830;&#32493;3&#26376;&#20302;&#20110;70&#20998;</td><td><button class="btn bsm bp">&#26597;&#30475;</button></td></tr>
+</tbody></table></div></div></div>
+<div id="pe" class="pg"><div class="st">&#20225;&#19994;&#31649;&#29702;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#20225;&#19994;&#21517;&#31216;..."><select class="frm" style="width:140px"><option>&#20840;&#37096;&#29366;&#24577;</option><option>&#27491;&#24120;</option><option>&#24453;&#23457;&#26680;</option></select><button class="btn bp">+ &#26032;&#22686;&#20225;&#19994;</button></div><div class="c"><div class="tw"><table><thead><tr><th>&#20225;&#19994;&#21517;&#31216;</th><th>&#34892;&#19994;</th><th>&#36710;&#36742;&#35268;&#27169;</th><th>&#20837;&#39547;&#26102;&#38388;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr class="cr" onclick="sp('p','ped')"><td><b>&#40511;&#31243;&#36816;&#36755;</b></td><td>&#20844;&#36335;&#23458;&#36816;</td><td>3,200&#36742;</td><td>2025-03-15</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+<tr><td>&#261星球&#29289;&#27969;</td><td>&#36135;&#36816;</td><td>1,850&#36742;</td><td>2025-05-20</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+<tr><td>&#21326;&#36890;&#23458;&#36816;</td><td>&#26053;&#28216;&#23458;&#36816;</td><td>2,100&#36742;</td><td>2025-01-10</td><td><span class="bdg br">&#39640;&#39118;&#38556;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+<tr><td>&#39034;&#25509;&#31199;&#36161;</td><td>&#31199;&#36161;</td><td>960&#36742;</td><td>2025-08-01</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+<tr><td>&#37995;&#23433;&#20986;&#31199;</td><td>&#20986;&#31199;&#23458;&#36816;</td><td>420&#36742;</td><td>2025-11-15</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+</tbody></table></div></div></div>
+<div id="ped" class="pg"><div class="st">&#20225;&#19994;&#35814;&#24773; - &#40511;&#31243;&#36816;&#36755;</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="c"><div class="st">&#22522;&#26412;&#20449;&#24687;</div><div class="ig"><div class="ii"><div class="il">&#20225;&#19994;&#21517;&#31216;</div><div class="iv">&#40511;&#31243;&#36816;&#36755;&#26377;&#38480;&#20844;&#21496;</div></div><div class="ii"><div class="il">&#32479;&#19968;&#31038;&#20250;&#20449;&#29992;&#20195;&#30721;</div><div class="iv">91110105MA0xxxxxx</div></div><div class="ii"><div class="il">&#34892;&#19994;&#31867;&#22411;</div><div class="iv">&#20844;&#36335;&#23458;&#36816;</div></div><div class="ii"><div class="il">&#27861;&#20154;&#20195;&#34920;</div><div class="iv">&#26446;&#26126;</div></div><div class="ii"><div class="il">&#32852;&#31995;&#26041;&#24335;</div><div class="iv">138-0013-8000</div></div></div></div><div class="c"><div class="st">&#36816;&#33829;&#27096;&#20917;</div><div class="sg3"><div class="sc"><div class="scl">&#22312;&#32479;&#36710;&#36742;</div><div class="scv" style="color:var(--a)">3,200</div></div><div class="sc"><div class="scl">&#32467;&#23545;&#39550;&#39542;&#21592;</div><div class="scv">3,410</div></div><div class="sc"><div class="scl">&#39550;&#39542;&#35780;&#20998;&#22343;&#20540;</div><div class="scv">78.5</div><div class="scs">B&#32423;&#20013;&#20302;&#39118;&#38556;</div></div></div></div></div><div class="c mt16"><div class="st">&#32479;&#31616;&#21333;&#21015;&#34920;&#65288;&#26368;&#36817;3&#26465;&#65289;</div><div class="tw"><table><thead><tr><th>&#20973;&#35777;&#21495;</th><th>&#36710;&#29260;</th><th>&#26041;&#26696;</th><th>&#29983;&#25928;&#26085;&#26399;</th><th>&#21097;&#26399;&#26085;&#26399;</th><th>&#29366;&#24577;</th></tr></thead><tbody>
+<tr><td>PC-2026-001</td><td>&#20140;A&#183;88888</td><td>&#26631;&#20934;&#26041;&#26696;</td><td>2026-01-01</td><td>2026-12-31</td><td><span class="bdg bge">&#29983;&#25928;&#20013;</span></td></tr><tr><td>PC-2026-002</td><td>&#20140;B&#183;12345</td><td>&#22522;&#30830;&#26041;&#26696;</td><td>2026-01-01</td><td>2026-12-31</td><td><span class="bdg bge">&#29983;&#25928;&#20013;</span></td></tr></tbody></table></div></div></div>
+<div id="pi" class="pg"><div class="st">&#21442;&#32479;&#35760;&#24405;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#20225;&#19994;&#21517;&#31216;..."><select class="frm" style="width:140px"><option>&#20840;&#37096;&#29366;&#24577;</option><option>&#29983;&#25928;&#20013;</option><option>&#24050;&#21097;&#26399;</option></select></div><div class="c"><div class="tw"><table><thead><tr><th>&#20225;&#19994;&#21517;&#31216;</th><th>&#36710;&#36742;&#25968;</th><th>&#32479;&#31649;&#36153;&#21512;&#35745;</th><th>&#21327;&#35758;&#26102;&#38388;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td>&#40511;&#31243;&#36816;&#36755;</td><td>3,200&#36742;</td><td>&#165;12,800,000</td><td>2026-01-01~2026-12-31</td><td><span class="bdg bge">&#29983;&#25928;&#20013;</span></td><td><button class="btn bsm">&#32479;&#31649;&#21333;</button></td></tr><tr><td>&#261星球&#29289;&#27969;</td><td>1,850&#36742;</td><td>&#165;6,650,000</td><td>2026-01-01~2026-12-31</td><td><span class="bdg bge">&#29983;&#25928;&#20013;</span></td><td><button class="btn bsm">&#32479;&#31649;&#21333;</button></td></tr></tbody></table></div></div></div>
+<div id="pc" class="pg"><div class="st">&#20107;&#25925;&#25253;&#26696;&#21463;&#29702;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#25253;&#26696;&#21495;..."><select class="frm" style="width:130px"><option>&#20840;&#37096;&#36890;&#36947;</option><option>&#24555;&#36895;&#36890;&#36947;</option><option>&#26631;&#20934;&#36890;&#36947;</option><option>&#22823;&#26696;&#36890;&#36947;</option></select><select class="frm" style="width:120px"><option>&#20840;&#37096;&#29366;&#24577;</option><option>&#24453;&#20998;&#37197;</option><option>&#22788;&#29702;&#20013;</option></select></div><div class="c"><div class="tw"><table><thead><tr><th>&#25253;&#26696;&#21495;</th><th>&#26102;&#38388;</th><th>&#20225;&#19994;</th><th>&#36710;&#29260;</th><th>&#36890;&#36947;</th><th>&#39044;&#20272;&#37329;&#39069;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr class="cr" onclick="sp('p','pcd')"><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28 09:15</td><td>&#40511;&#31243;&#36816;&#36755;</td><td>&#20140;A&#183;88888</td><td><span class="bdg bg">&#26631;&#20934;&#36890;&#36947;</span></td><td>&#165;15,800</td><td><span class="bdg by">&#26632;&#26597;&#20013;</span></td><td><button class="btn bsm bp">&#26597;&#30475;</button></td></tr>
+<tr><td>TSCS-2026-0327-0087</td><td>2026-03-27 16:42</td><td>&#261星球&#29289;&#27969;</td><td>&#20140;B&#183;66666</td><td><span class="bdg bge">&#24555;&#36895;&#36890;&#36947;</span></td><td>&#165;1,800</td><td><span class="bdg bf">&#24453;&#20998;&#37197;</span></td><td><button class="btn bsm bp">&#20998;&#37197;</button></td></tr>
+<tr><td>TSCS-2026-0326-0086</td><td>2026-03-26 11:30</td><td>&#21326;&#36890;&#23458;&#36816;</td><td>&#20140;C&#183;11222</td><td><span class="bdg br">&#22823;&#26696;&#36890;&#36947;</span></td><td>&#165;186,000</td><td><span class="bdg by">&#26448;&#26009;&#23457;&#26680;</span></td><td><button class="btn bsm bp">&#26597;&#30475;</button></td></tr>
+</tbody></table></div></div></div>
+<div id="pcd" class="pg"><div class="st">&#26696;&#20214;&#35814;&#24773; - TSCS-2026-0328-0088</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="c"><div class="st">&#25253;&#26696;&#20449;&#24687;</div><div class="ig"><div class="ii"><div class="il">&#25253;&#26696;&#21495;</div><div class="iv">TSCS-2026-0328-0088</div></div><div class="ii"><div class="il">&#20225;&#19994;</div><div class="iv">&#40511;&#31243;&#36816;&#36755;</div></div><div class="ii"><div class="il">&#36710;&#29260;</div><div class="iv">&#20140;A&#183;88888</div></div><div class="ii"><div class="il">&#36131;&#20219;&#21010;&#20998;</div><div class="iv"><span class="bdg by">&#20027;&#36131; 70%</span></div></div></div></div><div class="c"><div class="st">&#26696;&#20214;&#22788;&#29702;&#36827;&#24230;</div><div class="tl"><div class="ti d"><div class="tt">2026-03-28 09:15</div><div class="ttl">&#39550;&#39542;&#21592;&#19968;&#38190;&#25253;&#26696;</div><div class="td">&#39550;&#39542;&#21592;&#24352;&#20256;&#25551;&#20132;&#25253;&#26696;</div></div><div class="ti d"><div class="tt">2026-03-28 10:02</div><div class="ttl">&#20225;&#19994;&#26368;&#32456;&#25253;&#26696;</div><div class="td">&#20998;&#21496;&#23433;&#20840;&#21592;&#23457;&#26680;&#36890;&#36807;</div></div><div class="ti d"><div class="tt">2026-03-28 10:30</div><div class="ttl">&#26696;&#20214;&#21463;&#29702;</div><div class="td">&#35843;&#24230;&#21592;&#26446;&#23068;&#20998;&#37197;&#33267;&#26632;&#25439;&#21592;&#36213;&#24378;</div></div><div class="ti a"><div class="tt">2026-03-28 11:15</div><div class="ttl">&#29616;&#22330;&#26632;&#26597;&#20013;</div><div class="td">&#26632;&#25439;&#21592;&#24050;&#21040;&#36798;&#29616;&#22330;&#65292;&#27491;&#22312;&#21462;&#35777;</div></div><div class="ti p"><div class="tt">&#8212;</div><div class="ttl">&#25439;&#22833;&#35780;&#20272;</div><div class="td">&#31561;&#24453;&#26632;&#25439;&#21592;&#25551;&#20132;&#35780;&#20272;&#21333;</div></div><div class="ti p"><div class="tt">&#8212;</div><div class="ttl">&#20114;&#21161;&#32473;&#20184;</div><div class="td">&#31561;&#24453;&#26448;&#26009;&#23457;&#26680;&#19982;&#29702;&#31639;</div></div></div></div></div><div class="c mt16"><div class="st">&#26632;&#25439;&#20219;&#21153;&#20998;&#37197;</div><div style="display:flex;align-items:center;gap:16px"><div><div style="font-size:12px;color:var(--t2);margin-bottom:4px">&#24403;&#21069;&#26632;&#25439;&#21592;</div><div style="font-weight:600">&#36213;&#24378; <span class="bdg bg">&#29616;&#22330;&#26632;&#26597;&#20013;</span></div></div><div><div style="font-size:12px;color:var(--t2);margin-bottom:4px">&#24403;&#21069;&#29366;&#24577;</div><div style="font-weight:600">&#24050;&#21040;&#36798; &#183; 11:15&#31614;&#21040;</div></div><div><div style="font-size:12px;color:var(--t2);margin-bottom:4px">&#24050;&#25293;&#29031;</div><div style="font-weight:600">8/20 &#24352;</div></div><button class="btn bp" style="margin-left:auto" onclick="sp('p','pp')">&#26597;&#30475;&#20114;&#21161;&#32473;&#20184;</button></div></div></div>
+<div id="pp" class="pg"><div class="st">&#20114;&#21161;&#32473;&#20184; - TSCS-2026-0328-0088</div><div class="sg3 mb16"><div class="sc"><div class="scl">&#26696;&#20214;&#24635;&#25968;</div><div class="scv">127</div><div class="scs">&#26412;&#26376;&#26032;&#22686;</div></div><div class="sc"><div class="scl">&#24453;&#23457;&#26680;</div><div class="scv" style="color:#fa8c16">23</div><div class="scs">&#26448;&#26009;&#24453;&#23457;</div></div><div class="sc"><div class="scl">&#26412;&#26376;&#32473;&#20184;&#24635;&#39069;</div><div class="scv">&#165;3,842,600</div><div class="scs">&#24050;&#25903;&#20184;</div></div></div><div class="c"><div class="st">&#20114;&#21161;&#29702;&#31639;</div><div class="ig mb16"><div class="ii"><div class="il">&#25439;&#22833;&#39069;&#65288;&#21462;&#21457;&#31080;&#19982;&#35780;&#20272;&#36739;&#20302;&#32773;&#65289;</div><div class="iv m">&#165;15,800</div></div><div class="ii"><div class="il">&#36131;&#20219;&#27604;&#20363;</div><div class="iv">&#20027;&#36131; &#215; 70%</div></div><div class="ii"><div class="il">&#20813;&#32473;&#20184;&#39069;</div><div class="iv">&#165;500</div></div><div class="ii"><div class="il">&#21327;&#35758;&#25176;&#38500;&#27604;&#20363;</div><div class="iv">0%</div></div></div><div class="cr2"><div class="cr3"><span>&#25439;&#22833;&#39069; &#215; &#36131;&#20219;&#27604;&#20363;</span><span>&#165;15,800 &#215; 70% = &#165;11,060</span></div><div class="cr3"><span>&#8722; &#20813;&#32473;&#20184;&#39069;</span><span>&#165;11,060 &#8722; &#165;500 = &#165;10,560</span></div><div class="cr3"><span>&#215; (1 &#8722; &#21327;&#35758;&#25176;&#38500;)</span><span>&#165;10,560 &#215; 1.0 = &#165;10,560</span></div><div class="cr3 t"><span>&#20114;&#21161;&#32473;&#20184;&#27454;</span><span class="v">&#165;10,560</span></div></div><div class="mt16"><div class="st" style="margin-bottom:12px">&#20998;&#32423;&#23457;&#25209;</div><div class="ap"><div class="an" style="background:rgba(82,196,26,.1)"><div class="al">&#20114;&#21161;&#32473;&#20184;&#21592;</div><div class="av ts">&#10003; &#23457;&#26680;&#36890;&#36807;</div></div><div class="aa">&#8594;</div><div class="an" style="background:rgba(22,119,255,.1)"><div class="al">&#20225;&#19994;&#30830;&#35748;</div><div class="av" style="color:var(--a)">&#24453;&#30830;&#35748;</div><div class="as">&#8226;&#20224;&#20803;&#33258;&#21160;&#36890;&#36807;</div></div><div class="aa">&#8594;</div><div class="an"><div class="al">&#26368;&#32456;&#23457;&#25209;</div><div class="av">&#33258;&#21160;&#36890;&#36807;</div><div class="as">&#8226;&#20854;&#20182;&#24773;&#20917;</div></div><div class="aa">&#8594;</div><div class="an"><div class="al">&#25903;&#20184;&#25191;&#34892;</div><div class="av">&#24453;&#25191;&#34892;</div></div></div></div><div class="fx g8 mt16"><button class="btn be" onclick="tst('&#10003; &#32473;&#20184;&#25104;&#21151;&#65292;&#24050;&#36890;&#30693;&#20225;&#19994;')">&#30830;&#35748;&#32473;&#20184; &#165;10,560</button><button class="btn" onclick="sp('p','pf')">&#26597;&#30475;&#25903;&#20184;&#35760;&#24405;</button></div></div></div>
+<div id="pf" class="pg"><div class="st">&#36130;&#21153;&#25253;&#34920; - &#19977;&#36134;&#25143;&#27169;&#22411;</div><div class="sg"><div class="sc" style="border-left:4px solid #1677FF"><div class="scl">&#20114;&#21161;&#20114;&#27982;&#36164;&#37329;&#27744;&#65288;70%&#65289;</div><div class="scv" style="color:#1677FF">&#165;28,640,000</div><div class="scs">&#26412;&#26376;&#25910;&#20837; &#165;12,800,000 &#183; &#25903;&#20986; &#165;3,842,600</div></div><div class="sc" style="border-left:4px solid #fa8c16"><div class="scl">&#39118;&#38556;&#20648;&#22791;&#37329;&#65288;15%&#65289;</div><div class="scv" style="color:#fa8c16">&#165;6,140,000</div><div class="scs">&#19978;&#26376;&#32467;&#36716;</div></div><div class="sc" style="border-left:4px solid #52C41A"><div class="scl">&#24179;&#21488;&#36816;&#33829;&#31649;&#29702;&#36153;&#65288;15%&#65289;</div><div class="scv" style="color:#52C41A">&#165;6,140,000</div><div class="scs">&#26412;&#26376;&#25910;&#20837; &#165;2,742,857</div></div></div><div class="c"><div class="st">&#21508;&#20225;&#19994;&#19977;&#36134;&#25143;&#26126;&#32431;</div><div class="tw"><table><thead><tr><th>&#20225;&#19994;</th><th>&#26412;&#26376;&#32564;&#32435;</th><th>&#36164;&#27744;&#65288;70%&#65289;</th><th>&#20648;&#22791;&#37329;&#65288;15%&#65289;</th><th>&#36816;&#33829;&#36153;&#65288;15%&#65289;</th><th>&#32473;&#20184;&#25903;&#20986;</th><th>&#27744;&#20313;&#39069;</th></tr></thead><tbody>
+<tr><td>&#40511;&#31243;&#36816;&#36755;</td><td>&#165;12,800,000</td><td>&#165;8,960,000</td><td>&#165;1,920,000</td><td>&#165;1,920,000</td><td>&#165;1,280,000</td><td><span class="ts">&#165;7,680,000</span></td></tr><tr><td>&#261星球&#29289;&#27969;</td><td>&#165;6,650,000</td><td>&#165;4,655,000</td><td>&#165;997,500</td><td>&#165;997,500</td><td>&#165;680,000</td><td><span class="ts">&#165;3,975,000</span></td></tr><tr><td>&#21326;&#36890;&#23458;&#36816;</td><td>&#165;8,400,000</td><td>&#165;5,880,000</td><td>&#165;1,260,000</td><td>&#165;1,260,000</td><td>&#165;2,480,000</td><td><span class="te">&#165;3,400,000</span></td></tr></tbody></table></div></div></div>
+<div id="pr" class="pg"><div class="st">&#20225;&#19994;&#39118;&#25511;&#35780;&#32423;</div><div class="c"><div class="tw"><table><thead><tr><th>&#20225;&#19994;</th><th>&#35780;&#32423;</th><th>&#32473;&#20184;&#29575;</th><th>&#35780;&#20998;&#22343;&#20540;</th><th>&#32564;&#32435;&#24180;&#38480;</th><th>&#25302;&#38752;&#27604;&#20363;</th><th>&#39118;&#38556;&#25514;&#26045;</th></tr></thead><tbody>
+<tr><td>&#40511;&#31243;&#36816;&#36755;</td><td><span class="bdg bge">A&#32423;</span></td><td>34.2%</td><td>78.5</td><td>2&#24180;</td><td>15%</td><td>&#20248;&#20808;&#32564;&#32435;&#183;&#36153;&#29575;&#20248;&#24833;10%</td></tr><tr><td>&#261星球&#29289;&#27969;</td><td><span class="bdg bge">B&#32423;</span></td><td>52%</td><td>71</td><td>1&#24180;</td><td>32%</td><td>&#27491;&#24120;&#32564;&#32435;&#183;&#26631;&#20934;&#36153;&#29575;</td></tr><tr><td>&#21326;&#36890;&#23458;&#36816;</td><td><span class="bdg br">D&#32423;</span></td><td>91%</td><td>58</td><td>3&#24180;</td><td>62%</td><td>&#26242;&#20572;&#26032;&#22686;&#21442;&#32479;&#183;&#32422;&#35848;&#25972;&#25913;</td></tr><tr><td>&#39034;&#25509;&#31199;&#36161;</td><td><span class="bdg by">C&#32423;</span></td><td>67%</td><td>65</td><td>1&#24180;</td><td>45%</td><td>&#32564;&#32435;&#23457;&#26680;&#21152;&#20005;&#183;&#36153;&#29575;&#19978;&#27969;</td></tr></tbody></table></div></div><div class="c mt16"><div class="st">&#20225;&#19994;&#39118;&#25511;&#38647;&#36752;&#22270;</div><canvas id="crisk" height="180"></canvas></div></div>
+<div id="pu" class="pg"><div class="st">&#29992;&#25143;&#31649;&#29702;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#22995;&#21517;/&#36134;&#21495;..."><select class="frm" style="width:140px"><option>&#20840;&#37096;&#35282;&#33394;</option><option>&#35843;&#24230;&#21592;</option><option>&#20114;&#21161;&#32473;&#20184;&#21592;</option><option>&#36130;&#21153;</option><option>&#36816;&#33829;</option></select><button class="btn bp">+ &#26032;&#22686;&#29992;&#25143;</button></div><div class="c"><div class="tw"><table><thead><tr><th>&#22995;&#21517;</th><th>&#36134;&#21495;</th><th>&#35282;&#33394;</th><th>&#20225;&#19994;</th><th>&#26368;&#21518;&#30331;&#24405;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td>&#26446;&#23068;</td><td>linana</td><td><span class="bdg bg">&#35843;&#24230;&#21592;</span></td><td>&#24179;&#21488;</td><td>2026-03-28 09:00</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#32534;&#36753;</button></td></tr><tr><td>&#36213;&#24378;</td><td>zhaoqiang</td><td><span class="bdg bf">&#26632;&#25439;&#21592;</span></td><td>&#24179;&#21488;</td><td>2026-03-28 11:20</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#32534;&#36753;</button></td></tr><tr><td>&#29579;&#33457;</td><td>wangfang</td><td><span class="bdg bd2">&#20114;&#21161;&#32473;&#20184;&#21592;</span></td><td>&#24179;&#21488;</td><td>2026-03-28 08:45</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#32534;&#36753;</button></td></tr><tr><td>&#38472;&#20255;</td><td>chenwei</td><td><span class="bdg bge">&#36130;&#21153;</span></td><td>&#24179;&#21488;</td><td>2026-03-28 10:30</td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#32534;&#36753;</button></td></tr></tbody></table></div></div></div>
+
+</div>
 </div>
 
-<!-- ========== ENTERPRISE (????? ========== -->
-<div id="term-enterprise" class="layout term-content" data-term="enterprise" style="display:none">
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <div class="name">?????/div>
-      <div class="sub">?????? ? ?????/div>
-    </div>
-    <div class="sidebar-item active" onclick="showPage('enterprise','ent-home')">?? ?????/div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-vehicle')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-driver')">?? ????????/div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-safety')">??????????</div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-case')">??? ??????</div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-report')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-finance')">?? ??????</div>
-    <div class="sidebar-item" onclick="showPage('enterprise','ent-renew')">?? ??????</div>
-  </div>
-  <div class="main">
-    <!-- ?????-->
-    <div id="ent-home" class="page active">
-      <div class="section-title">????????/div>
-      <div class="stat-grid">
-        <div class="stat-card"><div class="label">??????</div><div class="value" style="color:var(--accent-enterprise)">3,200</div><div class="sub">???+120</div></div>
-        <div class="stat-card"><div class="label">???????????/div><div class="value" style="color:#fa8c16">3</div><div class="sub red">????????</div></div>
-        <div class="stat-card"><div class="label">????????/div><div class="value" style="color:var(--accent)">2</div><div class="sub">?????????3,400</div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value" style="color:#ff4d4f">15</div><div class="sub red">???15???</div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="card">
-          <div class="section-title">?????????</div>
-          <div class="flex gap-16 mb-12">
-            <div style="text-align:center">
-              <div style="font-size:42px;font-weight:700;color:var(--accent-enterprise)">78.5</div>
-              <div style="font-size:11px;color:var(--text2)">??????????/div>
-              <span class="badge badge-green" style="margin-top:4px">B??? ???</span>
-            </div>
-            <div style="flex:1">
-              <div style="margin-bottom:8px;font-size:12px">???????????/div>
-              <canvas id="ent-chart-score" height="80"></canvas>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="section-title">????????????</div>
-          <div class="stat-grid stat-grid-3" style="gap:8px">
-            <div class="stat-card"><div class="label">??????</div><div class="value" style="color:#ff4d4f">12</div></div>
-            <div class="stat-card"><div class="label">????????/div><div class="value">0.38%</div></div>
-            <div class="stat-card"><div class="label">??????</div><div class="value" style="color:#ff4d4f">?128,600</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">?? ??????</div>
-        <div class="flow-card" onclick="showPage('enterprise','ent-case')">
-          <div class="fc-icon" style="background:rgba(255,77,79,.1)">???</div>
-          <div class="fc-info"><div class="fc-title">???????????<span class="badge badge-red">3</span></div><div class="fc-desc">????????????????4????????????????????/div></div>
-        </div>
-        <div class="flow-card" onclick="showPage('enterprise','ent-home')">
-          <div class="fc-icon" style="background:rgba(22,119,255,.1)">??</div>
-          <div class="fc-info"><div class="fc-title">????????<span class="badge badge-blue">2</span></div><div class="fc-desc">???????????????????????????0,560 / ?12,840</div></div>
-        </div>
-        <div class="flow-card" onclick="showPage('enterprise','ent-renew')">
-          <div class="fc-icon" style="background:rgba(250,140,22,.1)">??</div>
-          <div class="fc-info"><div class="fc-title">????????? <span class="badge badge-yellow">15</span></div><div class="fc-desc">15???????????????15??????????????????</div></div>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="ent-vehicle" class="page">
-      <div class="section-title">??????</div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="????????VIN...">
-        <select class="form-control" style="width:120px"><option>???????/option><option>???</option><option>??????</option><option>?????/option><option>???</option></select>
-        <button class="btn btn-primary">+ ??????</button>
-        <button class="btn btn-success">+ ??????</button>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>???</th><th>???</th><th>??????</th><th>????????/th><th>???????/th><th>??????</th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td><b>???88888</b></td><td>??????????/td><td>??????</td><td>???</td><td><span class="badge badge-green">???</span></td><td>2026-12-31</td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???12345</td><td>??????????/td><td>??????</td><td>???</td><td><span class="badge badge-green">???</span></td><td>2026-12-31</td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???66789</td><td>?????????</td><td>???</td><td>???</td><td><span class="badge badge-yellow">??????</span></td><td>2026-04-10</td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???88001</td><td>??????</td><td>??????</td><td>??/td><td><span class="badge badge-gray">?????/span></td><td>2026-12-31</td><td><button class="btn btn-sm">???</button></td></tr>
-          </tbody>
-        </table>
-        <div class="pagination">
-          <span class="page-btn" style="opacity:.4">??/span>
-          <span class="page-btn active">1</span>
-          <span class="page-btn">2</span>
-          <span class="page-btn">3</span>
-          <span class="page-btn">...</span>
-          <span class="page-btn">128</span>
-          <span class="page-btn">??/span>
-        </div>
-      </div>
-    </div>
-    <!-- ????????-->
-    <div id="ent-driver" class="page">
-      <div class="section-title">????????/div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="??????/?????..">
-        <select class="form-control" style="width:120px"><option>??????</option><option>???(90+)</option><option>???(80+)</option><option>????70+)</option><option>???(<70)</option></select>
-        <button class="btn btn-primary">+ ??????</button>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>???</th><th>?????/th><th>??????</th><th>??????</th><th>??????</th><th>???</th><th>????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td><b>???</b></td><td>138****5678</td><td>A1</td><td>???88888</td><td><b style="color:#52C41A">92</b></td><td><span class="badge badge-green">???</span></td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???</td><td>139****2233</td><td>B1</td><td>???12345</td><td><b style="color:#52C41A">88</b></td><td><span class="badge badge-green">???</span></td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???</td><td>137****8899</td><td>B2</td><td>???66789</td><td><b style="color:#fa8c16">68</b></td><td><span class="badge badge-orange">???</span></td><td><span class="badge badge-green">???</span></td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>???</td><td>136****1155</td><td>A2</td><td>???99901</td><td><b style="color:#ff4d4f">58</b></td><td><span class="badge badge-red">??/span></td><td><span class="badge badge-red">?????/span></td><td><button class="btn btn-sm btn-danger">???</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">?????????</div>
-        <canvas id="ent-chart-dist" height="140"></canvas>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="ent-safety" class="page">
-      <div class="section-title">?????????</div>
-      <div class="stat-grid stat-grid-3">
-        <div class="stat-card"><div class="label">?????????????/div><div class="value" style="color:var(--accent-enterprise)">78.5</div><div class="sub">???????.3??/div></div>
-        <div class="stat-card"><div class="label">???????????/div><div class="value">0.38%</div><div class="sub">???????0.52%</div></div>
-        <div class="stat-card"><div class="label">????????/div><div class="value" style="color:#ff4d4f">8??/div><div class="sub">??????70??/div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="card">
-          <div class="section-title">????????????</div>
-          <canvas id="ent-chart-trend" height="100"></canvas>
-        </div>
-        <div class="card">
-          <div class="section-title">???????????/div>
-          <table>
-            <thead><tr><th>???</th><th>???</th><th>??????</th><th>???</th></tr></thead>
-            <tbody>
-              <tr><td>???</td><td><span class="badge badge-red">58</span></td><td>???3?????0??/td><td><button class="btn btn-sm btn-primary">???</button></td></tr>
-              <tr><td>???</td><td><span class="badge badge-orange">63</span></td><td>????????????</td><td><button class="btn btn-sm">???</button></td></tr>
-              <tr><td>???</td><td><span class="badge badge-orange">67</span></td><td>???????????/td><td><button class="btn btn-sm">???</button></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="ent-case" class="page">
-      <div class="section-title">??????</div>
-      <div class="toolbar">
-        <input class="search-input" placeholder="???????????...">
-        <select class="form-control" style="width:120px"><option>???????/option><option>?????/option><option>?????/option><option>?????/option></select>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>?????/th><th>???</th><th>???</th><th>???</th><th>??????</th><th>????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28 09:15</td><td>???88888</td><td>??????</td><td>?15,800</td><td><span class="badge badge-orange">?????/span></td><td><button class="btn btn-sm btn-primary">???</button></td></tr>
-            <tr><td>TSCS-2026-0327-0087</td><td>2026-03-27 16:42</td><td>???12345</td><td>??????</td><td>?1,800</td><td><span class="badge badge-green">?????/span></td><td><button class="btn btn-sm btn-primary">???</button></td></tr>
-            <tr><td>TSCS-2026-0325-0085</td><td>2026-03-25 14:20</td><td>???66789</td><td>??????</td><td>?8,200</td><td><span class="badge badge-green">?????/span></td><td><button class="btn btn-sm">???</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="ent-report" class="page">
-      <div class="section-title">?????????</div>
-      <div class="card">
-        <div class="step-indicator">
-          <div class="step-dot done">1</div><div class="step-line done"></div>
-          <div class="step-dot active">2</div><div class="step-line"></div>
-          <div class="step-dot pending">3</div><div class="step-line"></div>
-          <div class="step-dot pending">4</div><div class="step-line"></div>
-          <div class="step-dot pending">5</div>
-        </div>
-        <div class="form-group">
-          <div class="form-label">????????? *</div>
-          <select class="form-control"><option>???88888 - ???</option><option>???12345 - ???</option><option>???66789 - ???</option></select>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><div class="form-label">?????? *</div><input class="form-control" type="datetime-local" value="2026-03-28T09:15"></div>
-          <div class="form-group"><div class="form-label">?????? *</div><input class="form-control" placeholder="GPS?????..?????????????????"></div>
-        </div>
-        <div class="form-group">
-          <div class="form-label">?????? *</div>
-          <div style="display:flex;gap:8px">
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="resp" checked> ??? 100%</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="resp"> ??? 70%</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="resp"> ??? 50%</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="resp"> ??? 30%</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="resp"> ??? 0%</label>
-          </div>
-        </div>
-        <div class="form-group"><div class="form-label">??????</div><textarea class="form-control" rows="3" placeholder="???????????.."></textarea></div>
-        <div class="form-group">
-          <div class="form-label">??????????????</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">+</div>
-          </div>
-          <div style="font-size:11px;color:var(--text2);margin-top:4px">?????0/9 ???????????????????+ ?????????????????</div>
-        </div>
-        <div class="flex gap-8 mt-16
-          <button class="btn" onclick="showPage('enterprise','ent-home')">???</button>
-          <button class="btn btn-primary" onclick="toast('???????????????')">??????</button>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="ent-finance" class="page">
-      <div class="section-title">??????</div>
-      <div class="stat-grid stat-grid-3">
-        <div class="stat-card"><div class="label">????????????</div><div class="value" style="color:var(--accent-enterprise)">?12,800,000</div></div>
-        <div class="stat-card"><div class="label">???????????</div><div class="value">?1,280,000</div></div>
-        <div class="stat-card"><div class="label">?????/div><div class="value">10%</div><div class="sub text-success">???????/div></div>
-      </div>
-      <div class="card">
-        <div class="section-title">????????/div>
-        <table>
-          <thead><tr><th>??????</th><th>?????/th><th>?????/th><th>????/th><th>???</th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td>ZF-2026-001</td><td>3,200??/td><td>?12,800,000</td><td><span class="badge badge-green">???</span></td><td>2026-01-05</td><td><button class="btn btn-sm">???</button></td></tr>
-            <tr><td>ZF-2025-002</td><td>2,800??/td><td>?10,500,000</td><td><span class="badge badge-gray">?????/span></td><td>2025-01-10</td><td><button class="btn btn-sm">???</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="ent-renew" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <div class="section-title">??????????????0???</div>
-        <table>
-          <thead><tr><th><input type="checkbox"> ????/th><th>???</th><th>???</th><th>??????</th><th>??????</th><th>??????</th></tr></thead>
-          <tbody>
-            <tr><td><input type="checkbox" checked></td><td>???66789</td><td>?????????</td><td>??????</td><td>2026-04-10</td><td>?4,212</td></tr>
-            <tr><td><input type="checkbox" checked></td><td>???11230</td><td>??????????/td><td>??????</td><td>2026-04-15</td><td>?3,510</td></tr>
-            <tr><td><input type="checkbox"></td><td>???33880</td><td>??????????/td><td>??????</td><td>2026-04-20</td><td>?5,860</td></tr>
-          </tbody>
-        </table>
-        <div class="flex gap-8 mt-16">
-          <button class="btn btn-primary" onclick="toast('??????????????????????????)">???????????/button>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- ENTERPRISE -->
+<div id="t-e" class="lay" data-t="e" style="display:none">
+<div class="side">
+<div class="sh"><div class="shn">&#20225;&#19994;&#31471;</div><div class="shs">&#40511;&#31243;&#36816;&#36755; &#183; &#31649;&#29702;&#21592;</div></div>
+<div class="si active" onclick="sp('e','eh')">&#128202; &#24037;&#20316;&#21488;</div>
+<div class="si" onclick="sp('e','ev')">&#128663; &#36710;&#36742;&#31649;&#29702;</div>
+<div class="si" onclick="sp('e','ed')">&#128100; &#39550;&#39542;&#21592;&#31649;&#29702;</div>
+<div class="si" onclick="sp('e','es')">&#128736; &#23433;&#20840;&#30475;&#26495;</div>
+<div class="si" onclick="sp('e','ec')">&#9888; &#26696;&#20214;&#31649;&#29702;</div>
+<div class="si" onclick="sp('e','er')">&#128209; &#20107;&#25925;&#25253;&#26696;</div>
+<div class="si" onclick="sp('e','ef')">&#128176; &#36130;&#21153;&#31649;&#29702;</div>
+<div class="si" onclick="sp('e','en')">&#128259; &#32493;&#32479;&#31649;&#29702;</div>
+</div>
+<div class="main">
+<div id="ee-l" class="pg"><div style="display:flex;justify-content:center;align-items:center;height:60vh"><div class="c" style="width:360px;text-align:center"><div style="font-size:32px;margin-bottom:8px">&#128739;</div><div style="font-size:20px;font-weight:700;margin-bottom:4px">&#20225;&#19994;&#31471;</div><div style="font-size:12px;color:var(--t2);margin-bottom:24px">&#40511;&#31243;&#36816;&#36755;&#31649;&#29702;&#31995;&#32479;</div><div class="fg"><input class="frm" placeholder="&#35831;&#36755;&#20837;&#36134;&#21495;" value="admin"></div><div class="fg"><input class="frm" type="password" placeholder="&#35831;&#36755;&#20837;&#23494;&#30721;" value="******"></div><button class="btn be" style="width:100%;justify-content:center" onclick="sp('e','eh')">&#30331;&#24405;</button></div></div></div>
+<div id="eh" class="pg on"><div class="st">&#20225;&#19994;&#24037;&#20316;&#21488;</div><div class="sg"><div class="sc"><div class="scl">&#22312;&#32479;&#36710;&#36742;</div><div class="scv" style="color:var(--ae)">3,200</div><div class="scs">&#65288;&#26412;&#26376;+120&#65289;</div></div><div class="sc"><div class="scl">&#24453;&#22788;&#29702;&#20107;&#25925;&#25253;&#26696;</div><div class="scv" style="color:#fa8c16">3</div><div class="scs r">&#38656;&#21450;&#26102;&#22788;&#29702;</div></div><div class="sc"><div class="scl">&#24453;&#30830;&#35748;&#32473;&#20184;</div><div class="scv" style="color:var(--a)">2</div><div class="scs">&#24453;&#30830;&#35748;&#37329;&#39069;&#165;23,400</div></div><div class="sc"><div class="scl">&#21363;&#23558;&#21097;&#26399;&#36710;&#36742;</div><div class="scv" style="color:#ff4d4f">15</div><div class="scs r">&#26410;&#26469;15&#22825;&#20869;</div></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="c"><div class="st">&#39550;&#39542;&#35780;&#20998;&#24635;&#35272;</div><div style="display:flex;gap:16px;align-items:center"><div style="text-align:center"><div style="font-size:42px;font-weight:700;color:var(--ae)">78.5</div><span class="bdg bge" style="margin-top:4px">B&#32423;&#183;&#33391;&#22909;</span></div><div style="flex:1"><canvas id="eesc" height="80"></canvas></div></div></div><div class="c"><div class="st">&#26412;&#26376;&#23433;&#20840;&#20107;&#25925;&#32479;&#35745;</div><div class="sg3" style="gap:8px"><div class="sc"><div class="scl">&#20107;&#25925;&#27425;&#25968;</div><div class="scv" style="color:#ff4d4f">12</div></div><div class="sc"><div class="scl">&#23433;&#20840;&#20107;&#25925;&#29575;</div><div class="scv">0.38%</div></div><div class="sc"><div class="scl">&#32473;&#20184;&#37329;&#39069;</div><div class="scv" style="color:#ff4d4f">&#165;128,600</div></div></div></div></div>
+<div class="c mt16"><div class="st">&#128209; &#24453;&#21150;&#20107;&#39033;</div><div class="fc" onclick="sp('e','ec')"><div class="fci" style="background:rgba(255,77,79,.1)">&#9888;</div><div class="fcn"><div class="fct">&#24453;&#23457;&#26680;&#20107;&#25925;&#25253;&#26696; <span class="bdg br">3</span></div><div class="fcd">&#39550;&#39542;&#21592;&#25552;&#20132;&#30340;&#25253;&#26696;&#38656;&#22312;24&#23567;&#26102;&#20869;&#23436;&#25104;&#23457;&#26680;&#24182;&#25551;&#21040;&#24179;&#21488;</div></div></div><div class="fc" onclick="tst('&#24314;&#35758;&#24050;&#21457;&#36865;&#65292;&#24744;&#30340;&#24314;&#35758;&#24456;&#37325;&#35201;')"><div class="fci" style="background:rgba(22,119,255,.1)">&#128176;</div><div class="fcn"><div class="fct">&#24453;&#30830;&#35748;&#32473;&#20184; <span class="bdg bg">2</span></div><div class="fcd">&#20114;&#21161;&#29702;&#31639;&#21333;&#24050;&#29983;&#25104;&#65292;&#35831;&#30830;&#35748;&#32473;&#20184;&#37329;&#39069;&#65306;&#165;10,560 / &#165;12,840</div></div></div><div class="fc" onclick="sp('e','en')"><div class="fci" style="background:rgba(250,140,22,.1)">&#128259;</div><div class="fcn"><div class="fct">&#21363;&#23558;&#21097;&#26399;&#36710;&#36742; <span class="bdg by">15</span></div><div class="fcd">15&#36742;&#36710;&#30340;&#32479;&#31649;&#21333;&#23558;&#22312;&#26410;&#26469;15&#22825;&#20869;&#21097;&#26399;&#65292;&#35831;&#21450;&#26102;&#22788;&#29702;&#32493;&#32479;</div></div></div></div>
+<div id="ev" class="pg"><div class="st">&#36710;&#36742;&#31649;&#29702;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#36710;&#29260;&#21495;/VIN..."><select class="frm" style="width:120px"><option>&#20840;&#37096;&#29366;&#24577;</option><option>&#22312;&#32479;</option><option>&#21363;&#23558;&#21097;&#26399;</option><option>&#24050;&#36807;&#26399;</option></select><button class="btn be">+ &#25972;&#25209;&#23548;&#20837;</button><button class="btn be">+ &#26032;&#22686;&#36710;&#36742;</button></div><div class="c"><div class="tw"><table><thead><tr><th>&#36710;&#29260;</th><th>&#36710;&#22411;</th><th>&#20351;&#29992;&#24615;&#36136;</th><th>&#32467;&#23545;&#39550;&#39542;&#21592;</th><th>&#21442;&#32479;&#29366;&#24577;</th><th>&#21097;&#26399;&#26085;&#26399;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td><b>&#20140;A&#183;88888</b></td><td>&#22823;&#22411;&#26222;&#36890;&#23458;&#36710;</td><td>&#20844;&#36335;&#23458;&#36816;</td><td>&#24352;&#20255;</td><td><span class="bdg bge">&#22312;&#32479;</span></td><td>2026-12-31</td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+<tr><td>&#20140;B&#183;12345</td><td>&#20013;&#22411;&#26222;&#36890;&#23458;&#36710;</td><td>&#26053;&#28216;&#23458;&#36816;</td><td>&#26446;&#23068;</td><td><span class="bdg bge">&#22312;&#32479;</span></td><td>2026-12-31</td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr>
+<tr><td>&#20140;C&#183;66789</td><td>&#36731;&#22411;&#31665;&#24335;&#36135;&#36742;</td><td>&#36135;&#36816;</td><td>&#29579;&#24378;</td><td><span class="bdg by">&#21363;&#23558;&#21097;&#26399;</span></td><td>2026-04-10</td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr><tr><td>&#20140;D&#183;88001</td><td>&#23567;&#22411;&#36710;&#36742;</td><td>&#20986;&#31199;&#23458;&#36816;</td><td>&#8212;</td><td><span class="bdg bk">&#26410;&#32467;&#23545;</span></td><td>2026-12-31</td><td><button class="btn bsm be">&#32467;&#23545;</button></td></tr></tbody></table></div><div class="pgn"><span class="pb" style="opacity:.4">&#8249;</span><span class="pb on">1</span><span class="pb">2</span><span class="pb">3</span><span class="pb">...</span><span class="pb">128</span><span class="pb">&#8250;</span></div></div></div>
+<div id="ed" class="pg"><div class="st">&#39550;&#39542;&#21592;&#31649;&#29702;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#22995;&#21517;/&#25163;&#26426;&#21495;..."><select class="frm" style="width:120px"><option>&#20840;&#37096;&#35780;&#20998;</option><option>&#20248;&#31246;(90+)</option><option>&#33391;&#22909;(80+)</option><option>&#19968;&#33324;(70+)</option><option>&#36739;&#24046;(&lt;70)</option></select><button class="btn be">+ &#25972;&#25209;&#23548;&#20837;</button></div><div class="c"><div class="tw"><table><thead><tr><th>&#22995;&#21517;</th><th>&#25163;&#26426;&#21495;</th><th>&#20934;&#39550;&#36710;&#22411;</th><th>&#32467;&#23545;&#36710;&#36742;</th><th>&#39550;&#39542;&#35780;&#20998;</th><th>&#31561;&#32423;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td><b>&#24352;&#20255;</b></td><td>138&#5678;5678</td><td>A1</td><td>&#20140;A&#183;88888</td><td><b style="color:#52C41A">92</b></td><td><span class="bdg bge">&#20248;&#31246;</span></td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr><tr><td>&#26446;&#23068;</td><td>139&#22312;2233</td><td>B1</td><td>&#20140;B&#183;12345</td><td><b style="color:#52C41A">88</b></td><td><span class="bdg bge">&#33391;&#22909;</span></td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr><tr><td>&#29579;&#24378;</td><td>137&#6678;8899</td><td>B2</td><td>&#20140;C&#183;66789</td><td><b style="color:#fa8c16">68</b></td><td><span class="bdg by">&#36739;&#24046;</span></td><td><span class="bdg bge">&#27491;&#24120;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr><tr><td>&#36213;&#38669;</td><td>136&#6678;1155</td><td>A2</td><td>&#20140;A&#183;99901</td><td><b style="color:#ff4d4f">58</b></td><td><span class="bdg br">&#24046;</span></td><td><span class="bdg br">&#39640;&#39118;&#38556;</span></td><td><button class="btn bsm bdr">&#26597;&#30475;</button></td></tr></tbody></table></div></div><div class="c mt16"><div class="st">&#39550;&#39542;&#35780;&#20998;&#20998;&#24067;</div><canvas id="eddist" height="140"></canvas></div></div>
+<div id="es" class="pg"><div class="st">&#23433;&#20840;&#31649;&#29702;&#30475;&#26495;</div><div class="sg3"><div class="sc"><div class="scl">&#20225;&#19994;&#39550;&#39542;&#35780;&#20998;&#22343;&#20540;</div><div class="scv" style="color:var(--ae)">78.5</div><div class="scs">&#36752;&#19978;&#26376; &#8593;2.3&#20998;</div></div><div class="sc"><div class="scl">&#26412;&#26376;&#23433;&#20840;&#20107;&#25925;&#29575;</div><div class="scv">0.38%</div><div class="scs">&#34892;&#19994;&#22343;&#20540; 0.52%</div></div><div class="sc"><div class="scl">&#39118;&#38556;&#39550;&#39542;&#21592;</div><div class="scv" style="color:#ff4d4f">8&#20154;</div><div class="scs r">&#35780;&#20998;&#20302;&#20110;70&#20998;</div></div></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div class="c"><div class="st">&#26376;&#24230;&#39550;&#39542;&#35780;&#20998;&#36235;&#21183;</div><canvas id="estrend" height="100"></canvas></div><div class="c"><div class="st">&#39118;&#38556;&#39550;&#39542;&#21592;&#39044;&#35686;</div><div class="tw"><table><thead><tr><th>&#22995;&#21517;</th><th>&#35780;&#20998;</th><th>&#39118;&#38556;&#21407;&#22240;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td>&#36213;&#38669;</td><td><span class="bdg br">58</span></td><td>&#36830;&#32493;3&#26376;&#20302;&#20110;60&#20998;</td><td><button class="btn bsm be">&#32422;&#35848;</button></td></tr><tr><td>&#23385;&#40509;</td><td><span class="bdg by">63</span></td><td>&#26412;&#26376;&#21457;&#29983;&#20027;&#36131;&#20107;&#25925;</td><td><button class="btn bsm">&#26597;&#30475;</button></td></tr></tbody></table></div></div></div></div>
+<div id="ec" class="pg"><div class="st">&#26696;&#20214;&#31649;&#29702;</div><div class="tbar"><input class="srch" placeholder="&#25628;&#32034;&#25253;&#26696;&#21495;/&#36710;&#29260;..."><select class="frm" style="width:120px"><option>&#20840;&#37096;&#29366;&#24577;</option><option>&#22788;&#29702;&#20013;</option><option>&#24453;&#30830;&#35748;</option><option>&#24050;&#23436;&#25104;</option></select></div><div class="c"><div class="tw"><table><thead><tr><th>&#25253;&#26696;&#21495;</th><th>&#26102;&#38388;</th><th>&#36710;&#36742;</th><th>&#31867;&#22411;</th><th>&#39044;&#20272;&#37329;&#39069;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28 09:15</td><td>&#20140;A&#183;88888</td><td>&#36135;&#20135;&#25439;&#22833;</td><td>&#165;15,800</td><td><span class="bdg by">&#26632;&#26597;&#20013;</span></td><td><button class="btn bsm be">&#35814;&#24773;</button></td></tr><tr><td>TSCS-2026-0327-0087</td><td>2026-03-27 16:42</td><td>&#20140;B&#183;12345</td><td>&#36135;&#20135;&#25439;&#22833;</td><td>&#165;1,800</td><td><span class="bdg bge">&#24453;&#30830;&#35748;</span></td><td><button class="btn bsm be">&#30830;&#35748;</button></td></tr><tr><td>TSCS-2026-0325-0085</td><td>2026-03-25 14:20</td><td>&#20140;C&#183;66789</td><td>&#36135;&#20135;&#25439;&#22833;</td><td>&#165;8,200</td><td><span class="bdg bge">&#24050;&#23436;&#25104;</span></td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr></tbody></table></div></div></div>
+<div id="er" class="pg"><div class="st">&#26032;&#22686;&#20107;&#25925;&#25253;&#26696;</div><div class="c"><div class="si2"><div class="sd d">1</div><div class="sl d"></div><div class="sd a">2</div><div class="sl"></div><div class="sd p">3</div><div class="sl"></div><div class="sd p">4</div><div class="sl"></div><div class="sd p">5</div></div><div class="fg"><div class="fl">&#36873;&#25321;&#20107;&#25925;&#36710;&#36742; *</div><select class="frm"><option>&#20140;A&#183;88888 - &#24352;&#20255;</option><option>&#20140;B&#183;12345 - &#26446;&#23068;</option><option>&#20140;C&#183;66789 - &#29579;&#24378;</option></select></div><div class="fr"><div class="fg"><div class="fl">&#20107;&#25925;&#26102;&#38388; *</div><input class="frm" type="datetime-local" value="2026-03-28T09:15"></div><div class="fg"><div class="fl">&#20107;&#25925;&#22320;&#28857; *</div><input class="frm" placeholder="GPS&#23450;&#20301;&#20013;...&#21271;&#20140;&#24066;&#26397;&#38451;&#21306;&#20140;&#36890;&#24555;&#36895;&#36335;"></div></div><div class="fg"><div class="fl">&#36131;&#20219;&#21010;&#20998; *</div><div style="display:flex;gap:8px"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="eresp" checked> &#20840;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="eresp"> &#20027;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="eresp"> &#21516;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="eresp"> &#27425;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="eresp"> &#26080;&#36131;</label></div></div><div class="fg"><div class="fl">&#20107;&#25925;&#25551;&#36848;</div><textarea class="frm" rows="3" placeholder="&#35831;&#25551;&#36848;&#20107;&#25925;&#32463;&#36807;..."></textarea></div><div class="fg"><div class="fl">&#29616;&#22330;&#29031;&#29255;&#65288;&#26368;&#22810;9&#24352;&#65289;</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div style="height:80px;border:2px dashed var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--t2);cursor:pointer">+</div></div><div style="font-size:11px;color:var(--t2);margin-top:4px">&#24050;&#19978;&#20256; 0/9 &#24352;&#65288;&#24517;&#39035;&#21253;&#21547;&#65306;&#29616;&#22330;&#20840;&#26223;1&#24352; + &#21452;&#26041;&#36710;&#36742;&#21463;&#25439;&#37096;&#20301;&#21508;1&#24352;&#65289;</div><div class="fx g8 mt16"><button class="btn" onclick="sp('e','eh')">&#21462;&#28040;</button><button class="btn be" onclick="tst('&#25551;&#36848;&#25551;&#20132;&#25104;&#21151;&#65292;&#24050;&#36890;&#30693;&#24179;&#21488;')">&#25551;&#20184;&#25253;&#26696;</button></div></div></div>
+<div id="ef" class="pg"><div class="st">&#36130;&#21153;&#31649;&#29702;</div><div class="sg3 mb16"><div class="sc"><div class="scl">&#26412;&#24180;&#24230;&#24050;&#32564;&#32479;&#31649;&#36153;</div><div class="scv" style="color:var(--ae)">&#165;12,800,000</div></div><div class="sc"><div class="scl">&#26412;&#24180;&#24230;&#32473;&#20184;&#24635;&#39069;</div><div class="scv">&#165;1,280,000</div></div><div class="sc"><div class="scl">&#32473;&#20184;&#29575;</div><div class="scv">10%</div><div class="scs ts">&#20302;&#20110;&#22343;&#20540;</div></div></div><div class="c"><div class="st">&#32564;&#36153;&#21333;&#21015;&#34920;</div><div class="tw"><table><thead><tr><th>&#32564;&#36153;&#21333;&#21495;</th><th>&#36710;&#36742;&#25968;</th><th>&#24635;&#37329;&#39069;</th><th>&#29366;&#24577;</th><th>&#26102;&#38388;</th><th>&#25805;&#20316;</th></tr></thead><tbody>
+<tr><td>ZF-2026-001</td><td>3,200&#36742;</td><td>&#165;12,800,000</td><td><span class="bdg bge">&#24050;&#32564;</span></td><td>2026-01-05</td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr><tr><td>ZF-2025-002</td><td>2,800&#36742;</td><td>&#165;10,500,000</td><td><span class="bdg bk">&#24050;&#36807;&#26399;</span></td><td>2025-01-10</td><td><button class="btn bsm">&#35814;&#24773;</button></td></tr></tbody></table></div></div></div>
+<div id="en" class="pg"><div class="st">&#32493;&#32479;&#31649;&#29702;</div><div class="c"><div class="st" style="font-size:13px">&#21363;&#23558;&#21097;&#26399;&#36710;&#36742;&#65288;&#26410;&#26469;30&#22825;&#65289;</div><div class="tw"><table><thead><tr><th><input type="checkbox"> &#20840;&#36873;</th><th>&#36710;&#29260;</th><th>&#36710;&#22411;</th><th>&#24425;&#26041;&#26696;</th><th>&#21097;&#26399;&#26085;&#26399;</th><th>&#39044;&#20272;&#26032;&#36153;</th></tr></thead><tbody>
+<tr><td><input type="checkbox" checked></td><td>&#20140;C&#183;66789</td><td>&#36731;&#22411;&#31665;&#24335;&#36135;&#36742;</td><td>&#26631;&#20934;&#26041;&#26696;</td><td>2026-04-10</td><td>&#165;4,212</td></tr><tr><td><input type="checkbox" checked></td><td>&#20140;E&#183;11230</td><td>&#20013;&#22411;&#26222;&#36890;&#23458;&#36710;</td><td>&#22522;&#30830;&#26041;&#26696;</td><td>2026-04-15</td><td>&#165;3,510</td></tr><tr><td><input type="checkbox"></td><td>&#20140;F&#183;33880</td><td>&#22823;&#22411;&#26222;&#36890;&#23458;&#36710;</td><td>&#26631;&#20934;&#26041;&#26696;</td><td>2026-04-20</td><td>&#165;5,860</td></tr></tbody></table></div><div class="fx g8 mt16"><button class="btn be" onclick="tst('&#32493;&#32479;&#32564;&#36153;&#21333;&#24050;&#29983;&#25104;&#65292;&#35831;&#30830;&#35748;&#21518;&#23545;&#20844;&#36716;&#36151;')">&#29983;&#25104;&#32493;&#32479;&#32564;&#36153;&#21333;</button></div></div></div>
+
+</div>
 </div>
 
-<!-- ========== DRIVER (??????) ========== -->
-<div class="phone-wrap"><div class="phone-frame driver-phone"><div class="phone-notch"></div><div class="phone-body"><div id="term-driver" class="layout term-content" data-term="driver" style="display:none">
-  <div style="background:#fffaf5;padding:10px 14px 6px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;color:#FA8C16">驾驶员端</div><div style="padding:8px 0;background:#fffaf5">
-    <div class="sidebar-header">
-      <div class="name" style="color:var(--accent-driver)">??????</div>
-      <div class="sub">????????/div>
-    </div>
-    <div style="padding:8px 14px;font-size:12px;color:#FA8C16;font-weight:500;border-left:3px solid #FA8C16;background:rgba(250,140,22,.05)" onclick="showPage('driver','drv-home')">?? ???</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('driver','drv-report')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('driver','drv-case')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('driver','drv-score')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('driver','drv-msg')">?? ??????</div>
-  </div>
-  <div class="main">
-    <!-- ??? -->
-    <div id="drv-login" class="page">
-      <div style="display:flex;justify-content:center;align-items:center;min-height:70vh">
-        <div class="card" style="width:320px;text-align:center">
-          <div style="font-size:40px;margin-bottom:8px">??</div>
-          <div style="font-size:18px;font-weight:700;margin-bottom:24px">??????</div>
-          <div class="form-group"><input class="form-control" placeholder="?????????" value="138****5678"></div>
-          <div class="form-group" style="display:flex;gap:8px">
-            <input class="form-control" placeholder="????? style="flex:1">
-            <button class="btn" style="white-space:nowrap">????????/button>
-          </div>
-          <button class="btn btn-orange" style="width:100%;justify-content:center" onclick="showPage('driver','drv-home')">????/button>
-        </div>
-      </div>
-    </div>
-    <!-- ??? -->
-    <div id="drv-home" class="page active">
-      <div class="section-title">??????</div>
-      <div class="card" style="border-left:4px solid var(--accent-driver)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="font-size:20px;font-weight:700;margin-bottom:4px">???88888</div>
-            <div style="font-size:12px;color:var(--text2)">?????? ? ??????????/div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:28px;font-weight:700;color:var(--accent-driver)">78</div>
-            <div style="font-size:11px;color:var(--text2)">??????</div>
-          </div>
-        </div>
-      </div>
-      <div class="stat-grid stat-grid-3 mt-16">
-        <div class="stat-card" style="cursor:pointer" onclick="showPage('driver','drv-case')"><div class="label">??????</div><div class="value" style="color:var(--accent-driver)">1</div><div class="sub">?????/div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value" style="color:#52C41A">92</div><div class="sub">???</div></div>
-        <div class="stat-card"><div class="label">??????</div><div class="value">??5%</div><div class="sub">/ 3,200??/div></div>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">??????</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="flow-card" onclick="showPage('driver','drv-report')">
-            <div class="fc-icon" style="background:rgba(250,140,22,.15)">??</div>
-            <div class="fc-info"><div class="fc-title">??????</div><div class="fc-desc">?????????????????/div></div>
-          </div>
-          <div class="flow-card" onclick="showPage('driver','drv-score')">
-            <div class="fc-icon" style="background:rgba(82,196,26,.1)">??</div>
-            <div class="fc-info"><div class="fc-title">??????</div><div class="fc-desc">??????????????/div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="drv-report" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <div class="step-indicator">
-          <div class="step-dot active">1</div><div class="step-line"></div>
-          <div class="step-dot pending">2</div><div class="step-line"></div>
-          <div class="step-dot pending">3</div>
-        </div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:16px">Step 1 ? ?????????</div>
-        <div class="form-group"><div class="form-label">?????? *</div>
-          <select class="form-control"><option selected>???88888 - ???</option></select>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><div class="form-label">?????? *</div><input class="form-control" type="datetime-local" value="2026-03-28T09:15"></div>
-          <div class="form-group"><div class="form-label">?????? *</div><input class="form-control" placeholder="??????GPS???" value="?????????????????"></div>
-        </div>
-        <div class="form-group">
-          <div class="form-label">?????? *</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> ???</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp" checked> ???</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> ???</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> ???</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="dresp"> ???</label>
-          </div>
-        </div>
-        <div class="form-group"><div class="form-label">??????</div><textarea class="form-control" rows="3" placeholder="??????????????..">????????????????????????????????????????????????????/textarea></div>
-        <div class="form-group">
-          <div class="form-label">???????????????1+?????????????/div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">??</div>
-            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">??</div>
-            <div style="height:80px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text2);cursor:pointer">??</div>
-          </div>
-          <div style="font-size:11px;color:var(--text2);margin-top:4px">?????0/9 ??/div>
-        </div>
-        <div class="flex gap-8 mt-16">
-          <button class="btn btn-orange" style="width:100%;justify-content:center" onclick="toast('?????????????????SCS-2026-0328-0088')">??????</button>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="drv-case" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <table>
-          <thead><tr><th>?????/th><th>???</th><th>???</th><th>????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr>
-              <td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28</td><td>???88888</td>
-              <td><span class="badge badge-orange">?????/span></td>
-              <td><button class="btn btn-sm btn-orange">???</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="drv-score" class="page">
-      <div class="section-title">?????????</div>
-      <div class="card" style="text-align:center">
-        <div style="font-size:56px;font-weight:700;color:var(--accent-driver)">78</div>
-        <span class="badge badge-orange" style="font-size:14px;padding:4px 12px">B??? ???</span>
-        <div style="font-size:12px;color:var(--text2);margin-top:8px">??? 85% ????????????</div>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">????????/div>
-        <canvas id="drv-chart" height="160"></canvas>
-      </div>
-      <div class="card mt-16">
-        <div class="section-title">????????</div>
-        <canvas id="drv-trend" height="100"></canvas>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="drv-msg" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px">
-          <div style="width:36px;height:36px;border-radius:50%;background:rgba(22,119,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">??</div>
-          <div style="flex:1">
-            <div style="font-size:12px;font-weight:600;margin-bottom:3px">?????????</div>
-            <div style="font-size:11px;color:var(--text2)">?????TSCS-2026-0328-0088 ???????????????????????/div>
-            <div style="font-size:10px;color:var(--text2);margin-top:4px">2026-03-28 10:30</div>
-          </div>
-          <span class="badge badge-orange">??/span>
-        </div>
-        <div style="padding:12px 0;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px">
-          <div style="width:36px;height:36px;border-radius:50%;background:rgba(82,196,26,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0">??</div>
-          <div style="flex:1">
-            <div style="font-size:12px;font-weight:600;margin-bottom:3px">?????????</div>
-            <div style="font-size:11px;color:var(--text2)">???????????????78???????????????/div>
-            <div style="font-size:10px;color:var(--text2);margin-top:4px">2026-03-27 08:00</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="pw"><div class="pf dp"><div class="pn"></div><div class="pb2">
+<div id="dl" class="pg"><div style="display:flex;justify-content:center;align-items:center;height:70vh"><div class="c" style="width:300px;text-align:center"><div style="font-size:40px;margin-bottom:8px">&#128663;</div><div style="font-size:18px;font-weight:700;margin-bottom:24px">&#39550;&#39542;&#21592;&#31471;</div><div class="fg"><input class="frm" placeholder="&#35831;&#36755;&#20837;&#25163;&#26426;&#21495;" value="138****5678"></div><div class="fg" style="display:flex;gap:8px"><input class="frm" placeholder="&#39564;&#35777;&#30721;" style="flex:1"><button class="btn" style="white-space:nowrap">&#33719;&#21462;</button></div><button class="btn bd2" style="width:100%;justify-content:center" onclick="sp('d','dh')">&#30331;&#24405;</button></div></div></div>
+<div id="dh" class="pg on"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#25105;&#30340;&#36710;&#36742;</div><div class="c" style="border-left:4px solid var(--ad);margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:18px;font-weight:700;margin-bottom:4px">&#20140;A&#183;88888</div><div style="font-size:12px;color:var(--t2)">&#32447;&#23450;&#36710;&#36742; &#183; &#22823;&#22411;&#26222;&#36890;&#23458;&#36710;</div></div><div style="text-align:right"><div style="font-size:24px;font-weight:700;color:var(--ad)">78</div><div style="font-size:11px;color:var(--t2)">&#39550;&#39542;&#35780;&#20998;</div></div></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px"><div class="c" style="text-align:center;cursor:pointer" onclick="sp('d','dc')"><div style="font-size:22px">&#128209;</div><div style="font-size:10px;color:var(--t2)">&#25105;&#30340;&#26696;&#20214;</div><div style="font-size:18px;font-weight:700;color:var(--ad)">1</div></div><div class="c" style="text-align:center"><div style="font-size:22px">&#128992;</div><div style="font-size:10px;color:var(--t2)">&#26412;&#26376;&#23433;&#20840;</div><div style="font-size:18px;font-weight:700;color:#52C41A">92</div></div><div class="c" style="text-align:center"><div style="font-size:22px">&#128101;</div><div style="font-size:10px;color:var(--t2)">&#36710;&#38431;&#25490;&#21517;</div><div style="font-size:18px;font-weight:700">&#21069;15%</div></div></div><div class="c" style="padding:12px"><div class="st" style="font-size:13px;margin-bottom:10px">&#24555;&#25551;&#21151;&#33021;</div><div class="fc" onclick="sp('d','dr')"><div class="fci" style="background:rgba(250,140,22,.15)">&#128209;</div><div class="fcn"><div class="fct">&#20107;&#25925;&#25253;&#26696;</div><div class="fcd">&#21457;&#29983;&#20107;&#25925;&#65311;&#19968;&#38190;&#24555;&#36895;&#25253;&#26696;</div></div></div><div class="fc" onclick="sp('d','ds')"><div class="fci" style="background:rgba(82,196,26,.1)">&#128202;</div><div class="fcn"><div class="fct">&#39550;&#39542;&#35780;&#20998;</div><div class="fcd">&#26597;&#30475;&#35814;&#32454;&#35780;&#20998;&#19982;&#25490;&#21517;</div></div></div></div></div>
+<div id="dr" class="pg"><div style="padding:12px 14px 0"><div class="si2"><div class="sd a">1</div><div class="sl"></div><div class="sd p">2</div><div class="sl"></div><div class="sd p">3</div></div><div style="font-size:13px;font-weight:600;margin-bottom:12px">Step 1 &#183; &#36873;&#25321;&#20107;&#25925;&#36710;&#36742;</div><div class="fg"><div class="fl">&#20107;&#25925;&#36710;&#36742; *</div><select class="frm"><option selected>&#20140;A&#183;88888 - &#24352;&#20255;</option></select></div><div class="fr"><div class="fg"><div class="fl">&#20107;&#25925;&#26102;&#38388; *</div><input class="frm" type="datetime-local" value="2026-03-28T09:15"></div><div class="fg"><div class="fl">&#20107;&#25925;&#22352;&#28857; *</div><input class="frm" placeholder="&#28857;&#20987;&#33719;&#21462;GPS&#23450;&#20301;" value="&#21271;&#20140;&#24066;&#26397;&#38451;&#21306;&#20140;&#36890;&#24555;&#36895;&#36335;"></div></div><div class="fg"><div class="fl">&#36131;&#20219;&#21010;&#20998; *</div><div style="display:flex;gap:6px;flex-wrap:wrap"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="drresp"> &#20840;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="drresp" checked> &#20027;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="drresp"> &#21516;&#36131;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="drresp"> &#27425;&#36131;</label></div></div><div class="fg"><div class="fl">&#20107;&#25925;&#25551;&#36848;</div><textarea class="frm" rows="2" placeholder="&#35831;&#31616;&#35201;&#25551;&#36848;&#20107;&#25925;&#32463;&#36807;...">&#21069;&#36710;&#31361;&#28982;&#21464;&#36947;&#23548;&#33268;&#36861;&#23614;&#65292;&#21069;&#36710;&#21491;&#21518;&#20445;&#38505;&#26464;&#21463;&#25439;&#65292;&#26412;&#36710;&#21069;&#20445;&#38505;&#38505;&#21463;&#25439;&#65292;&#26080;&#20154;&#20260;&#12290;</textarea></div><div class="fg"><div class="fl">&#29616;&#22330;&#29031;&#29255;&#65288;&#24517;&#22635;&#65306;&#20840;&#26223;1+&#21452;&#26041;&#21463;&#25439;&#37096;&#20301;&#21508;1&#65289;</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><div style="height:64px;border:2px dashed var(--bdr);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--t2);cursor:pointer">&#128247;</div><div style="height:64px;border:2px dashed var(--bdr);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--t2);cursor:pointer">&#128247;</div><div style="height:64px;border:2px dashed var(--bdr);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--t2);cursor:pointer">&#128247;</div></div><div style="font-size:10px;color:var(--t2);margin-top:4px">&#24050;&#19978;&#20256; 0/9 &#24352;</div><button class="btn bd2" style="width:100%;justify-content:center;margin-top:16px" onclick="tst('&#25253;&#26696;&#25551;&#20132;&#25104;&#21151;&#65281;&#26696;&#20214;&#21495;&#65306;TSCS-2026-0328-0088')">&#25551;&#20184;&#25253;&#26696;</button></div></div>
+<div id="dc" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#25105;&#30340;&#26696;&#20214;</div><div class="c"><div class="tw"><table><thead><tr><th>&#25253;&#26696;&#21495;</th><th>&#26102;&#38388;</th><th>&#36710;&#36742;</th><th>&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody><tr><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28</td><td>&#20140;A&#183;88888</td><td><span class="bdg by">&#22788;&#29702;&#20013;</span></td><td><button class="btn bsm bd2">&#26597;&#30475;</button></td></tr></tbody></table></div></div></div></div>
+<div id="ds" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#39550;&#39542;&#35780;&#20998;&#35814;&#24773;</div><div class="c" style="text-align:center"><div style="font-size:56px;font-weight:700;color:var(--ad)">78</div><span class="bdg bge" style="font-size:13px;padding:4px 12px">B&#32423; &#183; &#33391;&#22909;</span><div style="font-size:12px;color:var(--t2);margin-top:8px">&#36229;&#36807; 85% &#30340;&#21516;&#31867;&#36710;&#22411;&#39550;&#39542;&#21592;</div></div><div class="c"><div class="st" style="font-size:13px">&#21508;&#32500;&#24230;&#24471;&#20998;</div><canvas id="dschart" height="160"></canvas></div><div class="c"><div class="st" style="font-size:13px">&#36817;6&#20010;&#26376;&#36235;&#21183;</div><canvas id="dstrend" height="100"></canvas></div></div></div>
+
+</div>
+<div class="pbb"><div class="pt active" onclick="pn('d','dh',this)"><span class="ic">&#128992;</span><span>&#39318;&#39029;</span></div><div class="pt" onclick="pn('d','dr',this)"><span class="ic">&#128209;</span><span>&#25253;&#26696;</span></div><div class="pt" onclick="pn('d','dc',this)"><span class="ic">&#128209;</span><span>&#26696;&#20214;</span></div><div class="pt" onclick="pn('d','ds',this)"><span class="ic">&#128202;</span><span>&#35780;&#20998;</span></div></div>
+</div>
 </div>
 
-</div><!-- ========== FIELD<!-- ========== FIELD (????? ========== -->
-<div class="phone-wrap"><div class="phone-frame field-phone"><div class="phone-notch"></div><div class="phone-body"><div id="term-field" class="layout term-content" data-term="field" style="display:none">
-  <div style="background:#f5f0ff;padding:10px 14px 6px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;color:#722ED1">现场端</div><div style="padding:8px 0;background:#f5f0ff">
-    <div class="sidebar-header">
-      <div class="name" style="color:var(--accent-field)">?????/div>
-      <div class="sub">?????? ???</div>
-    </div>
-    <div class="sidebar-item active" onclick="showPage('field','field-home')">?? ?????/div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('field','field-task')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('field','field-checkin')">??? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('field','field-photo')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('field','field-record')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('field','field-eval')">?? ??????</div>
-    <div style="padding:8px 14px;font-size:12px;color:#666;border-left:3px solid transparent" onclick="showPage('field','field-approval')">????????</div>
-  </div>
-  <div class="main">
-    <!-- ?????-->
-    <div id="field-home" class="page active">
-      <div class="section-title">?????/div>
-      <div class="stat-grid stat-grid-3">
-        <div class="stat-card"><div class="label">??????</div><div class="value" style="color:var(--accent-field)">3</div><div class="sub">?????/div></div>
-        <div class="stat-card"><div class="label">??????</div><div class="value">48</div><div class="sub">???4.2???/??/div></div>
-        <div class="stat-card"><div class="label">?????????</div><div class="value">4.2h</div></div>
-      </div>
-      <div class="section-title">????????/div>
-      <div class="flow-card" onclick="showPage('field','field-task')">
-        <div class="fc-icon" style="background:rgba(114,46,209,.15)">??</div>
-        <div class="fc-info">
-          <div class="fc-title">TSCS-2026-0328-0088 <span class="badge badge-red">????/span></div>
-          <div class="fc-desc">???88888 ? ????????????????? ? ??????</div>
-          <div class="fc-badge"><span class="badge badge-orange">?????/span> ????????0:30</div>
-        </div>
-      </div>
-      <div class="flow-card" onclick="showPage('field','field-task')">
-        <div class="fc-icon" style="background:rgba(114,46,209,.1)">???</div>
-        <div class="fc-info">
-          <div class="fc-title">TSCS-2026-0327-0087 <span class="badge badge-yellow">???</span></div>
-          <div class="fc-desc">???66666 ? ?????????????? ? ??????</div>
-          <div class="fc-badge"><span class="badge badge-orange">?????/span> ????????7:00??????</div>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="field-task" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <div class="info-grid">
-          <div class="info-item"><div class="info-label">?????/div><div class="info-value">TSCS-2026-0328-0088</div></div>
-          <div class="info-item"><div class="info-label">??????</div><div class="info-value">?????????????????</div></div>
-          <div class="info-item"><div class="info-label">??????</div><div class="info-value">???88888</div></div>
-          <div class="info-item"><div class="info-label">??????</div><div class="info-value">?????? ? ?????00?????50??/div></div>
-          <div class="info-item"><div class="info-label">?????/div><div class="info-value">??? 138****5678</div></div>
-          <div class="info-item"><div class="info-label">??????</div><div class="info-value"><span class="badge badge-yellow">??? 70%</span></div></div>
-        </div>
-      </div>
-      <div class="flex gap-8 mt-16">
-        <button class="btn" onclick="showPage('field','field-home')">???</button>
-        <button class="btn btn-purple" onclick="showPage('field','field-checkin')">???????????/button>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="field-checkin" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <div style="text-align:center;padding:20px 0">
-          <div style="font-size:48px;margin-bottom:12px">??</div>
-          <div style="font-size:15px;font-weight:600;margin-bottom:8px">?????????????????</div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:20px">GPS??????</div>
-          <button class="btn btn-purple" style="width:200px;justify-content:center" onclick="toast('????????????11:15')">?????????</button>
-        </div>
-      </div>
-      <div class="flex gap-8 mt-16">
-        <button class="btn" onclick="showPage('field','field-home')">????????/button>
-        <button class="btn btn-purple" style="margin-left:auto" onclick="showPage('field','field-photo')">????????????</button>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="field-photo" class="page">
-      <div class="section-title">?????????</div>
-      <div class="card">
-        <div class="section-title" style="font-size:13px;margin-bottom:12px">????????/20??/div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
-          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">????/div>
-          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">????/div>
-          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">????/div>
-          <div style="height:70px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer">????/div>
-        </div>
-        <div class="info-box" style="background:#fafafa;border-radius:8px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:16px">
-          <b>????????/b>????????????????????????????????????5????????????????????????????1??????????? ???????????????????        </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn" style="flex:1;justify-content:center">?? ???</button>
-          <button class="btn" style="flex:1;justify-content:center">???????</button>
-        </div>
-      </div>
-      <div class="flex gap-8 mt-16">
-        <button class="btn" onclick="showPage('field','field-checkin')">?????/button>
-        <button class="btn btn-purple" style="margin-left:auto" onclick="showPage('field','field-record')">????????????</button>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="field-record" class="page">
-      <div class="section-title">???????????????</div>
-      <div class="card">
-        <div class="form-group"><div class="form-label">????????*</div><input class="form-control" placeholder="?????></div>
-        <div class="form-row">
-          <div class="form-group"><div class="form-label">?????? *</div><input class="form-control" placeholder="?????></div>
-          <div class="form-group"><div class="form-label">?????? *</div><input class="form-control" placeholder="?????></div>
-        </div>
-        <div class="form-group">
-          <div class="form-label">????????????????????/div>
-          <div style="display:flex;gap:8px">
-            <textarea class="form-control" rows="3" placeholder="???????????.." style="flex:1">??????????????????????????????????????????????????????????/textarea>
-            <button class="btn" style="align-self:flex-end;white-space:nowrap">?? ???</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="form-label">?????? *</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> ??????</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp" checked> ??????</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> ??????</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> ??????</label>
-            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="fresp"> ?????/label>
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="form-label">??????</div>
-          <div style="height:60px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text2);cursor:pointer">??????????????/div>
-        </div>
-      </div>
-      <div class="flex gap-8 mt-16">
-        <button class="btn" onclick="showPage('field','field-photo')">?????/button>
-        <button class="btn btn-purple" style="margin-left:auto" onclick="showPage('field','field-eval')">????????????</button>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="field-eval" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <div class="section-title" style="font-size:13px">?????????</div>
-        <table>
-          <thead><tr><th>??????</th><th>??????</th><th>??????</th></tr></thead>
-          <tbody>
-            <tr><td>??????</td><td>?????? + ???</td><td>?3,200</td></tr>
-            <tr><td>??????</td><td>??????</td><td>?4,800</td></tr>
-            <tr><td>?????/td><td>??????</td><td>?2,100</td></tr>
-            <tr><td>??????</td><td>??????</td><td>?1,800</td></tr>
-          </tbody>
-          <tfoot><tr style="background:#fafafa"><td colspan="2" style="font-weight:700">???</td><td style="font-weight:700;color:var(--accent-field)">?11,900</td></tr></tfoot>
-        </table>
-        <div class="form-group mt-16"><div class="form-label">??????</div><textarea class="form-control" rows="2" placeholder="??????????????.."></textarea></div>
-        <div class="flex gap-8 mt-16">
-          <button class="btn" onclick="showPage('field','field-record')">?????/button>
-          <button class="btn btn-purple" style="margin-left:auto" onclick="toast('????????????');showPage('field','field-home')">?????????</button>
-        </div>
-      </div>
-    </div>
-    <!-- ?????? -->
-    <div id="field-approval" class="page">
-      <div class="section-title">??????</div>
-      <div class="card">
-        <table>
-          <thead><tr><th>???</th><th>???</th><th>???</th><th>???????/th><th>???</th></tr></thead>
-          <tbody>
-            <tr><td>TSCS-2026-0327-0087</td><td>??????</td><td>?9,800</td><td><span class="badge badge-orange">?????/span></td><td><button class="btn btn-sm btn-purple">???</button></td></tr>
-            <tr><td>TSCS-2026-0326-0086</td><td>??????</td><td>?186,000</td><td><span class="badge badge-orange">?????/span></td><td><button class="btn btn-sm btn-purple">???</button></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+<div class="pw"><div class="pf fp"><div class="pn"></div><div class="pb2">
+<div id="fl" class="pg"><div style="display:flex;justify-content:center;align-items:center;height:70vh"><div class="c" style="width:300px;text-align:center"><div style="font-size:40px;margin-bottom:8px">&#128241;</div><div style="font-size:18px;font-weight:700;margin-bottom:24px">&#29616;&#22330;&#31471;</div><div class="fg"><input class="frm" placeholder="&#35831;&#36755;&#20837;&#36134;&#21495;" value="zhaoqiang"></div><div class="fg"><input class="frm" type="password" placeholder="&#35831;&#36755;&#20837;&#23494;&#30721;" value="******"></div><button class="btn bf" style="width:100%;justify-content:center" onclick="sp('f','fh')">&#30331;&#24405;</button></div></div></div>
+<div id="fh" class="pg on"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#24037;&#20316;&#21488;</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px"><div class="c" style="text-align:center"><div class="scl">&#20170;&#26085;&#20219;&#21153;</div><div class="scv" style="color:var(--af)">3</div><div class="scs">&#24453;&#22788;&#29702;</div></div><div class="c" style="text-align:center"><div class="scl">&#26412;&#26376;&#23436;&#25104;</div><div class="scv">48</div><div class="scs">&#24179;&#22343;4.2&#23567;&#261时;</div></div><div class="c" style="text-align:center"><div class="scl">&#24179;&#22343;&#22788;&#29702;&#26102;&#38271;</div><div class="scv">4.2h</div></div></div><div class="st" style="font-size:13px">&#24453;&#22788;&#29702;&#20219;&#21153;</div><div class="fc" onclick="sp('f','ft')"><div class="fci" style="background:rgba(114,46,209,.15)">&#128680;</div><div class="fcn"><div class="fct">TSCS-2026-0328-0088 <span class="bdg br">&#32047;&#24613;</span></div><div class="fcd">&#20140;A&#183;88888 &#183; &#21271;&#20140;&#24066;&#26397;&#38451;&#21306;&#20140;&#36890;&#24555;&#36895;&#36335; &#183; &#36135;&#20135;&#25439;&#22833;</div><div><span class="bdg by">&#24453;&#20986;&#21457;</span> <span style="font-size:10px;color:var(--t2)">&#20998;&#37197;&#26102;&#38388;&#65306;10:30</span></div></div></div><div class="fc" onclick="sp('f','ft')"><div class="fci" style="background:rgba(114,46,209,.1)">&#9888;</div><div class="fcn"><div class="fct">TSCS-2026-0327-0087 <span class="bdg by">&#26631;&#20934;</span></div><div class="fcd">&#20140;B&#183;66666 &#183; &#21271;&#20140;&#24066;&#28023;&#27982;&#21306;&#23398;&#38498;&#36335; &#183; &#36135;&#20135;&#25439;&#22833;</div><div><span class="bdg by">&#24453;&#20986;&#21457;</span> <span style="font-size:10px;color:var(--t2)">&#20998;&#37197;&#26102;&#38388;&#65306;17:00&#65288;&#26144;&#26085;&#65289;</span></div></div></div></div></div>
+<div id="ft" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#20219;&#21153;&#35814;&#24773;</div><div class="c"><div class="ig"><div class="ii"><div class="il">&#25253;&#26696;&#21495;</div><div class="iv">TSCS-2026-0328-0088</div></div><div class="ii"><div class="il">&#20107;&#25925;&#22352;&#28857;</div><div class="iv">&#21271;&#20140;&#24066;&#26397;&#38451;&#21306;&#20140;&#36890;&#24555;&#36895;&#36335;</div></div><div class="ii"><div class="il">&#20107;&#25925;&#36710;&#36742;</div><div class="iv">&#20140;A&#183;88888</div></div><div class="ii"><div class="il">&#20445;&#38556;&#26041;&#26696;</div><div class="iv">&#26631;&#20934;&#26041;&#26696; &#183; &#31532;&#19977;&#32773;100&#19975;/&#36710;&#36742;50&#19975;</div></div><div class="ii"><div class="il">&#25253;&#26696;&#20154;</div><div class="iv">&#24352;&#20255; 138****5678</div></div><div class="ii"><div class="il">&#36131;&#20219;&#21010;&#20998;</div><div class="iv"><span class="bdg by">&#20027;&#36131; 70%</span></div></div></div><div class="fx g8 mt16"><button class="btn" onclick="sp('f','fh')">&#36820;&#22238;</button><button class="btn bf" onclick="sp('f','fc2')">&#25509;&#21463;&#20219;&#21153;&#24182;&#23548;&#33322;</button></div></div></div>
+<div id="fc2" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#21040;&#36798;&#31614;&#21040;</div><div class="c" style="text-align:center;padding:30px 0"><div style="font-size:48px;margin-bottom:12px">&#128507;</div><div style="font-size:15px;font-weight:600;margin-bottom:8px">&#21271;&#20140;&#24066;&#26397;&#38451;&#21306;&#20140;&#36890;&#24555;&#36895;&#36335;</div><div style="font-size:12px;color:var(--t2);margin-bottom:20px">GPS&#23450;&#20301;&#25104;&#21151;</div><button class="btn bf" style="width:200px;justify-content:center" onclick="tst('&#31614;&#21040;&#25104;&#21151;&#65281;&#26102;&#38388;&#65306;11:15')">&#30830;&#35748;&#21040;&#36798;&#31614;&#21040;</button></div><div class="fx g8 mt16"><button class="btn" onclick="sp('f','ft')">&#19978;&#19968;&#27493;</button><button class="btn bf" onclick="sp('f','fph')">&#19979;&#19968;&#27493;&#65306;&#29616;&#22330;&#25293;&#29031;</button></div></div>
+<div id="fph" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#29616;&#22330;&#25293;&#29031;&#21462;&#35777;</div><div class="c"><div style="font-size:12px;font-weight:600;margin-bottom:8px">&#24050;&#25293;&#29031;&#29255;&#65288;8/20&#65289;</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px"><div style="height:64px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer">&#128444;</div><div style="height:64px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer">&#128444;</div><div style="height:64px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer">&#128444;</div><div style="height:64px;background:#f0f0f0;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer">&#128444;</div></div><div style="background:#fafafa;border-radius:8px;padding:10px;font-size:12px;color:var(--t2);margin-bottom:12px"><b>&#25293;&#29031;&#35201;&#27714;&#65306;</b>&#24517;&#39035;&#21253;&#21547;&#65306;&#65288;&#19968;&#65289;&#29616;&#22330;&#20840;&#26223;&#29031;1&#24352; &#65289;&#27931;&#20107;&#36710;&#36742;&#20840;&#26223;&#65288;&#27491;&#20391;&#38754;45&#24230;&#65289;&#21508;1&#24352; &#65289;&#21463;&#25439;&#37096;&#20301;&#29305;&#20889;&#65288;&#21253;&#21547;&#29031;&#29255;&#29256;&#65289;&#21508;1&#24352; &#65289;&#36947;&#36335;&#29677;&#22659;&#29031; &#65289;&#22914;&#26377;&#35748;&#23450;&#20070;&#39035;&#25293;&#29031;&#35748;&#23450;&#20070;</div><div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center">&#128247; &#25293;&#29031;</button><button class="btn" style="flex:1;justify-content:center">&#128444; &#30456;&#20874;</button></div></div><div class="fx g8 mt16"><button class="btn" onclick="sp('f','fc2')">&#19978;&#19968;&#27493;</button><button class="btn bf" onclick="sp('f','frec')">&#19979;&#19968;&#27493;&#65306;&#31508;&#24405;&#23450;&#36131;</button></div></div>
+<div id="frec" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#24403;&#20107;&#20154;&#31508;&#24405;&#19982;&#21021;&#27493;&#23450;&#36131;</div><div class="c"><div class="fg"><div class="fl">&#24403;&#20107;&#20154;&#22995;&#21517; *</div><input class="frm" placeholder="&#35831;&#36755;&#20837;"></div><div class="fr"><div class="fg"><div class="fl">&#39550;&#39542;&#35777;&#21495; *</div><input class="frm" placeholder="&#35831;&#36755;&#20837;"></div><div class="fg"><div class="fl">&#32852;&#31995;&#26041;&#24335; *</div><input class="frm" placeholder="&#35831;&#36755;&#20837;"></div></div><div class="fg"><div class="fl">&#20107;&#25925;&#32463;&#36807;&#65288;&#21475;&#36848;&#33258;&#21160;&#36716;&#25991;&#23383;&#65289;</div><div style="display:flex;gap:8px"><textarea class="frm" rows="3" placeholder="&#35831;&#25551;&#36848;&#20107;&#25925;&#32463;&#36807;..." style="flex:1">&#21069;&#36710;&#31361;&#28982;&#21464;&#36947;&#65292;&#25105;&#36991;&#38450;&#19981;&#21450;&#36861;&#23614;&#65292;&#21069;&#36710;&#21491;&#21518;&#20445;&#38505;&#26464;&#21463;&#25439;&#65292;&#26412;&#36710;&#21069;&#20445;&#38505;&#38505;&#21463;&#25439;&#65292;&#26080;&#20154;&#20260;&#12290;</textarea><button class="btn" style="align-self:flex-end;white-space:nowrap">&#127908; &#35821;&#38899;</button></div></div><div class="fg"><div class="fl">&#21021;&#27493;&#23450;&#36131; *</div><div style="display:flex;gap:6px;flex-wrap:wrap"><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="frep"> &#20840;&#37096;&#36131;&#20219;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="frep" checked> &#20027;&#35201;&#36131;&#20219;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="frep"> &#21516;&#31561;&#36131;&#20219;</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px"><input type="radio" name="frep"> &#27425;&#35201;&#36131;&#20219;</label></div></div><div class="fg"><div class="fl">&#30005;&#23376;&#31614;&#21517;</div><div style="height:50px;border:2px dashed var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--t2);cursor:pointer">&#28857;&#20987;&#31614;&#21517;&#65288;&#24403;&#20107;&#20154;&#65289;</div></div><div class="fx g8 mt16"><button class="btn" onclick="sp('f','fph')">&#19978;&#19968;&#27493;</button><button class="btn bf" onclick="sp('f','fev')">&#19979;&#19968;&#27493;&#65306;&#25439;&#22833;&#35780;&#20272;</button></div></div></div>
+<div id="fev" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#25439;&#22833;&#35780;&#20272;</div><div class="c"><div style="font-size:13px;font-weight:600;margin-bottom:10px">&#28140;&#39033;&#25439;&#22833;&#35780;&#20272;</div><div class="tw"><table><thead><tr><th>&#25439;&#22833;&#37096;&#20301;</th><th>&#25439;&#22833;&#31867;&#22411;</th><th>&#39044;&#20272;&#37329;&#39069;</th></tr></thead><tbody><tr><td>&#21069;&#20445;&#38505;&#26464;</td><td>&#26495;&#37329;&#20462;&#22797; + &#21945;&#28526;</td><td>&#165;3,200</td></tr><tr><td>&#24038;&#21069;&#22823;&#28779;</td><td>&#26356;&#25442;&#38646;&#20214;</td><td>&#165;4,800</td></tr><tr><td>&#21069;&#33337;&#30422;</td><td>&#26495;&#37329;&#20462;&#22797;</td><td>&#165;2,100</td></tr><tr><td>&#27700;&#31649;&#26694;&#26550;</td><td>&#26356;&#25442;&#38646;&#20214;</td><td>&#165;1,800</td></tr></tbody><tfoot><tr style="background:#fafafa"><td colspan="2" style="font-weight:700">&#21512;&#35745;</td><td style="font-weight:700;color:var(--af)">&#165;11,900</td></tr></tfoot></table></div><div class="fg"><div class="fl">&#35780;&#20272;&#22791;&#27880;</div><textarea class="frm" rows="2" placeholder="&#22914;&#26377;&#29305;&#27573;&#24773;&#20917;&#35831;&#35828;&#26126;..."></textarea></div><div class="fx g8 mt16"><button class="btn" onclick="sp('f','frec')">&#19978;&#19968;&#27493;</button><button class="btn bf" style="margin-left:auto" onclick="tst('&#26632;&#26597;&#25253;&#21578;&#24050;&#25551;&#20132;&#65281;');sp('f','fh')">&#25551;&#20184;&#26632;&#26597;&#25253;&#21578;</button></div></div></div>
+<div id="fap" class="pg"><div style="padding:12px 14px 0"><div class="st" style="font-size:14px">&#23457;&#26680;&#20013;&#24515;</div><div class="c"><div class="tw"><table><thead><tr><th>&#26696;&#20214;</th><th>&#31867;&#22411;</th><th>&#37329;&#39069;</th><th>&#23457;&#26680;&#29366;&#24577;</th><th>&#25805;&#20316;</th></tr></thead><tbody><tr><td>TSCS-2026-0327-0087</td><td>&#25439;&#22833;&#35780;&#20272;</td><td>&#165;9,800</td><td><span class="bdg by">&#24453;&#23457;&#26680;</span></td><td><button class="btn bsm bf">&#23457;&#26680;</button></td></tr><tr><td>TSCS-2026-0326-0086</td><td>&#20154;&#20260;&#32473;&#20184;</td><td>&#165;186,000</td><td><span class="bdg by">&#24453;&#23457;&#26680;</span></td><td><button class="btn bsm bf">&#23457;&#26680;</button></td></tr></tbody></table></div></div></div>
+
 </div>
-
-<!-- TOAST<!-- TOAST -->
-<div id="toast" class="toast"></div>
-
-<!-- MODAL (??????) -->
-<div id="modal-case" class="modal-overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <span>?????? - TSCS-2026-0328-0088</span>
-      <button class="modal-close" onclick="closeModal()">?</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px">??????</div>
-        <div class="info-grid mb-12">
-          <div class="info-item"><div class="info-label">?????/div><div class="info-value">TSCS-2026-0328-0088</div></div>
-          <div class="info-item"><div class="info-label">???</div><div class="info-value">??????</div></div>
-          <div class="info-item"><div class="info-label">???</div><div class="info-value">???88888</div></div>
-          <div class="info-item"><div class="info-label">???</div><div class="info-value"><span class="badge badge-yellow">??? 70%</span></div></div>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:10px">??????</div>
-        <div class="timeline">
-          <div class="timeline-item done"><div class="timeline-time">09:15</div><div class="timeline-title">????????/div></div>
-          <div class="timeline-item done"><div class="timeline-time">10:02</div><div class="timeline-title">??????</div></div>
-          <div class="timeline-item done"><div class="timeline-time">10:30</div><div class="timeline-title">??????</div></div>
-          <div class="timeline-item active"><div class="timeline-time">11:15</div><div class="timeline-title">??????</div></div>
-          <div class="timeline-item pending"><div class="timeline-time">??/div><div class="timeline-title">??????</div></div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer"><button class="btn" onclick="closeModal()">???</button><button class="btn btn-primary">?????????</button></div>
-  </div>
+<div class="pbb"><div class="pt" onclick="pn('f','fh',this)"><span class="ic">&#128209;</span><span>&#24037;&#20316;&#21488;</span></div><div class="pt" onclick="pn('f','ft',this)"><span class="ic">&#128209;</span><span>&#20219;&#21153;</span></div><div class="pt" onclick="pn('f','fev',this)"><span class="ic">&#128176;</span><span>&#35780;&#20272;</span></div><div class="pt" onclick="pn('f','fap',this)"><span class="ic">&#10003;</span><span>&#23457;&#26680;</span></div></div>
 </div>
-
+</div>
+</div>
+<!-- TOAST -->
+<div id="tst" class="tst"></div>
 <script>
-// Navigation
-let currentTerm = 'platform';
+var ct = 'p';
+var charts = {};
 
-function switchTerm(term) {
-  currentTerm = term;
-  document.querySelectorAll('.term-tab').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.term-tab[data-term="${term}"]`).classList.add('active');
-  document.querySelectorAll('.term-content').forEach(el => el.style.display = 'none');
-  document.getElementById(`term-${term}`).style.display = 'flex';
-  document.querySelectorAll(`#term-${term} .page`).forEach(p => p.classList.remove('active'));
-  // Show first page of this term
-  const firstPage = document.querySelector(`#term-${term} .page`);
-  if (firstPage) firstPage.classList.add('active');
-  // Init charts if needed
-  if (term === 'platform') initPlatformCharts();
-  if (term === 'enterprise') initEnterpriseCharts();
-  if (term === 'driver') initDriverCharts();
+function st(t) {
+  ct = t;
+  document.querySelectorAll(".tab").forEach(function(el){el.classList.remove("active")});
+  document.querySelector(".tab[data-t=\""""+t+"""""]").classList.add("active");
+  document.querySelectorAll(".lay").forEach(function(el){el.style.display = "none"});
+  var el = document.getElementById("t-"+t);
+  if (el) {
+    el.style.display = "flex";
+    if (t === "d" || t === "f") { el.style.justifyContent = "center"; }
+    else { el.style.justifyContent = ""; }
+  }
+  var firstPage = document.querySelector("#t-"+t+" .pg");
+  if (firstPage) { firstPage.classList.add("on"); }
+  initCharts(t);
 }
 
-function showPage(term, pageId) {
-  document.querySelectorAll(`#term-${term} .page`).forEach(p => p.classList.remove('active'));
-  document.getElementById(pageId).classList.add('active');
-  document.querySelectorAll(`#term-${term} .sidebar-item`).forEach(i => i.classList.remove('active'));
-  const idx = Array.from(document.querySelectorAll(`#term-${term} .sidebar-item`)).findIndex(i => i.textContent.includes(document.getElementById(pageId).querySelector('.section-title')?.textContent || ''));
-  if (idx >= 0) document.querySelectorAll(`#term-${term} .sidebar-item`)[idx]?.classList.add('active');
+function sp(t, pid) {
+  document.querySelectorAll("#t-"+t+" .pg").forEach(function(el){el.classList.remove("on")});
+  var p = document.getElementById(pid);
+  if (p) p.classList.add("on");
+  var side = document.getElementById("t-"+t);
+  if (side) {
+    side.querySelectorAll(".si").forEach(function(el){el.classList.remove("active")});
+    var sis = side.querySelectorAll(".si");
+    for (var i=0;i<sis.length;i++) {
+      if (sis[i].getAttribute("onclick") && sis[i].getAttribute("onclick").indexOf(pid)>=0) {
+        sis[i].classList.add("active"); break;
+      }
+    }
+  }
+  initCharts(t);
 }
 
-function toast(msg, isError) {
-  const t = document.getElementById('toast');
+function pn(t, pid, el) {
+  document.querySelectorAll(".pt").forEach(function(e){e.classList.remove("active")});
+  if (el) el.classList.add("active");
+  sp(t, pid);
+}
+
+function tst(msg) {
+  var t = document.getElementById("tst");
   t.textContent = msg;
-  t.className = 'toast show' + (isError ? ' error' : '');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  t.className = "tst show";
+  setTimeout(function(){t.classList.remove("show");}, 3000);
 }
 
-function closeModal() {
-  document.getElementById('modal-case').classList.remove('show');
+function initCharts(t) {
+  if (charts[t]) return;
+  charts[t] = true;
+  
+  if (t === "p") {
+    var ccomp = document.getElementById("ccomp");
+    if (ccomp) {
+      new Chart(ccomp, {
+        type:"bar",
+        data:{labels:["鹏程","星辰","华通","顺捷","鑫安"],
+          datasets:[{label:"给附率%",data:[34,52,91,67,42],
+            backgroundColor:["#52C41A","#52C41A","#ff4d4f","#fa8c16","#52C41A"]}]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}}}
+      );
+    }
+    var ctrend = document.getElementById("ctrend");
+    if (ctrend) {
+      new Chart(ctrend, {
+        type:"line",
+        data:{labels:["10月","11月","12月","1月","2月","3月"],
+          datasets:[{label:"给付额(万元)",data:[280,310,290,340,360,384],
+            borderColor:"#1677FF",backgroundColor:"rgba(22,119,255,.1)",fill:true,tension:.4}]
+        },
+        options:{responsive:true}
+      });
+    }
+    var crisk = document.getElementById("crisk");
+    if (crisk) {
+      new Chart(crisk, {
+        type:"radar",
+        data:{labels:["给附率","评分","续约年限","挂靠比例","赔付速度"],
+          datasets:[
+            {label:"鹏程",data:[85,78,90,95,88],backgroundColor:"rgba(22,119,255,.2)",borderColor:"#1677FF"},
+            {label:"华通",data:[30,45,70,50,60],backgroundColor:"rgba(255,77,79,.2)",borderColor:"#ff4d4f"}
+          ]
+        },
+        options:{responsive:true}
+      });
+    }
+  }
+  
+  if (t === "e") {
+    var eesc = document.getElementById("eesc");
+    if (eesc) {
+      new Chart(eesc, {
+        type:"bar",
+        data:{labels:["一分司","二分司","三分司","四分司"],
+          datasets:[{label:"评分",data:[82,78,75,71],backgroundColor:"#52C41A"}]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}}}
+      );
+    }
+    var eddist = document.getElementById("eddist");
+    if (eddist) {
+      new Chart(eddist, {
+        type:"doughnut",
+        data:{labels:["优秀(90+)","良好(80+)","一般(70+)","较差(60+)","差(<60)"],
+          datasets:[{data:[320,1100,1400,480,110],
+            backgroundColor:["#52C41A","#73d13d","#fa8c16","#ff7a45","#ff4d4f"]}]
+        },
+        options:{responsive:true}
+      });
+    }
+    var estrend = document.getElementById("estrend");
+    if (estrend) {
+      new Chart(estrend, {
+        type:"line",
+        data:{labels:["10月","11月","12月","1月","2月","3月"],
+          datasets:[{label:"均分",data:[75,76,74,77,76.2,78.5],
+            borderColor:"#52C41A",backgroundColor:"rgba(82,196,26,.1)",fill:true,tension:.4}]
+        },
+        options:{responsive:true}
+      });
+    }
+  }
+  
+  if (t === "d") {
+    var dschart = document.getElementById("dschart");
+    if (dschart) {
+      new Chart(dschart, {
+        type:"radar",
+        data:{labels:["安全驾驶","事故记录","合规记录"],
+          datasets:[{label:"张伟",data:[85,90,95],backgroundColor:"rgba(250,140,22,.2)",borderColor:"#FA8C16"}]
+        },
+        options:{responsive:true,scales:{r:{min:0,max:100}}}
+      );
+    }
+    var dstrend = document.getElementById("dstrend");
+    if (dstrend) {
+      new Chart(dstrend, {
+        type:"line",
+        data:{labels:["10月","11月","12月","1月","2月","3月"],
+          datasets:[{label:"评分",data:[72,74,76,75,76,78],
+            borderColor:"#FA8C16",backgroundColor:"rgba(250,140,22,.1)",fill:true,tension:.4}]
+        },
+        options:{responsive:true}
+      });
+    }
+  }
 }
 
-// Charts
-function initPlatformCharts() {
-  if (document.getElementById('chart-company')) {
-    new Chart(document.getElementById('chart-company'), {
-      type:'bar',
-      data:{labels:['???','???','????,'???','???'],datasets:[{label:'?????',data:[34,52,91,67,42],backgroundColor:['#52C41A','#52C41A','#ff4d4f','#fa8c16','#52C41A']}]},
-      options:{responsive:true,plugins:{legend:{display:false}}}
-    });
-  }
-  if (document.getElementById('chart-trend')) {
-    new Chart(document.getElementById('chart-trend'), {
-      type:'line',
-      data:{labels:['10??,'11??,'12??,'1??,'2??,'3??],datasets:[{label:'????????)',data:[280,310,290,340,360,384],borderColor:'#1677FF',backgroundColor:'rgba(22,119,255,.1)',fill:true,tension:.4}]},
-      options:{responsive:true}
-    });
-  }
-  if (document.getElementById('chart-risk')) {
-    new Chart(document.getElementById('chart-risk'), {
-      type:'radar',
-      data:{labels:['?????,'???','??????','??????','??????'],datasets:[{label:'???',data:[85,78,90,95,88],backgroundColor:'rgba(22,119,255,.2)'},{label:'????,data:[30,45,70,50,60],backgroundColor:'rgba(255,77,79,.2)'}]},
-      options:{responsive:true}
-    });
-  }
-}
-
-function initEnterpriseCharts() {
-  if (document.getElementById('ent-chart-score')) {
-    new Chart(document.getElementById('ent-chart-score'), {
-      type:'bar',
-      data:{labels:['?????','?????,'?????,'?????],datasets:[{label:'???',data:[82,78,75,71],backgroundColor:'#52C41A'}]},
-      options:{responsive:true,plugins:{legend:{display:false}}}
-    });
-  }
-  if (document.getElementById('ent-chart-dist')) {
-    new Chart(document.getElementById('ent-chart-dist'), {
-      type:'doughnut',
-      data:{labels:['???(90+)','???(80+)','????70+)','???(60+)','??<60)'],datasets:[{data:[320,1100,1400,480,110],backgroundColor:['#52C41A','#73d13d','#fa8c16','#ff7a45','#ff4d4f']}]},
-      options:{responsive:true}
-    });
-  }
-  if (document.getElementById('ent-chart-trend')) {
-    new Chart(document.getElementById('ent-chart-trend'), {
-      type:'line',
-      data:{labels:['10??,'11??,'12??,'1??,'2??,'3??],datasets:[{label:'???',data:[75,76,74,77,76.2,78.5],borderColor:'#52C41A',backgroundColor:'rgba(82,196,26,.1)',fill:true,tension:.4}]},
-      options:{responsive:true}
-    });
-  }
-}
-
-function initDriverCharts() {
-  if (document.getElementById('drv-chart')) {
-    new Chart(document.getElementById('drv-chart'), {
-      type:'radar',
-      data:{labels:['??????','??????','??????'],datasets:[{label:'???',data:[85,90,95],backgroundColor:'rgba(250,140,22,.2)',borderColor:'#FA8C16'}]},
-      options:{responsive:true,scales:{r:{min:0,max:100}}}
-    });
-  }
-  if (document.getElementById('drv-trend')) {
-    new Chart(document.getElementById('drv-trend'), {
-      type:'line',
-      data:{labels:['10??,'11??,'12??,'1??,'2??,'3??],datasets:[{label:'???',data:[72,74,76,75,76,78],borderColor:'#FA8C16',backgroundColor:'rgba(250,140,22,.1)',fill:true,tension:.4}]},
-      options:{responsive:true}
-    });
-  }
-}
-
-// Init
-switchTerm('platform');
-
-function phNav(term, pageId, el) {
-  var tabs = el.parentElement.querySelectorAll('.phone-tab');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
-  el.classList.add('active');
-  showPage(term, pageId);
-}
+st("p");
 </script>
 </body>
 </html>
