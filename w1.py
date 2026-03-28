@@ -1,0 +1,251 @@
+html = '''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TSCS v2.0 多端交互演示</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Noto Sans SC",sans-serif;background:#F0F2F5;font-size:14px;color:#262626}
+:root{--a:#1677FF;--ae:#52C41A;--ad:#FA8C16;--af:#722ED1;--r:8px;--b:#d9d9d9;--t:#262626;--t2:#595959;--bg:#F0F2F5;--c:#fff;--sh:0 1px 3px rgba(0,0,0,.08);--sh2:0 4px 16px rgba(0,0,0,.12)}
+.nav{background:#fff;height:56px;display:flex;align-items:center;padding:0 24px;box-shadow:var(--sh);position:fixed;top:0;left:0;right:0;z-index:100}
+.nav .logo{font-size:18px;font-weight:700;margin-right:40px}
+.nav .logo span{font-size:12px;color:var(--t2);font-weight:400}
+.tabs{display:flex;gap:6px}
+.tab{padding:6px 20px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;border:2px solid transparent;color:var(--t2);background:transparent;font-family:inherit;transition:all .2s}
+.tab.tp{background:rgba(22,119,255,.1);color:var(--a);border-color:var(--a)}
+.tab.te{background:rgba(82,196,26,.1);color:var(--ae);border-color:var(--ae)}
+.tab.td{background:rgba(250,140,22,.1);color:var(--ad);border-color:var(--ad)}
+.tab.tf{background:rgba(114,46,209,.1);color:var(--af);border-color:var(--af)}
+.lay{display:flex;margin-top:56px;min-height:calc(100vh - 56px)}
+.side{width:215px;background:var(--c);border-right:1px solid var(--b);padding:16px 0;position:fixed;top:56px;left:0;bottom:0;overflow-y:auto}
+.side .sht{padding:0 16px 12px;border-bottom:1px solid var(--b);margin-bottom:12px}
+.side .sht .sn{font-weight:700;font-size:13px}
+.side .sht .ss{font-size:11px;color:var(--t2);margin-top:2px}
+.side .si{padding:9px 16px;font-size:12px;color:var(--t2);cursor:pointer;border-left:3px solid transparent;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:all .15s}
+.side .si:hover{background:var(--bg);color:var(--t)}
+.side .si.sa{color:var(--a);border-left-color:var(--a);background:rgba(22,119,255,.05);font-weight:500}
+.side .si.se{color:var(--ae);border-left-color:var(--ae);background:rgba(82,196,26,.05)}
+.side .si.sd{color:var(--ad);border-left-color:var(--ad);background:rgba(250,140,22,.05)}
+.side .si.sf{color:var(--af);border-left-color:var(--af);background:rgba(114,46,209,.05)}
+.main{flex:1;margin-left:215px;padding:20px;min-height:calc(100vh - 56px)}
+.card{background:var(--c);border-radius:var(--r);box-shadow:var(--sh);padding:20px;margin-bottom:16px}
+.stat{background:var(--c);border-radius:var(--r);box-shadow:var(--sh);padding:16px;display:flex;flex-direction:column;gap:4px}
+.stat .lbl{font-size:11px;color:var(--t2)}
+.stat .val{font-size:26px;font-weight:700}
+.stat .sub{font-size:10px}
+.stat .sub.r{color:#52C41A}
+.stat .sub.r2{color:#ff4d4f}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.grid2{grid-template-columns:1fr 1fr}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.hd{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.hd::before{content:"";display:inline-block;width:3px;height:15px;background:var(--a);border-radius:2px;flex-shrink:0}
+.hd.e::before{background:var(--ae)}
+.hd.d::before{background:var(--ad)}
+.hd.f::before{background:var(--af)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--b)}
+th{background:#fafafa;font-weight:500;color:var(--t2);font-size:11px}
+tr:hover{background:#fafafa}
+.cr{cursor:pointer}
+.bdg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500}
+.bdg.ba{background:rgba(22,119,255,.1);color:var(--a)}
+.bdg.ae{background:rgba(82,196,26,.1);color:var(--ae)}
+.bdg.ad{background:rgba(250,140,22,.1);color:var(--ad)}
+.bdg.af2{background:rgba(114,46,209,.1);color:var(--af)}
+.bdg.r{background:rgba(255,77,79,.1);color:#ff4d4f}
+.bdg.y{background:rgba(250,140,22,.15);color:#d46b00}
+.bdg.k{background:#f0f0f0;color:var(--t2)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--b);background:var(--c);color:var(--t);transition:all .15s;font-family:inherit}
+.btn:hover{border-color:#40a9ff;color:#40a9ff}
+.btn.p{background:var(--a);color:#fff;border-color:var(--a)}
+.btn.e{background:var(--ae);color:#fff;border-color:var(--ae)}
+.btn.d{background:var(--ad);color:#fff;border-color:var(--ad)}
+.btn.f2{background:var(--af);color:#fff;border-color:var(--af)}
+.btn.sm{padding:3px 9px;font-size:11px}
+.tb{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.in{padding:6px 10px;border:1px solid var(--b);border-radius:5px;font-size:12px;outline:none;font-family:inherit;width:180px;background:#fff}
+select.in,textarea.in{width:100%;padding:7px 10px;border:1px solid var(--b);border-radius:5px;font-size:12px;font-family:inherit;outline:none;background:#fff}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:12px;font-weight:500;margin-bottom:5px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tl{position:relative;padding-left:22px}
+.tl::before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--b)}
+.ti{position:relative;margin-bottom:18px}
+.ti::before{content:"";position:absolute;left:-19px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--b);border:2px solid #fff}
+.ti.done::before{background:#52C41A}
+.ti.active::before{background:var(--a);box-shadow:0 0 0 3px rgba(22,119,255,.2)}
+.ti.pending::before{background:var(--b)}
+.tt{font-size:10px;color:var(--t2);margin-bottom:1px}
+.ti .ttl{font-weight:500;font-size:12px}
+.ti .td{font-size:11px;color:var(--t2);margin-top:1px}
+.pg{display:none;animation:fade .25s ease}
+.pg.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+.toast{position:fixed;top:76px;right:20px;background:#fff;border-radius:var(--r);box-shadow:var(--sh2);padding:11px 18px;z-index:300;display:none;font-size:12px;max-width:280px;border-left:3px solid #52C41A}
+.toast.s{display:flex;align-items:center;gap:8px;animation:ti .3s ease}
+.toast.e{border-left-color:#ff4d4f}
+@keyframes ti{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.fx{display:flex;flex-wrap:wrap}
+.g8{gap:8px}.g12{gap:12px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.ts2{color:#52C41A}.te2{color:#ff4d4f}.tw2{color:#fa8c16}
+.tm{font-size:11px;color:var(--t2)}
+.fb{font-weight:700}
+.cr3{background:#fafafa;border-radius:var(--r);padding:14px;margin-top:12px}
+.cr4{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;color:var(--t2)}
+.cr4.t{font-size:14px;font-weight:700;color:var(--t);border-top:1px solid var(--b);margin-top:6px;padding-top:8px}
+.cr4.t .v{color:#52C41A;font-size:18px}
+.ap{display:flex;align-items:center;margin:16px 0}
+.an{flex:1;text-align:center;padding:10px 6px;background:#fafafa;border-radius:8px}
+.an .al{font-size:11px;color:var(--t2);margin-bottom:4px}
+.an .av{font-size:14px;font-weight:700}
+.an .as{font-size:10px;color:var(--t2)}
+.aa{font-size:14px;color:var(--b);flex-shrink:0}
+.pgn{display:flex;align-items:center;justify-content:flex-end;gap:3px;margin-top:14px}
+.pb{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid var(--b);border-radius:5px;cursor:pointer;font-size:12px;background:#fff;font-family:inherit;transition:all .15s}
+.pb.on{background:var(--a);color:#fff;border-color:var(--a)}
+.pb:hover:not(.on){border-color:#40a9ff;color:#40a9ff}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ii{display:flex;flex-direction:column;gap:2px}
+.il{font-size:11px;color:var(--t2)}
+.iv{font-size:13px;font-weight:500}
+.iv.m{font-size:18px;font-weight:700}
+.fc{display:flex;gap:12px;padding:12px;border:1px solid var(--b);border-radius:var(--r);margin-bottom:10px;cursor:pointer;transition:all .15s}
+.fc:hover{border-color:var(--a);box-shadow:var(--sh)}
+.fc .fci{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.fc .fcn{flex:1;min-width:0}
+.fc .fct{font-weight:600;font-size:13px;margin-bottom:3px}
+.fc .fcd{font-size:11px;color:var(--t2)}
+.phwrap{display:flex;justify-content:center;align-items:flex-start;padding:32px 20px;background:#d8d8d8;min-height:calc(100vh - 56px)}
+.phf{width:390px;background:#fff;border-radius:36px;box-shadow:0 8px 40px rgba(0,0,0,.22),0 0 0 11px #1a1a1a;overflow:hidden;position:relative}
+.pn{height:34px;background:#1a1a1a;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px}
+.pn::after{content:"";width:90px;height:16px;background:#111;border-radius:0 0 10px 10px}
+.phb{height:calc(100vh - 90px);overflow-y:auto;background:#fff}
+.phbb{position:absolute;bottom:0;left:0;right:0;height:58px;background:#fffaf5;border-top:1px solid #eee;display:flex}
+.pht{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10px;color:#999;cursor:pointer;transition:color .15s}
+.pht .ic{font-size:20px}
+.dpht.on{color:#FA8C16}
+.fpht.on{color:#722ED1}
+</style>
+</head>
+<body>
+<nav class='nav'>
+  <div class='logo'>TSCS <span>v2.0 多端交互演示</span></div>
+  <div class='tabs'>
+    <div class='tab tp on' id='tabp' onclick='st("p")'>🏛 机构端</div>
+    <div class='tab' id='tabe' onclick='st("e")'>🏢 企业端</div>
+    <div class='tab' id='tabd' onclick='st("d")'>🚗 驾驶员端</div>
+    <div class='tab' id='tabf' onclick='st("f")'>📱 现场端</div>
+  </div>
+</nav>
+<!-- 机构端 -->
+<div id='tp' class='lay'>
+<div class='side'>
+<div class='sht'><div class='sn'>机构端</div><div class='ss'>TSCS平台运营管理系统</div></div>
+<div class='si sa' onclick='sp("p","ph")'>📊 数据面板</div>
+<div class='si' onclick='sp("p","pe")'>🏢 企业管理</div>
+<div class='si' onclick='sp("p","pc")'>⚠ 事故报案</div>
+<div class='si' onclick='sp("p","pcd")'>🔍 案件详情</div>
+<div class='si' onclick='sp("p","ppay")'>💰 互助给付</div>
+<div class='si' onclick='sp("p","pf")'>📈 财务报表</div>
+<div class='si' onclick='sp("p","pr")'>🛡 风控评级</div>
+<div class='si' onclick='sp("p","pu")'>👥 用户管理</div>
+</div>
+<div class='main'>
+<!-- 数据面板 -->
+<div id='ph' class='pg on'>
+<div class='hd'>全局数据面板</div>
+<div class='grid4'>
+<div class='stat'><div class='val' style='color:var(--a)'>18</div><div class='lbl'>入驻企业总数</div><div class='sub'>本月+2</div></div>
+<div class='stat'><div class='val'>28,634</div><div class='lbl'>在统车辆总数</div><div class='sub'>活跃凭证</div></div>
+<div class='stat'><div class='val' style='color:#ff4d4f'>127</div><div class='lbl'>本月新增案件</div><div class='sub r2'>较上月+12</div></div>
+<div class='stat'><div class='val' style='color:#ff4d4f'>¥3,842,600</div><div class='lbl'>本月给付金额</div><div class='sub r2'>较上月+8%</div></div>
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:16px'>
+<div class='card'><div class='hd'>各企业关键指标对比</div><canvas id='cc' height='120'></canvas></div>
+<div class='card'><div class='hd'>月度给付趋势（万元）</div><canvas id='ct' height='120'></canvas></div>
+</div>
+<div class='card mt16'>
+<div class='hd'>⚠ 风险预警</div>
+<table><thead><tr><th>预警类型</th><th>企业</th><th>详情</th><th>操作</th></tr></thead>
+<tbody>
+<tr><td><span class='bdg r'>高给付率</span></td><td>华通客运</td><td>近12月给付率91%，超过80%红线</td><td><button class='btn sm p' onclick='sp("p","pr")'>查看</button></td></tr>
+<tr><td><span class='bdg y'>资金池不足</span></td><td>鹏程运输</td><td>互助资金池余额¥128万，低于预警线</td><td><button class='btn sm p'>处理</button></td></tr>
+<tr><td><span class='bdg af2'>评分过低</span></td><td>星辰物流</td><td>企业驾驶评分均值62分，已连续3月低于70分</td><td><button class='btn sm p'>查看</button></td></tr>
+</tbody></table>
+</div>
+</div>
+<!-- 企业列表 -->
+<div id='pe' class='pg'>
+<div class='hd'>企业管理</div>
+<div class='tb'><input class='in' placeholder='搜索企业名称...'><select class='in' style='width:140px'><option>全部状态</option><option>正常</option><option>待审核</option></select><button class='btn p'>+ 新增企业</button></div>
+<div class='card'>
+<table><thead><tr><th>企业名称</th><th>行业</th><th>车辆规模</th><th>入驻时间</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+<tr class='cr' onclick='sp("p","ped")'><td><b>鹏程运输</b></td><td>公路客运</td><td>3,200辆</td><td>2025-03-15</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>星辰物流</td><td>货运</td><td>1,850辆</td><td>2025-05-20</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>华通客运</td><td>旅游客运</td><td>2,100辆</td><td>2025-01-10</td><td><span class='bdg r'>高风险</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>顺捷租赁</td><td>租赁</td><td>960辆</td><td>2025-08-01</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>鑫安出租</td><td>出租客运</td><td>420辆</td><td>2025-11-15</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+</tbody></table>
+</div>
+</div>
+<!-- 案件列表 -->
+<div id='pc' class='pg'>
+<div class='hd'>事故报案受理</div>
+<div class='tb'><input class='in' placeholder='搜索报案号/车牌...'><select class='in' style='width:130px'><option>全部通道</option><option>快速通道</option><option>标准通道</option><option>大案通道</option></select><select class='in' style='width:120px'><option>全部状态</option><option>待分配</option><option>处理中</option></select></div>
+<div class='card'>
+<table><thead><tr><th>报案号</th><th>时间</th><th>企业</th><th>车牌</th><th>通道</th><th>预估金额</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+<tr class='cr' onclick='sp("p","pcd")'><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28 09:15</td><td>鹏程运输</td><td>京A·88888</td><td><span class='bdg ba'>标准通道</span></td><td>¥15,800</td><td><span class='bdg y'>核查中</span></td><td><button class='btn sm p'>查看</button></td></tr>
+<tr><td>TSCS-2026-0327-0087</td><td>2026-03-27 16:42</td><td>星辰物流</td><td>京B·66666</td><td><span class='bdg ae'>快速通道</span></td><td>¥1,800</td><td><span class='bdg af2'>待分配</span></td><td><button class='btn sm p'>分配</button></td></tr>
+<tr><td>TSCS-2026-0326-0086</td><td>2026-03-26 11:30</td><td>华通客运</td><td>京C·11222</td><td><span class='bdg r'>大案通道</span></td><td>¥186,000</td><td><span class='bdg y'>材料审核</span></td><td><button class='btn sm p'>查看</button></td></tr>
+</tbody></table>
+</div>
+</div>
+<!-- 案件详情 -->
+<div id='pcd' class='pg'>
+<div class='hd'>案件详情 - TSCS-2026-0328-0088</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:16px'>
+<div class='card'>
+<div class='hd'>报案信息</div>
+<div class='ig mb12'>
+<div class='ii'><div class='il'>报案号</div><div class='iv'>TSCS-2026-0328-0088</div></div>
+<div class='ii'><div class='il'>企业</div><div class='iv'>鹏程运输</div></div>
+<div class='ii'><div class='il'>车牌</div><div class='iv'>京A·88888</div></div>
+<div class='ii'><div class='il'>责任划分</div><div class='iv'><span class='bdg y'>主责 70%</span></div></div>
+</div>
+</div>
+<div class='card'>
+<div class='hd'>案件处理进度</div>
+<div class='tl'>
+<div class='ti done'><div class='tt'>2026-03-28 09:15</div><div class='ttl'>驾驶员一键报案</div><div class='td'>驾驶员张三提交报案</div></div>
+<div class='ti done'><div class='tt'>2026-03-28 10:02</div><div class='ttl'>企业最终报案</div><div class='td'>分司安全员审核通过</div></div>
+<div class='ti done'><div class='tt'>2026-03-28 10:30</div><div class='ttl'>案件受理</div><div class='td'>调度员李娜分配至核损员赵强</div></div>
+<div class='ti active'><div class='tt'>2026-03-28 11:15</div><div class='ttl'>现场核查中</div><div class='td'>核损员已到达现场，正在取证</div></div>
+<div class='ti pending'><div class='tt'>—</div><div class='ttl'>损失评估</div><div class='td'>等待核损员提交评估单</div></div>
+<div class='ti pending'><div class='tt'>—</div><div class='ttl'>互助给付</div><div class='td'>等待材料审核与理算</div></div>
+</div>
+</div>
+</div>
+<div class='card mt16'>
+<div class='hd'>核查任务分配</div>
+<div style='display:flex;align-items:center;gap:16px'>
+<div><div class='tm mb8'>当前核损员</div><div class='fb'>赵强 <span class='bdg ba'>现场核查中</span></div></div>
+<div><div class='tm mb8'>当前状态</div><div class='fb'>已到达 · 11:15签到</div></div>
+<div><div class='tm mb8'>已拍照</div><div class='fb'>8/20 张</div></div>
+<button class='btn p' style='margin-left:auto' onclick='sp("p","ppay")'>查看互助给付</button>
+</div>
+</div>
+</div>
+'''
+
+with open(r'D:\workAIspace\openclaw\tscs-demo\c1.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+print('c1.html written, len=', len(html))

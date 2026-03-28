@@ -1,0 +1,104 @@
+html = '''
+<!-- 驾驶员端手机框架 -->
+<div id='td' class='phwrap' style='display:none'>
+<div class='phf dp'>
+<div class='pn'></div>
+<div class='phb'>
+<div id='dl' class='card' style='margin:12px'>
+<div style='text-align:center;font-size:13px;font-weight:600;margin-bottom:12px'>登录小程序</div>
+<input class='in mb12' placeholder='手机号' value='138****5678'>
+<div style='display:flex;gap:8px'>
+<input class='in' style='flex:1' placeholder='验证码'>
+<button class='btn' style='white-space:nowrap'>获取验证码</button>
+</div>
+<button class='btn d' style='width:100%;margin-top:12px;justify-content:center' onclick='sp("d","dh")'>登录</button>
+</div>
+<div id='dh' class='card' style='margin:12px;display:none'>
+<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:14px'>
+<div>
+<div style='font-size:15px;font-weight:700'>京A·88888</div>
+<div style='font-size:11px;color:var(--t2)'>绑定车辆 · 大型普通客车</div>
+</div>
+<div style='text-align:right'>
+<div style='font-size:28px;font-weight:700;color:var(--ad)'>78</div>
+<div style='font-size:10px;color:var(--t2)'>驾驶评分</div>
+</div>
+</div>
+<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px'>
+<div class='stat' style='text-align:center;padding:10px;cursor:pointer' onclick='sp("d","dcs")'>
+<div style='font-size:20px;margin-bottom:4px'>📋</div><div style='font-size:10px;color:var(--t2)'>我的案件</div><div style='font-size:16px;font-weight:700;color:var(--ad)'>1</div>
+</div>
+<div class='stat' style='text-align:center;padding:10px'>
+<div style='font-size:20px;margin-bottom:4px'>💚</div><div style='font-size:10px;color:var(--t2)'>安全天数</div><div style='font-size:16px;font-weight:700;color:#52C41A'>92</div>
+</div>
+<div class='stat' style='text-align:center;padding:10px'>
+<div style='font-size:20px;margin-bottom:4px'>👤</div><div style='font-size:10px;color:var(--t2)'>车队排名</div><div style='font-size:16px;font-weight:700'>前15%</div>
+</div>
+</div>
+<div class='fc' onclick='sp("d","dr")' style='margin-bottom:0'>
+<div class='fci' style='background:rgba(250,140,22,.15)'>📋</div>
+<div class='fcn'><div class='fct'>事故报案</div><div class='fcd'>一键快速报案，5分钟搞定</div></div>
+</div>
+</div>
+<div id='dr' class='card' style='margin:12px;display:none'>
+<div class='hd d'>事故报案</div>
+<div style='display:flex;align-items:center;margin-bottom:14px'>
+<div style='width:24px;height:24px;border-radius:50%;background:var(--ad);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700'>1</div>
+<div style='flex:1;height:2px;background:#d9d9d9;margin:0 6px'></div>
+<div style='width:24px;height:24px;border-radius:50%;background:#d9d9d9;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700'>2</div>
+<div style='flex:1;height:2px;background:#d9d9d9;margin:0 6px'></div>
+<div style='width:24px;height:24px;border-radius:50%;background:#d9d9d9;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700'>3</div>
+</div>
+<div class='fg'><div class='fl'>事故车辆</div><select class='in'><option selected>京A·88888 - 张伟</option></select></div>
+<div class='fr'>
+<div class='fg'><div class='fl'>事故时间</div><input class='in' type='datetime-local' value='2026-03-28T09:15'></div>
+<div class='fg'><div class='fl'>事故地点</div><input class='in' value='北京市朝阳区京通快速路'></div>
+</div>
+<div class='fg'><div class='fl'>责任划分</div>
+<div style='display:flex;gap:6px;flex-wrap:wrap'>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='dr' checked> 全责</label>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='dr'> 主责</label>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='dr'> 同责</label>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='dr'> 次责</label>
+</div>
+</div>
+<div class='fg'><div class='fl'>事故描述</div><textarea class='in' rows='2'>前车突然变道导致追尾，右后保险杠受损，前保受损，无人伤。</textarea></div>
+<div class='fg'><div class='fl'>现场照片（必填：全景1+双方受损各1）</div>
+<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:6px'>
+<div style='height:64px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--t2);cursor:pointer'>📷</div>
+<div style='height:64px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--t2);cursor:pointer'>📷</div>
+<div style='height:64px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--t2);cursor:pointer'>📷</div>
+</div>
+<div class='tm mt8'>已上传 0/9 张</div>
+<button class='btn d' style='width:100%;margin-top:16px;justify-content:center' onclick='toast("报案成功！案件号：TSCS-2026-0328-0088")'>提交报案</button>
+</div>
+<div id='dcs' class='card' style='margin:12px;display:none'>
+<div class='hd d'>我的案件</div>
+<table><thead><tr><th>报案号</th><th>时间</th><th>状态</th><th></th></tr></thead>
+<tbody>
+<tr><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28</td><td><span class='bdg y'>处理中</span></td><td><button class='btn sm d'>查看</button></td></tr>
+</tbody></table>
+</div>
+<div id='ds' class='card' style='margin:12px;display:none'>
+<div class='hd d'>驾驶评分详情</div>
+<div style='text-align:center;margin-bottom:14px'>
+<div style='font-size:48px;font-weight:700;color:var(--ad)'>78</div>
+<span class='bdg ae' style='font-size:12px;padding:4px 12px'>B级 · 良好</span>
+<div class='tm mt8'>超过 85% 同类车型驾驶员</div>
+</div>
+<canvas id='dschart' height='140'></canvas>
+</div>
+</div>
+<div class='phbb'>
+<div class='pht dpht on' onclick='phNav("d","dh",this)'><span class='ic'>🏠</span><span>首页</span></div>
+<div class='pht dpht' onclick='phNav("d","dr",this)'><span class='ic'>📋</span><span>报案</span></div>
+<div class='pht dpht' onclick='phNav("d","dcs",this)'><span class='ic'>📂</span><span>案件</span></div>
+<div class='pht dpht' onclick='phNav("d","ds",this)'><span class='ic'>📊</span><span>评分</span></div>
+</div>
+</div>
+</div>
+'''
+
+with open(r'D:\workAIspace\openclaw\tscs-demo\c4.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+print('c4.html written, len=', len(html))

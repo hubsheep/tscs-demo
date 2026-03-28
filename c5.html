@@ -1,0 +1,90 @@
+
+<!-- 现场端手机框架 -->
+<div id='tf' class='phwrap' style='display:none'>
+<div class='phf fp'>
+<div class='pn'></div>
+<div class='phb'>
+<div id='fh' class='card' style='margin:12px'>
+<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px'>
+<div class='stat' style='text-align:center;padding:10px'><div style='font-size:22px;font-weight:700;color:var(--af)'>3</div><div style='font-size:10px;color:var(--t2)'>今日任务</div></div>
+<div class='stat' style='text-align:center;padding:10px'><div style='font-size:22px;font-weight:700'>48</div><div style='font-size:10px;color:var(--t2)'>本月完成</div></div>
+<div class='stat' style='text-align:center;padding:10px'><div style='font-size:22px;font-weight:700'>4.2h</div><div style='font-size:10px;color:var(--t2)'>平均时长</div></div>
+</div>
+<div class='hd f'>待处理任务</div>
+<div class='fc' onclick='sp("f","ft")'>
+<div class='fci' style='background:rgba(114,46,209,.15)'>🚨</div>
+<div class='fcn'><div class='fct'>TSCS-2026-0328-0088 <span class='bdg r'>紧急</span></div><div class='fcd'>京A·88888 · 北京市朝阳区京通快速路</div><div><span class='bdg y'>待出发</span> <span class='tm'>分配：10:30</span></div></div>
+</div>
+<div class='fc' onclick='sp("f","ft")'>
+<div class='fci' style='background:rgba(114,46,209,.1)'>⚠</div>
+<div class='fcn'><div class='fct'>TSCS-2026-0327-0087 <span class='bdg y'>标准</span></div><div class='fcd'>京B·66666 · 海淀区学院路</div><div><span class='bdg y'>待出发</span> <span class='tm'>分配：昨天17:00</span></div></div>
+</div>
+</div>
+<div id='ft' class='card' style='margin:12px;display:none'>
+<div class='hd f'>任务详情</div>
+<div class='ig mb12'>
+<div class='ii'><div class='il'>报案号</div><div class='iv'>TSCS-2026-0328-0088</div></div>
+<div class='ii'><div class='il'>事故地点</div><div class='iv'>北京市朝阳区京通快速路</div></div>
+<div class='ii'><div class='il'>车辆</div><div class='iv'>京A·88888</div></div>
+<div class='ii'><div class='il'>报案人</div><div class='iv'>张伟 138****5678</div></div>
+<div class='ii'><div class='il'>责任</div><div class='iv'><span class='bdg y'>主责 70%</span></div></div>
+</div>
+<div class='fx g8'>
+<button class='btn' onclick='sp("f","fh")'>返回</button>
+<button class='btn f2' onclick='sp("f","fci")'>接受任务并导航</button>
+</div>
+</div>
+<div id='fci' class='card' style='margin:12px;display:none'>
+<div class='hd f'>到达签到</div>
+<div style='text-align:center;padding:20px 0'>
+<div style='font-size:42px;margin-bottom:10px'>📍</div>
+<div style='font-size:13px;font-weight:600;margin-bottom:6px'>北京市朝阳区京通快速路</div>
+<div class='tm mb16'>GPS定位成功，已到达事故现场</div>
+<button class='btn f2' style='width:200px;justify-content:center' onclick='sp("f","fph")'>确认签到</button>
+</div>
+</div>
+<div id='fph' class='card' style='margin:12px;display:none'>
+<div class='hd f'>现场拍照</div>
+<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px'>
+<div style='height:72px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--t2);cursor:pointer;background:#fafafa'>📷</div>
+<div style='height:72px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--t2);cursor:pointer;background:#fafafa'>📷</div>
+<div style='height:72px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--t2);cursor:pointer;background:#fafafa'>📷</div>
+<div style='height:72px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--t2);cursor:pointer;background:#fafafa'>📷</div>
+<div style='height:72px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--t2);cursor:pointer;background:#fafafa'>📷</div>
+<div style='height:72px;border:2px dashed var(--b);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--t2);cursor:pointer;background:#fafafa'>📷</div>
+</div>
+<div class='tm mb12'>已上传 0/20 张 · 必填：全景1 + 受损细节各1</div>
+<button class='btn f2' style='width:100%;justify-content:center' onclick='sp("f","frec")'>下一步：笔录</button>
+</div>
+<div id='frec' class='card' style='margin:12px;display:none'>
+<div class='hd f'>电子笔录</div>
+<div class='fg'><div class='fl'>对方姓名</div><input class='in' placeholder='请输入'></div>
+<div class='fg'><div class='fl'>对方电话</div><input class='in' placeholder='请输入'></div>
+<div class='fg'><div class='fl'>对方车牌</div><input class='in' placeholder='请输入'></div>
+<div class='fg'><div class='fl'>笔录描述</div><textarea class='in' rows='4' placeholder='请描述事故经过...'></textarea></div>
+<div class='fx g8'>
+<button class='btn' onclick='sp("f","fph")'>上一步</button>
+<button class='btn f2' onclick='sp("f","fev")'>提交并评估</button>
+</div>
+</div>
+<div id='fev' class='card' style='margin:12px;display:none'>
+<div class='hd f'>损失评估</div>
+<div class='ig mb12'>
+<div class='ii'><div class='il'>三者车辆损失</div><div class='iv'>¥8,200</div></div>
+<div class='ii'><div class='il'>本车损失</div><div class='iv'>¥7,600</div></div>
+<div class='ii'><div class='il'>总损失</div><div class='iv m' style='color:var(--af)'>¥15,800</div></div>
+<div class='ii'><div class='il'>责任比例</div><div class='iv'>主责 70%</div></div>
+<div class='ii'><div class='il'>我方赔付额</div><div class='iv m' style='color:#ff4d4f'>¥10,710</div></div>
+<div class='ii'><div class='il'>三者赔付额</div><div class='iv'>¥4,590</div></div>
+</div>
+<button class='btn f2' style='width:100%;justify-content:center' onclick='toast("评估已提交，等待平台审核")'>提交评估结果</button>
+</div>
+</div>
+<div class='phbb'>
+<div class='pht fpht on' onclick='phNav("f","fh",this)'><span class='ic'>🏠</span><span>工作台</span></div>
+<div class='pht fpht' onclick='phNav("f","ft",this)'><span class='ic'>📋</span><span>任务</span></div>
+<div class='pht fpht' onclick='phNav("f","fph",this)'><span class='ic'>📷</span><span>拍照</span></div>
+<div class='pht fpht' onclick='phNav("f","fev",this)'><span class='ic'>📊</span><span>评估</span></div>
+</div>
+</div>
+</div>

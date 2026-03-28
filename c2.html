@@ -1,0 +1,148 @@
+
+<!-- 互助给付 -->
+<div id='ppay' class='pg'>
+<div class='hd'>互助给付 - TSCS-2026-0328-0088</div>
+<div class='grid3 mb16'>
+<div class='stat'><div class='val'>127</div><div class='lbl'>案件总数</div><div class='sub'>本月新增</div></div>
+<div class='stat'><div class='val' style='color:#fa8c16'>23</div><div class='lbl'>待审核</div><div class='sub'>材料待审</div></div>
+<div class='stat'><div class='val'>¥3,842,600</div><div class='lbl'>本月给付总额</div><div class='sub'>已支付</div></div>
+</div>
+<div class='card'>
+<div class='hd'>互助理算</div>
+<div class='ig mb16'>
+<div class='ii'><div class='il'>损失额（取发票与评估较低者）</div><div class='iv m'>¥15,800</div></div>
+<div class='ii'><div class='il'>责任比例</div><div class='iv'>主责 × 70%</div></div>
+<div class='ii'><div class='il'>免给付额</div><div class='iv'>¥500</div></div>
+<div class='ii'><div class='il'>协议扣除比例</div><div class='iv'>0%</div></div>
+</div>
+<div class='cr3'>
+<div class='cr4'><span>损失额 × 责任比例</span><span>¥15,800 × 70% = ¥11,060</span></div>
+<div class='cr4'><span>− 免给付额</span><span>¥11,060 − ¥500 = ¥10,560</span></div>
+<div class='cr4'><span>× (1 − 协议扣除)</span><span>¥10,560 × 1.0 = ¥10,560</span></div>
+<div class='cr4 t'><span>互助给付款</span><span class='v'>¥10,560</span></div>
+</div>
+<div class='mt16'>
+<div class='hd' style='margin-bottom:12px'>分级审批</div>
+<div class='ap'>
+<div class='an' style='background:rgba(82,196,26,.1)'><div class='al'>互助给付员</div><div class='av ts2'>✓ 审核通过</div></div>
+<div class='aa'>→</div>
+<div class='an' style='background:rgba(22,119,255,.1)'><div class='al'>企业确认</div><div class='av' style='color:var(--a)'>待确认</div><div class='as'>≤2万自动通过</div></div>
+<div class='aa'>→</div>
+<div class='an'><div class='al'>最终审批</div><div class='av'>自动通过</div><div class='as'>≤2万</div></div>
+<div class='aa'>→</div>
+<div class='an'><div class='al'>支付执行</div><div class='av'>待执行</div></div>
+</div>
+</div>
+<div class='fx g8 mt16'>
+<button class='btn e' onclick='toast("给付成功，已通知企业")'>确认给付 ¥10,560</button>
+<button class='btn' onclick='sp("p","pf")'>查看支付记录</button>
+</div>
+</div>
+<!-- 财务报表 -->
+<div id='pf' class='pg'>
+<div class='hd'>财务报表 - 三账户模型</div>
+<div class='grid4'>
+<div class='stat' style='border-left:4px solid #1677FF'><div class='val' style='color:#1677FF'>¥28,640,000</div><div class='lbl'>互助互济资金池（70%）</div><div class='sub'>本月收入 ¥12,800,000 · 支出 ¥3,842,600</div></div>
+<div class='stat' style='border-left:4px solid #fa8c16'><div class='val' style='color:#fa8c16'>¥6,140,000</div><div class='lbl'>风险储备金（15%）</div><div class='sub'>上月结转</div></div>
+<div class='stat' style='border-left:4px solid #52C41A'><div class='val' style='color:#52C41A'>¥6,140,000</div><div class='lbl'>平台运营管理费（15%）</div><div class='sub'>本月收入 ¥2,742,857</div></div>
+</div>
+<div class='card mt16'>
+<div class='hd'>各企业三账户明细</div>
+<table><thead><tr><th>企业</th><th>本月缴纳</th><th>资金池70%</th><th>储备金15%</th><th>运营费15%</th><th>给付支出</th><th>池余额</th></tr></thead>
+<tbody>
+<tr><td>鹏程运输</td><td>¥12,800,000</td><td>¥8,960,000</td><td>¥1,920,000</td><td>¥1,920,000</td><td>¥1,280,000</td><td><span class='ts2'>¥7,680,000</span></td></tr>
+<tr><td>星辰物流</td><td>¥6,650,000</td><td>¥4,655,000</td><td>¥997,500</td><td>¥997,500</td><td>¥680,000</td><td><span class='ts2'>¥3,975,000</span></td></tr>
+<tr><td>华通客运</td><td>¥8,400,000</td><td>¥5,880,000</td><td>¥1,260,000</td><td>¥1,260,000</td><td>¥2,480,000</td><td><span class='te2'>¥3,400,000</span></td></tr>
+</tbody></table>
+</div>
+</div>
+<!-- 风控评级 -->
+<div id='pr' class='pg'>
+<div class='hd'>企业风控评级</div>
+<div class='card'>
+<table><thead><tr><th>企业</th><th>评级</th><th>给付率</th><th>评分均值</th><th>续约年限</th><th>挂靠比例</th><th>风险措施</th></tr></thead>
+<tbody>
+<tr><td>鹏程运输</td><td><span class='bdg ae'>A级</span></td><td>34.2%</td><td>78.5</td><td>2年</td><td>15%</td><td>优先续约·费率优惠10%</td></tr>
+<tr><td>星辰物流</td><td><span class='bdg ae'>B级</span></td><td>52%</td><td>71</td><td>1年</td><td>32%</td><td>正常续约·标准费率</td></tr>
+<tr><td>华通客运</td><td><span class='bdg r'>D级</span></td><td>91%</td><td>58</td><td>3年</td><td>62%</td><td>暂停新增参统·约谈整改</td></tr>
+<tr><td>顺捷租赁</td><td><span class='bdg y'>C级</span></td><td>67%</td><td>65</td><td>1年</td><td>45%</td><td>续约审核加严·费率上浮</td></tr>
+</tbody></table>
+</div>
+<div class='card mt16'>
+<div class='hd'>企业风控雷达图</div>
+<canvas id='crisk' height='180'></canvas>
+</div>
+</div>
+<!-- 用户管理 -->
+<div id='pu' class='pg'>
+<div class='hd'>用户管理</div>
+<div class='tb'><input class='in' placeholder='搜索姓名/账号...'><select class='in' style='width:140px'><option>全部角色</option><option>调度员</option><option>互助给付员</option><option>财务</option><option>运营</option></select><button class='btn p'>+ 新增用户</button></div>
+<div class='card'>
+<table><thead><tr><th>姓名</th><th>账号</th><th>角色</th><th>企业</th><th>最后登录</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+<tr><td>李娜</td><td>linana</td><td><span class='bdg ba'>调度员</span></td><td>平台</td><td>2026-03-28 09:00</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>编辑</button></td></tr>
+<tr><td>赵强</td><td>zhaoqiang</td><td><span class='bdg af2'>核损员</span></td><td>平台</td><td>2026-03-28 11:20</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>编辑</button></td></tr>
+<tr><td>王芳</td><td>wangfang</td><td><span class='bdg ad'>互助给付员</span></td><td>平台</td><td>2026-03-28 08:45</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>编辑</button></td></tr>
+<tr><td>陈伟</td><td>chenwei</td><td><span class='bdg ae'>财务</span></td><td>平台</td><td>2026-03-28 10:30</td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>编辑</button></td></tr>
+</tbody></table>
+</div>
+</div>
+</div>
+</div>
+<!-- 企业端 -->
+<div id='te' class='lay' style='display:none'>
+<div class='side'>
+<div class='sht'><div class='sn'>企业端</div><div class='ss'>鹏程运输 · 管理员</div></div>
+<div class='si sa' onclick='sp("e","eh")'>📊 工作台</div>
+<div class='si' onclick='sp("e","ev")'>🚗 车辆管理</div>
+<div class='si' onclick='sp("e","ed")'>👤 驾驶员管理</div>
+<div class='si' onclick='sp("e","es")'>🛡 安全看板</div>
+<div class='si' onclick='sp("e","ec")'>⚠ 案件管理</div>
+<div class='si' onclick='sp("e","er")'>📋 事故报案</div>
+<div class='si' onclick='sp("e","efn")'>🔄 续统管理</div>
+</div>
+<div class='main'>
+<div id='eh' class='pg on'>
+<div class='hd e'>企业工作台</div>
+<div class='grid4'>
+<div class='stat'><div class='val' style='color:var(--ae)'>3,200</div><div class='lbl'>在统车辆</div><div class='sub'>本月+120</div></div>
+<div class='stat'><div class='val' style='color:#fa8c16'>3</div><div class='lbl'>待处理事故报案</div><div class='sub r2'>需及时处理</div></div>
+<div class='stat'><div class='val' style='color:var(--a)'>2</div><div class='lbl'>待确认给付</div><div class='sub'>待确认¥23,400</div></div>
+<div class='stat'><div class='val' style='color:#ff4d4f'>15</div><div class='lbl'>即将到期车辆</div><div class='sub r2'>未来15天内</div></div>
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:16px'>
+<div class='card'>
+<div class='hd e'>驾驶评分总览</div>
+<div style='display:flex;align-items:center;gap:16px'>
+<div style='text-align:center'>
+<div style='font-size:42px;font-weight:700;color:var(--ae)'>78.5</div>
+<span class='bdg ae'>B级·良好</span>
+</div>
+<canvas id='eesc' height='80'></canvas>
+</div>
+</div>
+<div class='card'>
+<div class='hd e'>本月安全事故统计</div>
+<div class='grid3' style='gap:8px'>
+<div class='stat'><div class='val' style='color:#ff4d4f'>12</div><div class='lbl'>事故次数</div></div>
+<div class='stat'><div class='val'>0.38%</div><div class='lbl'>安全事故率</div></div>
+<div class='stat'><div class='val' style='color:#ff4d4f'>¥128,600</div><div class='lbl'>给付金额</div></div>
+</div>
+</div>
+</div>
+<div class='card mt16'>
+<div class='hd e'>📋 待办事项</div>
+<div class='fc' onclick='sp("e","ec")'>
+<div class='fci' style='background:rgba(255,77,79,.1)'>⚠</div>
+<div class='fcn'><div class='fct'>待审核事故报案 <span class='bdg r'>3</span></div><div class='fcd'>驾驶员提交的报案需在24小时内完成审核并提交至平台</div></div>
+</div>
+<div class='fc' onclick='toast("建议已发，您很重要")'>
+<div class='fci' style='background:rgba(22,119,255,.1)'>💰</div>
+<div class='fcn'><div class='fct'>待确认给付 <span class='bdg ba'>2</span></div><div class='fcd'>互助理算单已生成，请确认：¥10,560 / ¥12,840</div></div>
+</div>
+<div class='fc' onclick='sp("e","efn")'>
+<div class='fci' style='background:rgba(250,140,22,.1)'>🔄</div>
+<div class='fcn'><div class='fct'>即将到期车辆 <span class='bdg y'>15</span></div><div class='fcd'>15辆车统筹单将在未来15天内到期，请及时处理续统</div></div>
+</div>
+</div>
+</div>

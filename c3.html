@@ -1,0 +1,115 @@
+
+<div id='ev' class='pg'>
+<div class='hd e'>车辆管理</div>
+<div class='tb'><input class='in' placeholder='搜索车牌号/VIN...'><select class='in' style='width:120px'><option>全部状态</option><option>在统</option><option>即将到期</option><option>已过期</option></select><button class='btn e'>+ 批量导入</button><button class='btn e'>+ 新增车辆</button></div>
+<div class='card'>
+<table><thead><tr><th>车牌</th><th>车型</th><th>使用性质</th><th>绑定驾驶员</th><th>参统状态</th><th>到期日期</th><th>操作</th></tr></thead>
+<tbody>
+<tr><td><b>京A·88888</b></td><td>大型普通客车</td><td>公路客运</td><td>张伟</td><td><span class='bdg ae'>在统</span></td><td>2026-12-31</td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>京B·12345</td><td>中型普通客车</td><td>旅游客运</td><td>李娜</td><td><span class='bdg ae'>在统</span></td><td>2026-12-31</td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>京C·66789</td><td>轻型厢式货车</td><td>货运</td><td>王强</td><td><span class='bdg y'>即将到期</span></td><td>2026-04-10</td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>京D·88001</td><td>小型轿车</td><td>出租客运</td><td>—</td><td><span class='bdg k'>未绑定</span></td><td>2026-12-31</td><td><button class='btn sm e'>绑定</button></td></tr>
+</tbody></table>
+<div class='pgn'><span class='pb' style='opacity:.4'>‹</span><span class='pb on'>1</span><span class='pb'>2</span><span class='pb'>3</span><span class='pb'>...</span><span class='pb'>128</span><span class='pb'>›</span></div>
+</div>
+</div>
+<div id='ed' class='pg'>
+<div class='hd e'>驾驶员管理</div>
+<div class='tb'><input class='in' placeholder='搜索姓名/手机号...'><select class='in' style='width:120px'><option>全部评分</option><option>优秀(90+)</option><option>良好(80+)</option><option>较差(<70)</option></select><button class='btn e'>+ 批量导入</button></div>
+<div class='card'>
+<table><thead><tr><th>姓名</th><th>手机号</th><th>准驾车型</th><th>绑定车辆</th><th>驾驶评分</th><th>等级</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+<tr><td><b>张伟</b></td><td>138****5678</td><td>A1</td><td>京A·88888</td><td><b style='color:#52C41A'>92</b></td><td><span class='bdg ae'>优秀</span></td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>李娜</td><td>139****2233</td><td>B1</td><td>京B·12345</td><td><b style='color:#52C41A'>88</b></td><td><span class='bdg ae'>良好</span></td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>王强</td><td>137****8899</td><td>B2</td><td>京C·66789</td><td><b style='color:#fa8c16'>68</b></td><td><span class='bdg y'>较差</span></td><td><span class='bdg ae'>正常</span></td><td><button class='btn sm'>详情</button></td></tr>
+<tr><td>赵雷</td><td>136****1155</td><td>A2</td><td>京A·99901</td><td><b style='color:#ff4d4f'>58</b></td><td><span class='bdg r'>差</span></td><td><span class='bdg r'>高风险</span></td><td><button class='btn sm d'>查看</button></td></tr>
+</tbody></table>
+</div>
+<div class='card mt16'>
+<div class='hd e'>驾驶评分分布</div>
+<canvas id='eddist' height='140'></canvas>
+</div>
+</div>
+<div id='es' class='pg'>
+<div class='hd e'>安全管理看板</div>
+<div class='grid3'>
+<div class='stat'><div class='val' style='color:var(--ae)'>78.5</div><div class='lbl'>企业评分均值</div><div class='sub'>较上月↑2.3分</div></div>
+<div class='stat'><div class='val'>0.38%</div><div class='lbl'>安全事故率</div><div class='sub'>行业均值0.52%</div></div>
+<div class='stat'><div class='val' style='color:#ff4d4f'>8人</div><div class='lbl'>风险驾驶员</div><div class='sub r2'>评分低于70分</div></div>
+</div>
+<div style='display:grid;grid-template-columns:1fr 1fr;gap:16px'>
+<div class='card'><div class='hd e'>月度驾驶评分趋势</div><canvas id='estrend' height='100'></canvas></div>
+<div class='card'><div class='hd e'>风险驾驶员预警</div>
+<table><thead><tr><th>姓名</th><th>评分</th><th>风险原因</th><th>操作</th></tr></thead>
+<tbody>
+<tr><td>赵雷</td><td><span class='bdg r'>58</span></td><td>连续3月低于60分</td><td><button class='btn sm e'>约谈</button></td></tr>
+<tr><td>孙鹏</td><td><span class='bdg y'>63</span></td><td>本月发生主责事故</td><td><button class='btn sm'>查看</button></td></tr>
+</tbody></table>
+</div>
+</div>
+</div>
+<div id='ec' class='pg'>
+<div class='hd e'>案件管理</div>
+<div class='tb'><input class='in' placeholder='搜索报案号/车牌...'><select class='in' style='width:120px'><option>全部状态</option><option>处理中</option><option>待确认</option><option>已完成</option></select></div>
+<div class='card'>
+<table><thead><tr><th>报案号</th><th>时间</th><th>车牌</th><th>类型</th><th>金额</th><th>状态</th><th>操作</th></tr></thead>
+<tbody>
+<tr><td><b>TSCS-2026-0328-0088</b></td><td>2026-03-28 09:15</td><td>京A·88888</td><td>财产损失</td><td>¥15,800</td><td><span class='bdg y'>核查中</span></td><td><button class='btn sm e'>详情</button></td></tr>
+<tr><td>TSCS-2026-0327-0087</td><td>2026-03-27 16:42</td><td>京B·12345</td><td>财产损失</td><td>¥1,800</td><td><span class='bdg ae'>待确认</span></td><td><button class='btn sm e'>确认</button></td></tr>
+<tr><td>TSCS-2026-0325-0085</td><td>2026-03-25 14:20</td><td>京C·66789</td><td>财产损失</td><td>¥8,200</td><td><span class='bdg ae'>已完成</span></td><td><button class='btn sm'>详情</button></td></tr>
+</tbody></table>
+</div>
+</div>
+<div id='er' class='pg'>
+<div class='hd e'>新增事故报案</div>
+<div class='card'>
+<div style='display:flex;align-items:center;margin-bottom:20px'>
+<div style='width:28px;height:28px;border-radius:50%;background:var(--ae);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0'>1</div>
+<div style='flex:1;height:2px;background:#d9d9d9;margin:0 8px'></div>
+<div style='width:28px;height:28px;border-radius:50%;background:var(--a);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0'>2</div>
+<div style='flex:1;height:2px;background:#d9d9d9;margin:0 8px'></div>
+<div style='width:28px;height:28px;border-radius:50%;background:#d9d9d9;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0'>3</div>
+</div>
+<div class='fg'><div class='fl'>事故车辆 *</div><select class='in'><option>京A·88888 - 张伟</option><option>京B·12345 - 李娜</option></select></div>
+<div class='fr'>
+<div class='fg'><div class='fl'>事故时间 *</div><input class='in' type='datetime-local' value='2026-03-28T09:15'></div>
+<div class='fg'><div class='fl'>事故地点 *</div><input class='in' placeholder='GPS定位中...' value='北京市朝阳区京通快速路'></div>
+</div>
+<div class='fg'><div class='fl'>责任划分 *</div>
+<div style='display:flex;gap:8px'>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='eresp' checked> 全责</label>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='eresp'> 主责</label>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='eresp'> 同责</label>
+<label style='display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px'><input type='radio' name='eresp'> 次责</label>
+</div>
+</div>
+<div class='fg'><div class='fl'>事故描述</div><textarea class='in' rows='3' placeholder='请描述...'></textarea></div>
+<div class='fg'><div class='fl'>现场照片（最多9张）</div>
+<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px'>
+<div style='height:80px;border:2px dashed var(--b);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--t2);cursor:pointer'>+</div>
+</div>
+<div class='tm mt8'>已上传 0/9 张（必须：全景1+双方受损部位各1）</div>
+</div>
+<div class='fx g8 mt16'>
+<button class='btn' onclick='sp("e","eh")'>取消</button>
+<button class='btn e' onclick='toast("提交成功，已通知平台")'>提交报案</button>
+</div>
+</div>
+</div>
+<div id='efn' class='pg'>
+<div class='hd e'>续统管理</div>
+<div class='card'>
+<div class='hd e' style='font-size:13px'>即将到期车辆（未来30天）</div>
+<table><thead><tr><th><input type='checkbox' checked> 全选</th><th>车牌</th><th>车型</th><th>方案</th><th>到期日</th><th>预估新费</th></tr></thead>
+<tbody>
+<tr><td><input type='checkbox' checked></td><td>京C·66789</td><td>轻型厢式货车</td><td>标准方案</td><td>2026-04-10</td><td>¥4,212</td></tr>
+<tr><td><input type='checkbox' checked></td><td>京E·11230</td><td>中型普通客车</td><td>基础方案</td><td>2026-04-15</td><td>¥3,510</td></tr>
+<tr><td><input type='checkbox'></td><td>京F·33880</td><td>大型普通客车</td><td>标准方案</td><td>2026-04-20</td><td>¥5,860</td></tr>
+</tbody></table>
+<div class='fx g8 mt16'>
+<button class='btn e' onclick='toast("续统缴费单已生成，请确认后对公转账")'>生成续统缴费单</button>
+</div>
+</div>
+</div>
+</div>
+</div>
