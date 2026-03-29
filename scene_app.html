@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>现场端小程序</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; }
+.container { max-width: 430px; margin: 0 auto; background: #fff; min-height: 100vh; position: relative; padding-bottom: 60px; }
+
+/* 状态栏 */
+.status-bar { background: #1677ff; color: #fff; padding: 8px 16px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+.status-bar .time { font-weight: 600; }
+
+/* 头部 */
+.header { background: #1677ff; color: #fff; padding: 16px; text-align: center; }
+.header h1 { font-size: 18px; font-weight: 600; }
+.header .subtitle { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+
+/* Tab栏 */
+.tab-bar { display: flex; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 10; }
+.tab-item { flex: 1; text-align: center; padding: 12px 0; font-size: 14px; color: #666; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab-item.active { color: #1677ff; border-bottom-color: #1677ff; }
+
+/* 页面 */
+.page { display: none; padding: 16px; }
+.page.active { display: block; }
+
+/* 工作台 */
+.welcome-banner { background: linear-gradient(135deg, #1677ff, #4096ff); color: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.welcome-banner .greet { font-size: 14px; opacity: 0.9; }
+.welcome-banner .name { font-size: 20px; font-weight: 600; margin-top: 4px; }
+.welcome-banner .role { font-size: 12px; opacity: 0.8; margin-top: 8px; }
+
+.stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+.stat-card { background: #f8fbff; border-radius: 8px; padding: 12px 8px; text-align: center; }
+.stat-card .num { font-size: 22px; font-weight: 700; color: #1677ff; }
+.stat-card .label { font-size: 11px; color: #666; margin-top: 4px; }
+
+.section-title { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a; }
+
+.task-list { }
+.task-item { background: #fff; border-radius: 8px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-left: 3px solid #1677ff; }
+.task-item .task-title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+.task-item .task-meta { font-size: 12px; color: #999; margin-top: 6px; display: flex; gap: 12px; }
+.task-item .task-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-top: 6px; }
+.task-item .status-new { background: #e6f4ff; color: #1677ff; }
+.task-item .status-doing { background: #fff7e6; color: #fa8c16; }
+.task-item .status-done { background: #f6ffed; color: #52c41a; }
+
+.notice-list { }
+.notice-item { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+.notice-item .icon { width: 36px; height: 36px; background: #e6f4ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.notice-item .content { flex: 1; }
+.notice-item .title { font-size: 14px; font-weight: 500; }
+.notice-item .time { font-size: 11px; color: #999; margin-top: 2px; }
+
+/* 案件处理 */
+.case-filters { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+.filter-chip { padding: 6px 14px; border-radius: 20px; font-size: 13px; background: #f0f0f0; color: #666; white-space: nowrap; cursor: pointer; }
+.filter-chip.active { background: #1677ff; color: #fff; }
+
+.case-list { }
+.case-item { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.case-item .case-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.case-item .case-id { font-size: 13px; color: #666; }
+.case-item .case-status { font-size: 12px; padding: 2px 10px; border-radius: 4px; }
+.case-item .status-pending { background: #fff7e6; color: #fa8c16; }
+.case-item .status-accepted { background: #e6f4ff; color: #1677ff; }
+.case-item .case-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px; }
+.case-item .case-info { font-size: 12px; color: #999; }
+.case-item .case-actions { margin-top: 12px; display: flex; gap: 8px; }
+.case-item .btn { flex: 1; padding: 8px; border-radius: 6px; font-size: 13px; text-align: center; cursor: pointer; border: none; }
+.case-item .btn-primary { background: #1677ff; color: #fff; }
+.case-item .btn-default { background: #f5f5f5; color: #666; }
+
+/* 审批中心 */
+.approval-tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 1px solid #eee; }
+.approval-tab { flex: 1; text-align: center; padding: 10px; font-size: 14px; color: #666; border-bottom: 2px solid transparent; cursor: pointer; }
+.approval-tab.active { color: #1677ff; border-bottom-color: #1677ff; }
+
+.approval-list { }
+.approval-item { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.approval-item .approval-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.approval-item .approval-meta { font-size: 12px; color: #999; margin-bottom: 10px; }
+.approval-item .approval-actions { display: flex; gap: 8px; }
+.approval-item .btn { flex: 1; padding: 8px; border-radius: 6px; font-size: 13px; text-align: center; cursor: pointer; border: none; }
+.approval-item .btn-primary { background: #1677ff; color: #fff; }
+.approval-item .btn-danger { background: #fff1f0; color: #ff4d4f; }
+.approval-item .btn-default { background: #f5f5f5; color: #666; }
+
+/* 我的 */
+.profile-card { background: linear-gradient(135deg, #1677ff, #4096ff); border-radius: 12px; padding: 20px; color: #fff; text-align: center; margin-bottom: 16px; }
+.profile-card .avatar { width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.profile-card .name { font-size: 18px; font-weight: 600; }
+.profile-card .dept { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+.profile-card .code { font-size: 12px; opacity: 0.7; margin-top: 6px; }
+
+.menu-list { background: #fff; border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+.menu-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+.menu-item:last-child { border-bottom: none; }
+.menu-item .icon { width: 32px; height: 32px; background: #f0f7ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 16px; }
+.menu-item .label { flex: 1; font-size: 14px; color: #333; }
+.menu-item .arrow { color: #ccc; font-size: 14px; }
+
+.logout-btn { width: 100%; padding: 14px; background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 15px; color: #ff4d4f; cursor: pointer; }
+
+/* 底部导航 */
+.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid #eee; display: flex; z-index: 100; }
+.nav-item { flex: 1; text-align: center; padding: 8px 0; cursor: pointer; }
+.nav-item .nav-icon { font-size: 20px; margin-bottom: 2px; }
+.nav-item .nav-label { font-size: 10px; color: #999; }
+.nav-item.active .nav-label { color: #1677ff; }
+.nav-item.active .nav-icon { color: #1677ff; }
+
+/* 弹窗 */
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal.show { display: flex; }
+.modal-content { background: #fff; border-radius: 12px; width: 85%; max-width: 340px; padding: 20px; }
+.modal-title { font-size: 16px; font-weight: 600; text-align: center; margin-bottom: 16px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btns .btn { flex: 1; padding: 10px; border-radius: 6px; font-size: 14px; text-align: center; cursor: pointer; border: none; }
+.modal-btns .btn-cancel { background: #f5f5f5; color: #666; }
+.modal-btns .btn-confirm { background: #1677ff; color: #fff; }
+
+/* 表单 */
+.form-item { margin-bottom: 14px; }
+.form-label { font-size: 13px; color: #666; margin-bottom: 6px; display: block; }
+.form-input { width: 100%; padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; outline: none; }
+.form-input:focus { border-color: #1677ff; }
+textarea.form-input { height: 80px; resize: none; }
+
+/* 步骤条 */
+.step-progress { display: flex; align-items: center; margin-bottom: 20px; padding: 0 10px; }
+.step-item { flex: 1; text-align: center; position: relative; }
+.step-item .step-dot { width: 24px; height: 24px; background: #d9d9d9; border-radius: 50%; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
+.step-item.done .step-dot { background: #1677ff; }
+.step-item.active .step-dot { background: #1677ff; box-shadow: 0 0 0 4px rgba(22,119,255,0.2); }
+.step-item .step-label { font-size: 10px; color: #999; }
+.step-item.active .step-label { color: #1677ff; font-weight: 600; }
+.step-line { flex: 0 0 20%; height: 2px; background: #d9d9d9; }
+.step-line.done { background: #1677ff; }
+
+/* 空状态 */
+.empty-state { text-align: center; padding: 40px 20px; color: #999; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+.empty-state .text { font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 状态栏 -->
+  <div class="status-bar">
+    <span class="time">9:30</span>
+    <span>现场端</span>
+    <span>📶 5G</span>
+  </div>
+
+  <!-- Tab栏 -->
+  <div class="tab-bar" id="tabBar">
+    <div class="tab-item active" data-tab="work">工作台</div>
+    <div class="tab-item" data-tab="case">案件处理</div>
+    <div class="tab-item" data-tab="approval">审批</div>
+    <div class="tab-item" data-tab="mine">我的</div>
+  </div>
+
+  <!-- 工作台 -->
+  <div class="page active" id="page-work">
+    <div class="welcome-banner">
+      <div class="greet">早上好</div>
+      <div class="name">李查勘</div>
+      <div class="role">查勘核损员 · 深圳分司</div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="num">3</div>
+        <div class="label">今日任务</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">12</div>
+        <div class="label">本月完成</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">35m</div>
+        <div class="label">平均时长</div>
+      </div>
+    </div>
+
+    <div class="section-title">📋 待办任务</div>
+    <div class="task-list">
+      <div class="task-item">
+        <div class="task-title">粤B12345 轻微碰撞</div>
+        <div class="task-meta">
+          <span>📍 罗湖区</span>
+          <span>🕐 09:15</span>
+        </div>
+        <span class="task-status status-new">新任务</span>
+      </div>
+      <div class="task-item">
+        <div class="task-title">粤B67890 侧面剐蹭</div>
+        <div class="task-meta">
+          <span>📍 南山区</span>
+          <span>🕐 08:40</span>
+        </div>
+        <span class="task-status status-doing">处理中</span>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:20px">🔔 消息通知</div>
+    <div class="notice-list">
+      <div class="notice-item">
+        <div class="icon">📢</div>
+        <div class="content">
+          <div class="title">报案量上涨，今日已接47起</div>
+          <div class="time">10分钟前</div>
+        </div>
+      </div>
+      <div class="notice-item">
+        <div class="icon">✅</div>
+        <div class="content">
+          <div class="title">粤B23456 案件已结案</div>
+          <div class="time">30分钟前</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 案件处理 -->
+  <div class="page" id="page-case">
+    <div class="case-filters">
+      <div class="filter-chip active">全部</div>
+      <div class="filter-chip">待出发</div>
+      <div class="filter-chip">处理中</div>
+      <div class="filter-chip">待提交</div>
+      <div class="filter-chip">已提交</div>
+    </div>
+
+    <div class="case-list">
+      <div class="case-item">
+        <div class="case-header">
+          <span class="case-id">报案号：BA2026033001</span>
+          <span class="case-status status-pending">待出发</span>
+        </div>
+        <div class="case-title">粤B12345 · 轻微碰撞</div>
+        <div class="case-info">事故时间：2026-03-30 09:15 · 罗湖区</div>
+        <div class="case-actions">
+          <div class="btn btn-primary" onclick="showModal('出发确认', '确认出发前往现场？')">出发</div>
+          <div class="btn btn-default">详情</div>
+        </div>
+      </div>
+
+      <div class="case-item">
+        <div class="case-header">
+          <span class="case-id">报案号：BA2026032908</span>
+          <span class="case-status status-accepted">处理中</span>
+        </div>
+        <div class="case-title">粤B67890 · 侧面剐蹭</div>
+        <div class="case-info">事故时间：2026-03-30 08:40 · 南山区</div>
+        <div class="case-actions">
+          <div class="btn btn-primary" onclick="switchTab('case-detail')">继续处理</div>
+          <div class="btn btn-default">详情</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 案件处理详情（点击继续处理显示） -->
+    <div id="case-detail" style="display:none; margin-top:16px;">
+      <div class="section-title">处理进度</div>
+      <div class="step-progress">
+        <div class="step-item done"><div class="step-dot">✓</div><div class="step-label">任务接收</div></div>
+        <div class="step-line done"></div>
+        <div class="step-item done"><div class="step-dot">✓</div><div class="step-label">出发签到</div></div>
+        <div class="step-line done"></div>
+        <div class="step-item done"><div class="step-dot">✓</div><div class="step-label">到达签到</div></div>
+        <div class="step-line"></div>
+        <div class="step-item active"><div class="step-dot">4</div><div class="step-label">现场拍照</div></div>
+        <div class="step-line"></div>
+        <div class="step-item"><div class="step-dot">5</div><div class="step-label">笔录</div></div>
+        <div class="step-line"></div>
+        <div class="step-item"><div class="step-dot">6</div><div class="step-label">定损</div></div>
+        <div class="step-line"></div>
+        <div class="step-item"><div class="step-dot">7</div><div class="step-label">提交</div></div>
+      </div>
+
+      <div class="section-title">📷 现场拍照</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+        <div style="aspect-ratio:1;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#ccc;">+</div>
+        <div style="aspect-ratio:1;background:#e6f4ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>
+        <div style="aspect-ratio:1;background:#e6f4ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">📷</div>
+      </div>
+
+      <div class="form-item">
+        <label class="form-label">拍照说明</label>
+        <textarea class="form-input" placeholder="描述现场情况..."></textarea>
+      </div>
+
+      <div class="btn btn-primary" style="width:100%;padding:12px;border-radius:8px;border:none;background:#1677ff;color:#fff;font-size:15px;cursor:pointer;">保存并下一步</div>
+    </div>
+  </div>
+
+  <!-- 审批中心 -->
+  <div class="page" id="page-approval">
+    <div class="approval-tabs">
+      <div class="approval-tab active">审批待办</div>
+      <div class="approval-tab">审批历史</div>
+    </div>
+
+    <div class="approval-list">
+      <div class="approval-item">
+        <div class="approval-title">张某 - 配件价格复议申请</div>
+        <div class="approval-meta">提交时间：2026-03-30 09:20 · 金额差异 ¥2,300</div>
+        <div class="approval-actions">
+          <div class="btn btn-primary">通过</div>
+          <div class="btn btn-danger">拒绝</div>
+          <div class="btn btn-default">详情</div>
+        </div>
+      </div>
+      <div class="approval-item">
+        <div class="approval-title">李某 - 超权限减免申请</div>
+        <div class="approval-meta">提交时间：2026-03-29 17:30 · 减免金额 ¥5,000</div>
+        <div class="approval-actions">
+          <div class="btn btn-primary">通过</div>
+          <div class="btn btn-danger">拒绝</div>
+          <div class="btn btn-default">详情</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 我的 -->
+  <div class="page" id="page-mine">
+    <div class="profile-card">
+      <div class="avatar">👤</div>
+      <div class="name">李查勘</div>
+      <div class="dept">查勘核损员 · 深圳分司</div>
+      <div class="code">工号：KCC-2024-0042</div>
+    </div>
+
+    <div class="menu-list">
+      <div class="menu-item">
+        <div class="icon">👤</div>
+        <div class="label">账号信息</div>
+        <div class="arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="icon">📂</div>
+        <div class="label">我的任务记录</div>
+        <div class="arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="icon">📞</div>
+        <div class="label">通讯录</div>
+        <div class="arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="icon">🔧</div>
+        <div class="label">配件价格查询</div>
+        <div class="arrow">›</div>
+      </div>
+      <div class="menu-item">
+        <div class="icon">⚙️</div>
+        <div class="label">设置</div>
+        <div class="arrow">›</div>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="showModal('退出登录', '确定退出当前账号？')">退出登录</button>
+  </div>
+
+</div>
+
+<!-- 底部导航 -->
+<div class="bottom-nav" id="bottomNav">
+  <div class="nav-item active" data-tab="work" onclick="switchTab(this.dataset.tab)">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">工作台</div>
+  </div>
+  <div class="nav-item" data-tab="case" onclick="switchTab(this.dataset.tab)">
+    <div class="nav-icon">📋</div>
+    <div class="nav-label">案件处理</div>
+  </div>
+  <div class="nav-item" data-tab="approval" onclick="switchTab(this.dataset.tab)">
+    <div class="nav-icon">✅</div>
+    <div class="nav-label">审批</div>
+  </div>
+  <div class="nav-item" data-tab="mine" onclick="switchTab(this.dataset.tab)">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">我的</div>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <div class="modal-title" id="modalTitle">确认</div>
+    <div class="modal-btns">
+      <div class="btn btn-cancel" onclick="hideModal()">取消</div>
+      <div class="btn btn-confirm" onclick="hideModal()">确定</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Tab切换
+function switchTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  document.getElementById('page-' + tab).classList.add('active');
+  document.querySelector('.tab-item[data-tab="' + tab + '"]').classList.add('active');
+  document.querySelector('.nav-item[data-tab="' + tab + '"]').classList.add('active');
+
+  // 如果点击案件处理的继续处理，显示详情
+  if (tab === 'case-detail') {
+    document.getElementById('case-detail').style.display = 'block';
+  }
+}
+
+// 顶部Tab栏点击
+document.querySelectorAll('.tab-item').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+// 筛选点击
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+
+// 审批Tab点击
+document.querySelectorAll('.approval-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.approval-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// 弹窗
+function showModal(title, msg) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modal').classList.add('show');
+}
+function hideModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+</script>
+</body>
+</html>
