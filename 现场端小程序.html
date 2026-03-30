@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现场端 · TSCS</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #080c14;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.phone-frame {
+  width: 420px;
+  min-height: 90vh;
+  background: #1e293b;
+  border-radius: 44px;
+  border: 8px solid #2d3748;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+}
+.phone-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 126px; height: 34px;
+  background: #0f1724;
+  border-radius: 0 0 20px 20px;
+  z-index: 10;
+}
+
+.statusbar {
+  height: 44px;
+  background: #0f1724;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.statusbar .right { display: flex; gap: 4px; font-size: 14px; }
+
+.page { display: none; flex-direction: column; min-height: calc(100vh - 44px); }
+.page.active { display: flex; }
+
+/* ===== 首页 ===== */
+.page-home { background: #0f1724; }
+
+.top-card {
+  margin: 16px;
+  background: linear-gradient(135deg, #1e3a5f, #c026d3);
+  border-radius: 20px;
+  padding: 24px 20px;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(192,38,211,0.2);
+  border: 1px solid #6b21a8;
+}
+.top-card .greeting { font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
+.top-card .name { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.top-card .role { font-size: 12px; opacity: 0.7; margin-bottom: 16px; }
+.top-card .stats { display: flex; gap: 20px; }
+.top-card .stat-item { text-align: center; }
+.top-card .stat-item .n { font-size: 24px; font-weight: 800; }
+.top-card .stat-item .t { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+.task-section { margin: 0 16px 16px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.section-title { font-size: 15px; font-weight: 700; color: #e2e8f0; }
+.section-more { font-size: 12px; color: #a855f7; cursor: pointer; }
+
+.task-card {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1px solid #334155;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.task-card:active { transform: scale(0.99); border-color: #a855f7; }
+.task-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.task-card .case-no { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+.task-card .priority {
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 8px; font-weight: 600;
+}
+.priority-urgent { background: #fee2e2; color: #ef4444; }
+.priority-normal { background: #ede9fe; color: #a855f7; }
+.task-card .status {
+  font-size: 11px; padding: 3px 10px;
+  border-radius: 20px; font-weight: 600;
+}
+.status-pending { background: #3f2f1c; color: #e8962e; }
+.status-doing { background: #1e3a5f; color: #60a5fa; }
+.status-done { background: #1f2d1c; color: #10b981; }
+.task-card .info { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #64748b; }
+.task-card .info-row { display: flex; gap: 14px; }
+.task-card .progress-bar {
+  margin-top: 10px;
+  height: 4px;
+  background: #334155;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.task-card .progress-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7, #60a5fa);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+.task-card .progress-label { font-size: 10px; color: #475569; margin-top: 4px; }
+
+/* 底部标签栏 */
+.tabbar {
+  position: sticky;
+  bottom: 0;
+  height: 68px;
+  background: #1e293b;
+  border-top: 1px solid #334155;
+  display: flex;
+  padding: 0 8px;
+  z-index: 200;
+  flex-shrink: 0;
+}
+.tab-item {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: #475569;
+  font-size: 10px;
+  transition: color 0.2s;
+}
+.tab-item.active { color: #a855f7; }
+.tab-item .icon { font-size: 22px; }
+
+/* ===== 任务详情页 ===== */
+.page-task { background: #0f1724; }
+.detail-header {
+  background: linear-gradient(135deg, #1e3a5f, #6b21a8);
+  padding: 16px;
+  color: #fff;
+}
+.detail-header .top-bar {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.back-btn-dark {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; border: none; color: #fff;
+}
+.detail-header h2 { font-size: 17px; font-weight: 700; flex: 1; }
+.detail-status { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+.detail-no { font-size: 20px; font-weight: 800; margin-bottom: 14px; font-family: monospace; letter-spacing: 1px; }
+.detail-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.detail-info-item .k { font-size: 11px; opacity: 0.7; margin-bottom: 2px; }
+.detail-info-item .v { font-size: 14px; font-weight: 600; }
+
+.detail-body { padding: 16px; }
+.info-card {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #334155;
+}
+.info-card-title {
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+}
+.info-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+.info-row .k { color: #64748b; }
+.info-row .v { font-weight: 600; color: #e2e8f0; }
+
+.action-btns { display: flex; gap: 10px; margin-bottom: 12px; }
+.action-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: opacity 0.2s;
+}
+.action-btn:active { opacity: 0.8; }
+.action-btn.primary { background: linear-gradient(135deg, #a855f7, #9333ea); color: #fff; }
+.action-btn.secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+
+.step-progress {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #334155;
+}
+.step-progress .title { font-size: 13px; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+.step-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.step-item .dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; flex-shrink: 0;
+}
+.step-item.done .dot { background: #10b981; color: #fff; }
+.step-item.active .dot { background: #a855f7; color: #fff; }
+.step-item.pending .dot { background: #334155; color: #64748b; }
+.step-item.done .text { color: #64748b; }
+.step-item.active .text { color: #e2e8f0; font-weight: 600; }
+.step-item.pending .text { color: #475569; }
+
+/* ===== 到达签到页 ===== */
+.page-checkin { background: #0f1724; }
+.checkin-header {
+  background: linear-gradient(135deg, #1e3a5f, #6b21a8);
+  padding: 16px;
+}
+.back-btn-white {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; border: none; color: #fff; margin-bottom: 14px;
+}
+.checkin-header h2 { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.checkin-header p { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+.checkin-body { padding: 16px; flex: 1; }
+.map-placeholder {
+  background: #1e293b;
+  border-radius: 16px;
+  height: 200px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px;
+  border: 1px solid #334155;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.map-placeholder .map-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #1e293b 0%, #0f1724 100%);
+}
+.map-placeholder .map-content { position: relative; text-align: center; }
+.map-placeholder .icon { font-size: 40px; margin-bottom: 8px; }
+.map-placeholder .txt { font-size: 13px; color: #94a3b8; }
+.map-placeholder .address { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+.gps-btn {
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  color: #fff;
+  border: none;
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(168,85,247,0.3);
+}
+.gps-btn:active { transform: scale(0.99); }
+.gps-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.checkin-tips {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid #334155;
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.8;
+}
+.checkin-tips strong { color: #e2e8f0; }
+
+/* ===== 现场取证页 ===== */
+.page-verify { background: #0f1724; }
+.verify-header {
+  background: #1e293b;
+  padding: 16px;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 44px;
+  z-index: 50;
+}
+.verify-header .top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.verify-header h2 { font-size: 17px; font-weight: 700; color: #fff; flex: 1; }
+.step-indicator { font-size: 11px; color: #a855f7; font-weight: 600; }
+
+.verify-body { padding: 16px; flex: 1; }
+.verify-tip {
+  background: #1e3a5f;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: #93c5fd;
+  line-height: 1.6;
+}
+
+.photo-section { margin-bottom: 18px; }
+.photo-section-title { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.photo-item {
+  aspect-ratio: 1;
+  background: #1e293b;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  position: relative;
+  cursor: pointer;
+  border: 2px dashed #334155;
+  color: #475569;
+  overflow: hidden;
+}
+.photo-item.has-img { border: none; color: inherit; }
+.photo-item .del {
+  position: absolute; top: -6px; right: -6px;
+  width: 20px; height: 20px;
+  background: #ef4444;
+  border-radius: 50%;
+  font-size: 11px; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.photo-item .tag {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.6);
+  font-size: 10px; color: #fff;
+  text-align: center; padding: 2px;
+}
+
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 8px; display: block; }
+.form-label .r { color: #ef4444; margin-left: 2px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: #1e293b;
+  border: 1.5px solid #334155;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #e2e8f0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #a855f7; }
+.form-input::placeholder, .form-textarea::placeholder { color: #475569; }
+.form-textarea { resize: none; height: 80px; }
+.form-select { cursor: pointer; }
+.form-select option { background: #1e293b; }
+
+.form-footer {
+  padding: 12px 16px 20px;
+  background: #0f1724;
+  border-top: 1px solid #1e293b;
+  position: sticky;
+  bottom: 0;
+}
+.btn-next {
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  color: #fff; border: none;
+  width: 100%; padding: 16px;
+  border-radius: 14px; font-size: 16px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(168,85,247,0.3);
+}
+.btn-next:active { transform: scale(0.99); }
+
+/* ===== 签名区 ===== */
+.signature-area {
+  background: #1e293b;
+  border-radius: 14px;
+  border: 1px solid #334155;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.signature-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid #334155;
+  font-size: 12px; color: #64748b;
+}
+.signature-header .name { color: #e2e8f0; font-weight: 600; }
+.signature-canvas-wrap {
+  height: 120px;
+  position: relative;
+  cursor: crosshair;
+}
+#sig-canvas { width: 100%; height: 120px; display: block; }
+.signature-empty {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #475569;
+  pointer-events: none;
+}
+.signature-empty.show { display: flex; }
+
+/* ===== 损失评估页 ===== */
+.page-evaluate { background: #0f1724; }
+.evaluate-header {
+  background: #1e293b;
+  padding: 16px;
+  border-bottom: 1px solid #334155;
+  position: sticky;
+  top: 44px;
+  z-index: 50;
+}
+.evaluate-header .top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.evaluate-header h2 { font-size: 17px; font-weight: 700; color: #fff; flex: 1; }
+.evaluate-body { padding: 16px; flex: 1; }
+
+.loss-item {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #334155;
+}
+.loss-item .loss-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.loss-item .loss-name { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+.loss-item .loss-amount {
+  font-size: 16px; font-weight: 800; color: #a855f7;
+  display: flex; align-items: center; gap: 4px;
+}
+.loss-item .loss-amount input {
+  width: 80px;
+  background: #0f1724;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 14px; font-weight: 700;
+  color: #a855f7;
+  text-align: right;
+  outline: none;
+}
+.loss-item .loss-amount input:focus { border-color: #a855f7; }
+.loss-item .loss-remark { font-size: 12px; color: #64748b; }
+
+.loss-summary {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #334155;
+  margin-bottom: 14px;
+}
+.loss-summary .row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+.loss-summary .row .k { color: #64748b; }
+.loss-summary .row .v { font-weight: 600; color: #e2e8f0; }
+.loss-summary .row.total {
+  border-top: 1px solid #334155;
+  margin-top: 8px; padding-top: 10px;
+  font-size: 15px;
+}
+.loss-summary .row.total .k { color: #e2e8f0; font-weight: 700; }
+.loss-summary .row.total .v { color: #10b981; font-size: 18px; font-weight: 800; }
+
+.loss-tip {
+  background: #1e3a5f;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  color: #93c5fd;
+  line-height: 1.6;
+}
+
+/* ===== 提交成功页 ===== */
+.page-success { background: #0f1724; align-items: center; justify-content: center; text-align: center; padding: 40px 24px; flex: 1; }
+.success-icon {
+  width: 88px; height: 88px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px; margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(5,150,105,0.3);
+}
+.success-title { font-size: 24px; font-weight: 800; color: #e2e8f0; margin-bottom: 8px; }
+.success-sub { font-size: 14px; color: #64748b; margin-bottom: 28px; line-height: 1.6; }
+.case-num-box {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 18px;
+  width: 100%;
+  margin-bottom: 12px;
+  border: 1px solid #334155;
+}
+.case-num-box .label { font-size: 12px; color: #64748b; margin-bottom: 4px; }
+.case-num-box .num { font-size: 18px; font-weight: 800; color: #a855f7; letter-spacing: 2px; font-family: monospace; }
+.tip-box {
+  background: #1e3a5f;
+  border-radius: 14px;
+  padding: 14px;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  color: #93c5fd;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  border: 1px solid #1e40af;
+}
+.btn-group { display: flex; gap: 12px; width: 100%; }
+.btn-group button { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+.btn-outline { background: #1e293b; color: #a855f7; border: 1.5px solid #a855f7; }
+.btn-fill { background: linear-gradient(135deg, #a855f7, #9333ea); color: #fff; }
+
+/* ===== 我的页 ===== */
+.page-my { background: #0f1724; }
+.my-header {
+  background: linear-gradient(135deg, #1e3a5f, #6b21a8);
+  padding: 24px 16px 40px;
+  color: #fff;
+}
+.my-user { display: flex; align-items: center; gap: 14px; }
+.my-avatar {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  border: 3px solid rgba(255,255,255,0.3);
+}
+.my-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.my-role { font-size: 13px; opacity: 0.8; }
+.my-card {
+  background: #1e293b;
+  border-radius: 20px;
+  margin: -24px 16px 16px;
+  padding: 6px 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  border: 1px solid #334155;
+}
+.menu-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #334155;
+  transition: background 0.15s;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: #2d3748; }
+.menu-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.menu-text { flex: 1; font-size: 15px; font-weight: 500; color: #e2e8f0; }
+.menu-arrow { color: #475569; font-size: 16px; }
+.auth-status { font-size: 12px; padding: 2px 8px; border-radius: 8px; font-weight: 600; }
+.auth-status.done { color: #10b981; background: #1f2d1c; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(255,255,255,0.95);
+  color: #1a1a1a;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 动画 */
+.page { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="statusbar">
+    <span id="status-time">9:41</span>
+    <span class="right">📶 📡 🔋</span>
+  </div>
+
+  <!-- ===== 首页 ===== -->
+  <div class="page page-home active" id="page-home">
+    <div class="top-card">
+      <div class="greeting">您好</div>
+      <div class="name">李核损</div>
+      <div class="role">现场核损员 · 机构端分配</div>
+      <div class="stats">
+        <div class="stat-item">
+          <div class="n">2</div>
+          <div class="t">待处理</div>
+        </div>
+        <div class="stat-item">
+          <div class="n">1</div>
+          <div class="t">进行中</div>
+        </div>
+        <div class="stat-item">
+          <div class="n">47</div>
+          <div class="t">本月完成</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-section">
+      <div class="section-header">
+        <span class="section-title">⏳ 待处理任务</span>
+        <span class="section-more" onclick="showPage('history')">全部 →</span>
+      </div>
+      <!-- 进行中任务 -->
+      <div class="task-card" onclick="showPage('task')" style="border-color:#a855f7;">
+        <div class="top">
+          <span class="case-no">TSC202603300001</span>
+          <span class="priority priority-urgent">紧急</span>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <span class="status status-doing">进行中</span>
+          <span style="font-size:11px; color:#64748b;">🔵 步骤3/5</span>
+        </div>
+        <div class="info">
+          <div class="info-row"><span>🕐 今天 10:17</span><span>📍 朝阳区东四环</span><span>🚗 京A·D1234</span></div>
+          <div class="info-row"><span>📋 碰撞 · 全责</span><span>🏢 XX运输公司</span></div>
+        </div>
+        <div class="progress-bar">
+          <div class="fill" style="width:60%;"></div>
+        </div>
+        <div class="progress-label">现场取证中 · 60%</div>
+      </div>
+      <!-- 待接单 -->
+      <div class="task-card" onclick="acceptTask()">
+        <div class="top">
+          <span class="case-no">TSC202603290087</span>
+          <span class="priority priority-normal">普通</span>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <span class="status status-pending">待接单</span>
+        </div>
+        <div class="info">
+          <div class="info-row"><span>🕐 昨天 16:42</span><span>📍 海淀区学院路</span></div>
+          <div class="info-row"><span>📋 刮擦 · 主责</span><span>🚗 京B·E5678</span></div>
+        </div>
+        <div style="margin-top:10px;">
+          <div style="background:#1f2d1c; color:#10b981; padding:8px 14px; border-radius:10px; font-size:13px; font-weight:600; text-align:center; cursor:pointer;" onclick="event.stopPropagation(); acceptTask()">📥 立即接单</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="task-section">
+      <div class="section-header">
+        <span class="section-title">✅ 今日完成</span>
+      </div>
+      <div class="task-card" style="opacity:0.7;">
+        <div class="top">
+          <span class="case-no">TSC202603280065</span>
+          <span class="status status-done">已完成</span>
+        </div>
+        <div class="info">
+          <div class="info-row"><span>🕐 今天 08:30</span><span>📍 石景山区</span></div>
+          <div class="info-row"><span>💰 核定损失 ¥4,200</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 任务详情页 ===== -->
+  <div class="page page-task" id="page-task">
+    <div class="detail-header">
+      <div class="top-bar">
+        <button class="back-btn-dark" onclick="showPage('home')">←</button>
+        <h2>任务详情</h2>
+      </div>
+      <div class="detail-status">🔵 进行中 · 步骤 3/5</div>
+      <div class="detail-no">TSC202603300001</div>
+      <div class="detail-info-grid">
+        <div class="detail-info-item"><div class="k">事故时间</div><div class="v">2026-03-30 10:17</div></div>
+        <div class="detail-info-item"><div class="k">事故地点</div><div class="v">朝阳区东四环中路</div></div>
+        <div class="detail-info-item"><div class="k">责任划分</div><div class="v">全部责任</div></div>
+        <div class="detail-info-item"><div class="k">事故类型</div><div class="v">碰撞</div></div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="info-card">
+        <div class="info-card-title">🚗 车辆信息</div>
+        <div class="info-row"><span class="k">车牌</span><span class="v">京A·D1234</span></div>
+        <div class="info-row"><span class="k">车型</span><span class="v">东风重卡 DFL1240</span></div>
+        <div class="info-row"><span class="k">企业</span><span class="v">北京XX运输有限公司</span></div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">👤 当事司机</div>
+        <div class="info-row"><span class="k">姓名</span><span class="v">张师傅</span></div>
+        <div class="info-row"><span class="k">电话</span><span class="v">138****6789</span></div>
+      </div>
+
+      <div class="action-btns">
+        <button class="action-btn secondary" onclick="toast('已打开导航')">🗺️ 导航</button>
+        <button class="action-btn secondary" onclick="toast('已拨打 138****6789')">📞 联系司机</button>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">📋 案件进度</div>
+        <div class="step-progress">
+          <div class="step-item done">
+            <div class="dot">✓</div>
+            <div class="text">任务接单</div>
+            <div style="margin-left:auto; font-size:11px; color:#475569;">10:25</div>
+          </div>
+          <div class="step-item done">
+            <div class="dot">✓</div>
+            <div class="text">到达签到</div>
+            <div style="margin-left:auto; font-size:11px; color:#475569;">10:48</div>
+          </div>
+          <div class="step-item active">
+            <div class="dot">●</div>
+            <div class="text">现场取证</div>
+            <div style="margin-left:auto; font-size:11px; color:#a855f7;">进行中</div>
+          </div>
+          <div class="step-item pending">
+            <div class="dot">○</div>
+            <div class="text">损失评估</div>
+          </div>
+          <div class="step-item pending">
+            <div class="dot">○</div>
+            <div class="text">提交报告</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-next" onclick="showPage('checkin')">继续：到达签到 →</button>
+      <button class="btn-next" style="background:linear-gradient(135deg,#475569,#334155); margin-top:10px; box-shadow:none;" onclick="showPage('verify')">📷 现场取证</button>
+    </div>
+  </div>
+
+  <!-- ===== 到达签到页 ===== -->
+  <div class="page page-checkin" id="page-checkin">
+    <div class="checkin-header">
+      <button class="back-btn-white" onclick="showPage('task')">←</button>
+      <h2>到达签到</h2>
+      <p>已到达事故现场，请完成签到确认</p>
+    </div>
+    <div class="checkin-body">
+      <div class="map-placeholder">
+        <div class="map-bg"></div>
+        <div class="map-content">
+          <div class="icon">📍</div>
+          <div class="txt" id="checkin-status">未获取位置</div>
+          <div class="address" id="checkin-address">—</div>
+        </div>
+      </div>
+
+      <button class="gps-btn" id="gps-btn" onclick="doGPSCheckin()">
+        📍 获取当前位置并签到
+      </button>
+
+      <div class="checkin-tips">
+        <strong>📌 签到须知：</strong><br>
+        · 请确保已到达事故现场附近再签到<br>
+        · 系统将记录签到时间和GPS坐标<br>
+        · 签到后请立即开始现场取证<br>
+        · 如遇定位偏差较大，请联系企业端
+      </div>
+
+      <div style="margin-top:12px;">
+        <button class="btn-next" style="background:linear-gradient(135deg,#475569,#334155); box-shadow:none;" onclick="showPage('task')">跳过签到</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 现场取证页 ===== -->
+  <div class="page page-verify" id="page-verify">
+    <div class="verify-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('task')">←</button>
+        <h2>现场取证</h2>
+        <span class="step-indicator">步骤 3/5</span>
+      </div>
+    </div>
+    <div class="verify-body">
+      <div class="verify-tip">
+        💡 请拍摄事故现场照片，包括：全景照、局部损失照、对方车辆照片等。照片将作为核查依据存档。
+      </div>
+
+      <!-- 现场照片 -->
+      <div class="photo-section">
+        <div class="photo-section-title">📷 现场照片 <span style="color:#ef4444;">*</span></div>
+        <div class="photo-grid" id="photo-grid-verify">
+          <div class="photo-item" id="pv-0" onclick="addVerifyPhoto(0)">+</div>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-top:6px;">至少上传1张全景照</div>
+      </div>
+
+      <!-- 核查记录 -->
+      <div class="form-group">
+        <label class="form-label">事故经过描述 <span class="r">*</span></label>
+        <textarea class="form-textarea" id="v-desc" placeholder="请详细描述事故经过...">京A·D1234行驶中东四环中路，因前方货车紧急刹车，我方反应不及与其发生追尾碰撞，前保险杠及大灯受损，现场无人员伤亡。</textarea>
+      </div>
+
+      <!-- 损失类型 -->
+      <div class="form-group">
+        <label class="form-label">损失类型</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <span style="background:#a855f7; color:#fff; padding:6px 12px; border-radius:8px; font-size:12px; cursor:pointer;">碰撞损失</span>
+          <span style="background:#1e293b; color:#94a3b8; padding:6px 12px; border-radius:8px; font-size:12px; border:1px solid #334155; cursor:pointer;">货损</span>
+          <span style="background:#1e293b; color:#94a3b8; padding:6px 12px; border-radius:8px; font-size:12px; border:1px solid #334155; cursor:pointer;">人伤</span>
+        </div>
+      </div>
+
+      <!-- 初步定损 -->
+      <div class="form-group">
+        <label class="form-label">初步定损金额（元）</label>
+        <input class="form-input" id="v-amount" type="number" value="2600" placeholder="请输入预估金额">
+      </div>
+
+      <!-- 司机笔录 & 签名 -->
+      <div class="form-group">
+        <label class="form-label">司机笔录确认 <span class="r">*</span></label>
+        <div class="signature-area">
+          <div class="signature-header">
+            <span>当事司机签字确认</span>
+            <span class="name" id="sig-name">张师傅</span>
+          </div>
+          <div class="signature-canvas-wrap" id="sig-wrap">
+            <canvas id="sig-canvas"></canvas>
+            <div class="signature-empty show" id="sig-empty">在此处签名</div>
+          </div>
+          <div class="signature-header" style="border-top:1px solid #334155; border-bottom:none;">
+            <span style="color:#10b981;">✓ 笔录已确认</span>
+            <span style="color:#64748b; cursor:pointer;" onclick="clearSig()">清除签名</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-next" onclick="submitVerify()">提交取证 →</button>
+    </div>
+  </div>
+
+  <!-- ===== 损失评估页 ===== -->
+  <div class="page page-evaluate" id="page-evaluate">
+    <div class="evaluate-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('verify')">←</button>
+        <h2>损失评估</h2>
+        <span class="step-indicator">步骤 4/5</span>
+      </div>
+    </div>
+    <div class="evaluate-body">
+      <div class="loss-tip">
+        💡 请根据实际维修需求，填写各项损失金额。系统将根据责任比例和免给付额自动计算互助给付款。
+      </div>
+
+      <div class="loss-item">
+        <div class="loss-row">
+          <span class="loss-name">前保险杠</span>
+          <div class="loss-amount">¥ <input type="number" value="1200" id="loss-1"></div>
+        </div>
+        <div style="font-size:11px; color:#64748b;">原厂配件 + 喷漆</div>
+      </div>
+
+      <div class="loss-item">
+        <div class="loss-row">
+          <span class="loss-name">左前大灯</span>
+          <div class="loss-amount">¥ <input type="number" value="800" id="loss-2"></div>
+        </div>
+        <div style="font-size:11px; color:#64748b;">LED大灯总成</div>
+      </div>
+
+      <div class="loss-item">
+        <div class="loss-row">
+          <span class="loss-name">工时费</span>
+          <div class="loss-amount">¥ <input type="number" value="600" id="loss-3"></div>
+        </div>
+        <div style="font-size:11px; color:#64748b;">拆装 + 调试</div>
+      </div>
+
+      <div class="loss-item">
+        <div class="loss-row">
+          <span class="loss-name">其他配件</span>
+          <div class="loss-amount">¥ <input type="number" value="0" id="loss-4"></div>
+        </div>
+      </div>
+
+      <div style="background:#1e293b; border-radius:14px; padding:14px; border:1px solid #334155; margin-bottom:10px;">
+        <div style="font-size:13px; font-weight:600; color:#e2e8f0; margin-bottom:10px;">增加损失项目 +</div>
+      </div>
+
+      <div class="loss-summary">
+        <div class="row"><span class="k">损失核定总额</span><span class="v" id="loss-total">¥ 2,600</span></div>
+        <div class="row"><span class="k">责任比例（全部责任）</span><span class="v">× 100%</span></div>
+        <div class="row"><span class="k">免给付额</span><span class="v">- ¥ 500</span></div>
+        <div class="row"><span class="k">备注</span><span class="v">—</span></div>
+        <div class="row total">
+          <span class="k">互助给付款</span>
+          <span class="v" id="loss-pay">¥ 2,100</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:#64748b; text-align:center; margin-bottom:14px;">
+        * 免给付额：500元 | 责任比例：100% | 互助给付款 = (核定总额 × 责任比例) - 免给付额
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-next" onclick="showPage('success')">提交核查报告 →</button>
+    </div>
+  </div>
+
+  <!-- ===== 提交成功页 ===== -->
+  <div class="page page-success" id="page-success">
+    <div class="success-icon">✓</div>
+    <div class="success-title">核查报告已提交</div>
+    <div class="success-sub">TSC202603300001 核查工作已完成<br>案件将进入互助理算流程</div>
+    <div class="case-num-box">
+      <div class="label">案件编号</div>
+      <div class="num">TSC202603300001</div>
+    </div>
+    <div class="tip-box">
+      <strong>📋 核查摘要：</strong><br>
+      · 损失核定金额：¥2,600<br>
+      · 互助给付款：¥2,100<br>
+      · 报告已提交至机构端审核
+    </div>
+    <div class="btn-group">
+      <button class="btn-outline" onclick="showPage('home')">返回首页</button>
+      <button class="btn-fill" onclick="showPage('home')">查看案件列表</button>
+    </div>
+  </div>
+
+  <!-- ===== 我的页 ===== -->
+  <div class="page page-my" id="page-my">
+    <div class="my-header">
+      <div class="my-user">
+        <div class="my-avatar">👤</div>
+        <div>
+          <div class="my-name">李核损</div>
+          <div class="my-role">现场核损员</div>
+        </div>
+      </div>
+    </div>
+    <div class="my-card" style="padding-bottom:8px;">
+      <div class="menu-item" onclick="toast('账号信息')">
+        <div class="menu-icon" style="background:#1e3a5f;">👤</div>
+        <div class="menu-text">账号信息</div>
+        <span class="auth-status done">✓ 已认证</span>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('实名认证')">
+        <div class="menu-icon" style="background:#3a1a1a;">🪪</div>
+        <div class="menu-text">实名认证</div>
+        <span class="auth-status done">✓ 已认证</span>
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+    <div class="my-card">
+      <div class="menu-item" onclick="toast('任务统计')">
+        <div class="menu-icon" style="background:#1f2d1c;">📊</div>
+        <div class="menu-text">我的统计</div>
+        <span style="font-size:12px; color:#a855f7; font-weight:700; margin-right:4px;">47件</span>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('消息通知设置')">
+        <div class="menu-icon" style="background:#3f2f1c;">🔔</div>
+        <div class="menu-text">消息通知设置</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('联系客服')">
+        <div class="menu-icon" style="background:#1f2d1c;">📞</div>
+        <div class="menu-text">联系客服</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('帮助中心')">
+        <div class="menu-icon" style="background:#2a1f3a;">❓</div>
+        <div class="menu-text">帮助中心</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('关于')">
+        <div class="menu-icon" style="background:#1e293b;">ℹ️</div>
+        <div class="menu-text">关于</div>
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部标签栏 -->
+  <div class="tabbar" id="tabbar">
+    <div class="tab-item active" onclick="tabBar(this,'home')"><span class="icon">🏠</span><span>首页</span></div>
+    <div class="tab-item" onclick="tabBar(this,'task')"><span class="icon">📋</span><span>任务</span></div>
+    <div class="tab-item" onclick="tabBar(this,'my')"><span class="icon">👤</span><span>我的</span></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 任务数据 =====
+const tasks = [
+  { no:'TSC202603300001', status:'doing', priority:'urgent', time:'10:17', location:'朝阳区东四环中路', plate:'京A·D1234', duty:'全部责任', type:'碰撞', company:'北京XX运输公司', driver:'张师傅', driverPhone:'138****6789', progress:60, step:3 }
+];
+
+// ===== GPS签到 =====
+let checkinDone = false;
+function doGPSCheckin() {
+  const btn = document.getElementById('gps-btn');
+  const status = document.getElementById('checkin-status');
+  const address = document.getElementById('checkin-address');
+  btn.disabled = true;
+  btn.textContent = '⏳ 定位中...';
+  toast('正在获取GPS定位...');
+  setTimeout(() => {
+    const loc = '北京市朝阳区东四环中路 38号';
+    status.textContent = '✅ 已定位';
+    status.style.color = '#10b981';
+    address.textContent = loc;
+    btn.textContent = '✅ 签到成功';
+    btn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+    checkinDone = true;
+    toast('签到成功！当前时间：' + new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}));
+  }, 1800);
+}
+
+// ===== 签名 =====
+let sigCtx, sigDrawing = false, hasSig = false;
+
+function initSig() {
+  const canvas = document.getElementById('sig-canvas');
+  const wrap = document.getElementById('sig-wrap');
+  canvas.width = wrap.offsetWidth;
+  canvas.height = 120;
+  sigCtx = canvas.getContext('2d');
+  sigCtx.strokeStyle = '#60a5fa';
+  sigCtx.lineWidth = 2;
+  sigCtx.lineCap = 'round';
+  sigCtx.lineJoin = 'round';
+
+  canvas.addEventListener('mousedown', startSig);
+  canvas.addEventListener('mousemove', drawSig);
+  canvas.addEventListener('mouseup', endSig);
+  canvas.addEventListener('mouseleave', endSig);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); startSig(e.touches[0]); });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); drawSig(e.touches[0]); });
+  canvas.addEventListener('touchend', endSig);
+}
+function startSig(e) {
+  sigDrawing = true;
+  hasSig = true;
+  document.getElementById('sig-empty').style.display = 'none';
+  sigCtx.beginPath();
+  const rect = document.getElementById('sig-canvas').getBoundingClientRect();
+  const x = (e.clientX || e.pageX) - rect.left;
+  const y = (e.clientY || e.pageY) - rect.top;
+  sigCtx.moveTo(x, y);
+}
+function drawSig(e) {
+  if (!sigDrawing) return;
+  const rect = document.getElementById('sig-canvas').getBoundingClientRect();
+  const x = (e.clientX || e.pageX) - rect.left;
+  const y = (e.clientY || e.pageY) - rect.top;
+  sigCtx.lineTo(x, y);
+  sigCtx.stroke();
+}
+function endSig() { sigDrawing = false; }
+function clearSig() {
+  const canvas = document.getElementById('sig-canvas');
+  sigCtx.clearRect(0, 0, canvas.width, canvas.height);
+  hasSig = false;
+  document.getElementById('sig-empty').style.display = 'flex';
+}
+
+// ===== 照片 =====
+let verifyPhotos = [];
+function addVerifyPhoto(index) {
+  const photos = ['📷','🚗','🛣️','💥','🔧','📋'];
+  const el = document.getElementById('pv-' + index);
+  el.classList.add('has-img');
+  const tagNames = ['事故全景','车损近景','现场环境','对方车辆','损伤细节','其他'];
+  el.innerHTML = photos[Math.floor(Math.random()*photos.length)] +
+    '<span class="del" onclick="removeVPhoto('+index+')">×</span>' +
+    '<div class="tag">'+tagNames[Math.floor(Math.random()*tagNames.length)]+'</div>';
+  verifyPhotos.push(index);
+  const nextId = verifyPhotos.length;
+  if (nextId < 9) {
+    const newEl = document.createElement('div');
+    newEl.className = 'photo-item';
+    newEl.id = 'pv-' + nextId;
+    newEl.onclick = () => addVerifyPhoto(nextId);
+    newEl.textContent = '+';
+    document.getElementById('photo-grid-verify').appendChild(newEl);
+  }
+}
+function removeVPhoto(index) {
+  event.stopPropagation();
+  const el = document.getElementById('pv-' + index);
+  if (el) {
+    el.classList.remove('has-img');
+    el.innerHTML = '+';
+    el.onclick = () => addVerifyPhoto(index);
+  }
+}
+
+function submitVerify() {
+  if (verifyPhotos.length === 0) { toast('请上传至少1张现场照片'); return; }
+  if (!hasSig) { toast('请让司机签字确认'); return; }
+  showPage('evaluate');
+}
+
+// ===== 损失计算 =====
+function updateLossCalc() {
+  const l1 = parseFloat(document.getElementById('loss-1').value) || 0;
+  const l2 = parseFloat(document.getElementById('loss-2').value) || 0;
+  const l3 = parseFloat(document.getElementById('loss-3').value) || 0;
+  const l4 = parseFloat(document.getElementById('loss-4').value) || 0;
+  const total = l1 + l2 + l3 + l4;
+  const pay = Math.max(0, total - 500);
+  document.getElementById('loss-total').textContent = '¥ ' + total.toLocaleString();
+  document.getElementById('loss-pay').textContent = '¥ ' + pay.toLocaleString();
+}
+
+['loss-1','loss-2','loss-3','loss-4'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateLossCalc);
+});
+
+// ===== 接单 =====
+function acceptTask() {
+  toast('已接单！任务已加入您的队列');
+}
+
+// ===== 页面导航 =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const tabMap = { home:0, task:1, my:2, checkin:-1, verify:-1, evaluate:-1, success:-1, history:-1 };
+  document.querySelectorAll('.tab-item').forEach((t,i) => {
+    t.classList.toggle('active', i===(tabMap[page]??-1));
+  });
+  const hide = ['checkin','verify','evaluate','success','task'];
+  document.getElementById('tabbar').style.display = hide.includes(page) ? 'none' : 'flex';
+  if (page === 'verify') setTimeout(initSig, 100);
+}
+function tabBar(el, page) { showPage(page); }
+
+// ===== Toast =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ===== 时间 =====
+function updateTime() {
+  const now = new Date();
+  document.getElementById('status-time').textContent = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+}
+updateTime();
+setInterval(updateTime, 60000);
+</script>
+
+</body>
+</html>

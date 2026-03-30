@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>企业端 · TSCS</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #080c14;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.phone-frame {
+  width: 420px;
+  min-height: 90vh;
+  background: #1e293b;
+  border-radius: 44px;
+  border: 8px solid #2d3748;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+}
+.phone-frame::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 126px; height: 34px;
+  background: #0f1724;
+  border-radius: 0 0 20px 20px;
+  z-index: 10;
+}
+
+.statusbar {
+  height: 44px;
+  background: #0f1724;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+.statusbar .right { display: flex; gap: 4px; font-size: 14px; }
+
+.page { display: none; flex-direction: column; min-height: calc(100vh - 44px); }
+.page.active { display: flex; }
+
+/* ===== 首页 ===== */
+.page-home { background: #0f1724; }
+
+.top-card {
+  margin: 16px;
+  background: linear-gradient(135deg, #064e3b, #059669);
+  border-radius: 20px;
+  padding: 24px 20px;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(5,150,105,0.2);
+  border: 1px solid #065f46;
+}
+.top-card .greeting { font-size: 13px; opacity: 0.8; margin-bottom: 4px; }
+.top-card .name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.top-card .role { font-size: 12px; opacity: 0.7; margin-bottom: 16px; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.stat-box {
+  background: rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.stat-box .n { font-size: 22px; font-weight: 800; }
+.stat-box .t { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+.stat-box .n.alert { color: #fbbf24; }
+.stat-box .n.danger { color: #f87171; }
+
+/* 待办区 */
+.todo-section { margin: 0 16px 16px; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.section-title { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+.section-badge {
+  font-size: 10px; padding: 2px 8px;
+  background: #f87171; color: #fff;
+  border-radius: 10px; font-weight: 600;
+}
+.section-more { font-size: 11px; color: #34d399; cursor: pointer; }
+
+.todo-card {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border: 1px solid #334155;
+  transition: border-color 0.15s;
+}
+.todo-card:active { border-color: #34d399; }
+.todo-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.todo-card .case-no { font-size: 13px; font-weight: 700; color: #e2e8f0; }
+.todo-card .tag {
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 8px; font-weight: 600;
+}
+.tag-wait { background: #3f2f1c; color: #fbbf24; }
+.tag-urgent { background: #3a1a1a; color: #f87171; }
+.tag-link { background: #1e3a5f; color: #60a5fa; }
+.todo-card .info { font-size: 11px; color: #64748b; display: flex; gap: 10px; }
+.todo-card .action {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 12px; color: #34d399;
+  font-weight: 600; margin-top: 8px;
+}
+
+/* 快捷入口 */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 0 16px 16px;
+}
+.quick-item {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 14px 6px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid #334155;
+  transition: border-color 0.15s;
+}
+.quick-item:active { border-color: #34d399; }
+.quick-item .icon { font-size: 24px; margin-bottom: 6px; display: block; }
+.quick-item .text { font-size: 11px; color: #94a3b8; font-weight: 500; }
+
+/* 案件列表 */
+.case-card {
+  background: #1e293b;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border: 1px solid #334155;
+}
+.case-card:active { border-color: #34d399; }
+.case-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.case-card .case-no { font-size: 13px; font-weight: 700; color: #e2e8f0; }
+.case-card .status {
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 20px; font-weight: 600;
+}
+.status-wait { background: #3f2f1c; color: #fbbf24; }
+.status-doing { background: #1e3a5f; color: #60a5fa; }
+.status-done { background: #1f2d1c; color: #34d399; }
+.status-pending { background: #2a1f3a; color: #a78bfa; }
+.case-card .info { display: flex; gap: 10px; font-size: 11px; color: #64748b; }
+
+/* 底部标签栏 */
+.tabbar {
+  position: sticky;
+  bottom: 0;
+  height: 68px;
+  background: #1e293b;
+  border-top: 1px solid #334155;
+  display: flex;
+  padding: 0 8px;
+  z-index: 200;
+  flex-shrink: 0;
+}
+.tab-item {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+  color: #475569;
+  font-size: 10px;
+  transition: color 0.2s;
+}
+.tab-item.active { color: #34d399; }
+.tab-item .icon { font-size: 22px; }
+
+/* ===== 通用 ===== */
+.back-btn-dark {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; border: none; color: #fff;
+}
+.page-header {
+  background: #1e293b;
+  padding: 16px;
+  position: sticky;
+  top: 44px;
+  z-index: 50;
+  border-bottom: 1px solid #334155;
+}
+.page-header .top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.page-header h2 { font-size: 17px; font-weight: 700; color: #fff; flex: 1; }
+.page-body { padding: 16px; flex: 1; }
+
+.info-card {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #334155;
+}
+.info-card-title {
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+}
+.info-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+.info-row .k { color: #64748b; }
+.info-row .v { font-weight: 600; color: #e2e8f0; }
+
+.action-btn {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: opacity 0.2s;
+}
+.action-btn:active { opacity: 0.8; }
+.action-btn.primary { background: linear-gradient(135deg, #059669, #10b981); color: #fff; }
+.action-btn.secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; }
+.action-btn.danger { background: linear-gradient(135deg, #dc2626, #ef4444); color: #fff; }
+.action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ===== 表单组件 ===== */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 8px; display: block; }
+.form-label .r { color: #ef4444; margin-left: 2px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: #0f1724;
+  border: 1.5px solid #334155;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #e2e8f0;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #34d399; }
+.form-input::placeholder, .form-textarea::placeholder { color: #475569; }
+.form-textarea { resize: none; height: 80px; }
+.form-select option { background: #1e293b; }
+.form-row { display: flex; gap: 10px; }
+.form-row .form-group { flex: 1; }
+
+.chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1.5px solid #334155;
+  background: #1e293b;
+  color: #94a3b8;
+  transition: all 0.2s;
+}
+.chip.active { background: #059669; color: #fff; border-color: #059669; }
+
+.photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.photo-item {
+  aspect-ratio: 1;
+  background: #0f1724;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  position: relative;
+  cursor: pointer;
+  border: 2px dashed #334155;
+  color: #475569;
+  overflow: hidden;
+}
+.photo-item.has-img { border: none; color: inherit; }
+.photo-item .del {
+  position: absolute; top: -5px; right: -5px;
+  width: 18px; height: 18px;
+  background: #ef4444;
+  border-radius: 50%;
+  font-size: 10px; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.form-footer {
+  padding: 12px 16px 20px;
+  background: #0f1724;
+  border-top: 1px solid #1e293b;
+  position: sticky;
+  bottom: 0;
+  display: flex; gap: 10px;
+}
+.form-footer .btn { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+.btn-confirm { background: linear-gradient(135deg, #059669, #10b981); color: #fff; }
+.btn-cancel { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+
+/* ===== 详情页 ===== */
+.detail-header {
+  background: linear-gradient(135deg, #064e3b, #059669);
+  padding: 16px;
+  color: #fff;
+}
+.detail-status { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+.detail-no { font-size: 20px; font-weight: 800; margin-bottom: 14px; font-family: monospace; letter-spacing: 1px; }
+.detail-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.detail-info-item .k { font-size: 11px; opacity: 0.7; margin-bottom: 2px; }
+.detail-info-item .v { font-size: 14px; font-weight: 600; }
+
+.staff-card {
+  display: flex; align-items: center; gap: 12px;
+  background: #0f1724; border-radius: 14px; padding: 12px;
+  margin-top: 8px; border: 1px solid #334155;
+}
+.staff-avatar {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #34d399, #10b981);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #fff; font-weight: 700; flex-shrink: 0;
+}
+.staff-info { flex: 1; }
+.staff-name { font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 2px; }
+.staff-role { font-size: 12px; color: #64748b; }
+.staff-phone {
+  background: #10b981; color: #fff;
+  padding: 7px 14px; border-radius: 10px;
+  font-size: 12px; font-weight: 600; cursor: pointer; border: none;
+}
+
+.pay-card {
+  background: #0f1724;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 8px;
+  border: 1px solid #334155;
+}
+.pay-amount { font-size: 28px; font-weight: 800; color: #34d399; margin-bottom: 4px; }
+.pay-label { font-size: 12px; color: #64748b; }
+.pay-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; text-align: left; }
+.pay-info-grid .item .k { font-size: 10px; color: #64748b; }
+.pay-info-grid .item .v { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+
+/* ===== 确认页 ===== */
+.page-confirm { background: #0f1724; align-items: center; justify-content: center; text-align: center; padding: 40px 24px; flex: 1; }
+.confirm-icon {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(5,150,105,0.3);
+}
+.confirm-title { font-size: 22px; font-weight: 800; color: #e2e8f0; margin-bottom: 8px; }
+.confirm-sub { font-size: 14px; color: #64748b; margin-bottom: 24px; line-height: 1.6; }
+.confirm-detail {
+  background: #1e293b;
+  border-radius: 16px;
+  padding: 18px;
+  width: 100%;
+  margin-bottom: 20px;
+  border: 1px solid #334155;
+  text-align: left;
+}
+.confirm-detail .row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+.confirm-detail .row .k { color: #64748b; }
+.confirm-detail .row .v { font-weight: 600; color: #e2e8f0; }
+.confirm-detail .row.total {
+  border-top: 1px solid #334155;
+  margin-top: 8px; padding-top: 10px;
+  font-size: 15px;
+}
+.confirm-detail .row.total .k { color: #e2e8f0; font-weight: 700; }
+.confirm-detail .row.total .v { color: #34d399; font-size: 18px; }
+.confirm-btns { display: flex; gap: 12px; width: 100%; }
+.confirm-btns button { flex: 1; padding: 14px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+.confirm-btns .btn-outline { background: #1e293b; color: #34d399; border: 1.5px solid #34d399; }
+.confirm-btns .btn-fill { background: linear-gradient(135deg, #059669, #10b981); color: #fff; }
+
+/* ===== 我的页 ===== */
+.page-my { background: #0f1724; }
+.my-header {
+  background: linear-gradient(135deg, #064e3b, #059669);
+  padding: 24px 16px 40px;
+  color: #fff;
+}
+.my-user { display: flex; align-items: center; gap: 14px; }
+.my-avatar {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  border: 3px solid rgba(255,255,255,0.3);
+}
+.my-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.my-role { font-size: 13px; opacity: 0.8; }
+.my-card {
+  background: #1e293b;
+  border-radius: 20px;
+  margin: -24px 16px 16px;
+  padding: 6px 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  border: 1px solid #334155;
+}
+.menu-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #334155;
+  transition: background 0.15s;
+}
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: #2d3748; }
+.menu-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.menu-text { flex: 1; font-size: 14px; font-weight: 500; color: #e2e8f0; }
+.menu-arrow { color: #475569; font-size: 16px; }
+.menu-badge { font-size: 11px; background: #fef2f2; color: #ef4444; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(255,255,255,0.95);
+  color: #1a1a1a;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 动画 */
+.page { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="statusbar">
+    <span id="status-time">9:41</span>
+    <span class="right">📶 📡 🔋</span>
+  </div>
+
+  <!-- ===== 首页 ===== -->
+  <div class="page page-home active" id="page-home">
+    <div class="top-card">
+      <div class="greeting">您好</div>
+      <div class="name">王管理</div>
+      <div class="role">XX运输公司 · 分司主管</div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="n alert">3</div>
+          <div class="t">待补充报案</div>
+        </div>
+        <div class="stat-box">
+          <div class="n">12</div>
+          <div class="t">进行中</div>
+        </div>
+        <div class="stat-box">
+          <div class="n">89</div>
+          <div class="t">本月结案</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 待办 -->
+    <div class="todo-section">
+      <div class="section-header">
+        <span class="section-title">⚡ 待办事项</span>
+        <span class="section-badge">3</span>
+      </div>
+
+      <div class="todo-card" onclick="showPage('case-detail')">
+        <div class="top">
+          <span class="case-no">TSC202603300001</span>
+          <span class="tag tag-urgent">紧急</span>
+        </div>
+        <div class="info">
+          <span>🕐 今天 10:17</span>
+          <span>📍 朝阳区东四环</span>
+          <span>🚗 京A·D1234</span>
+        </div>
+        <div class="action" onclick="event.stopPropagation(); showPage('supplement')">📝 补充报案信息 →</div>
+      </div>
+
+      <div class="todo-card" onclick="showPage('case-detail')">
+        <div class="top">
+          <span class="case-no">TSC202603300002</span>
+          <span class="tag tag-wait">待处理</span>
+        </div>
+        <div class="info">
+          <span>🕐 今天 09:42</span>
+          <span>📍 海淀区学院路</span>
+          <span>🚗 京B·E5678</span>
+        </div>
+        <div class="action" onclick="event.stopPropagation(); showPage('supplement')">📝 补充报案信息 →</div>
+      </div>
+
+      <div class="todo-card" onclick="showPage('calc-confirm')">
+        <div class="top">
+          <span class="case-no">TSC202603280065</span>
+          <span class="tag tag-wait">待确认</span>
+        </div>
+        <div class="info">
+          <span>💰 互助理算：¥3,200</span>
+          <span>🏢 机构端已发起</span>
+        </div>
+        <div class="action" onclick="event.stopPropagation(); showPage('calc-confirm')">✅ 确认理算单 →</div>
+      </div>
+    </div>
+
+    <!-- 快捷入口 -->
+    <div class="quick-grid">
+      <div class="quick-item" onclick="showPage('cases')">
+        <span class="icon">📋</span>
+        <span class="text">案件列表</span>
+      </div>
+      <div class="quick-item" onclick="showPage('drivers')">
+        <span class="icon">🚛</span>
+        <span class="text">驾驶员</span>
+      </div>
+      <div class="quick-item" onclick="showPage('vehicles')">
+        <span class="icon">🚗</span>
+        <span class="text">车辆</span>
+      </div>
+
+    </div>
+
+    <!-- 近期案件 -->
+    <div class="todo-section">
+      <div class="section-header">
+        <span class="section-title">📋 近期案件</span>
+        <span class="section-more" onclick="showPage('cases')">全部 →</span>
+      </div>
+      <div class="case-card" onclick="showPage('case-detail')">
+        <div class="top">
+          <span class="case-no">TSC202603150032</span>
+          <span class="status status-done">已结案</span>
+        </div>
+        <div class="info">
+          <span>🕐 03-15</span>
+          <span>📍 海淀区</span>
+          <span>💰 ¥3,200</span>
+        </div>
+      </div>
+      <div class="case-card" onclick="showPage('case-detail')">
+        <div class="top">
+          <span class="case-no">TSC202602280019</span>
+          <span class="status status-done">已结案</span>
+        </div>
+        <div class="info">
+          <span>🕐 02-28</span>
+          <span>📍 昌平区</span>
+          <span>💰 ¥1,850</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 案件列表页 ===== -->
+  <div class="page page-cases" id="page-cases">
+    <div class="page-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('home')">←</button>
+        <h2>案件列表</h2>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <div style="flex:1; display:flex; gap:4px;">
+          <span class="chip active" onclick="filterCases(this,'all')">全部</span>
+          <span class="chip" onclick="filterCases(this,'ing')">进行中</span>
+          <span class="chip" onclick="filterCases(this,'done')">已结案</span>
+        </div>
+      </div>
+    </div>
+    <div class="page-body">
+      <div id="case-list-all">
+        <div class="case-card" onclick="showPage('case-detail')">
+          <div class="top"><span class="case-no">TSC202603300001</span><span class="status status-doing">处理中</span></div>
+          <div class="info"><span>🕐 今天 10:17</span><span>📍 朝阳区</span><span>🚗 京A·D1234</span></div>
+        </div>
+        <div class="case-card" onclick="showPage('case-detail')">
+          <div class="top"><span class="case-no">TSC202603300002</span><span class="status status-wait">待补充</span></div>
+          <div class="info"><span>🕐 今天 09:42</span><span>📍 海淀区</span><span>🚗 京B·E5678</span></div>
+        </div>
+        <div class="case-card" onclick="showPage('case-detail')">
+          <div class="top"><span class="case-no">TSC202603280065</span><span class="status status-pending">待确认</span></div>
+          <div class="info"><span>🕐 03-28</span><span>📍 石景山区</span><span>💰 ¥4,200</span></div>
+        </div>
+        <div class="case-card" onclick="showPage('case-detail')">
+          <div class="top"><span class="case-no">TSC202603150032</span><span class="status status-done">已结案</span></div>
+          <div class="info"><span>🕐 03-15</span><span>📍 海淀区</span><span>💰 ¥3,200</span></div>
+        </div>
+        <div class="case-card" onclick="showPage('case-detail')">
+          <div class="top"><span class="case-no">TSC202602280019</span><span class="status status-done">已结案</span></div>
+          <div class="info"><span>🕐 02-28</span><span>📍 昌平区</span><span>💰 ¥1,850</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 案件详情页 ===== -->
+  <div class="page page-case-detail" id="page-case-detail">
+    <div class="detail-header">
+      <div class="top" style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+        <button class="back-btn-dark" onclick="showPage('home')">←</button>
+        <h2 style="font-size:17px; font-weight:700; flex:1;">案件详情</h2>
+      </div>
+      <div class="detail-status" id="cd-status">🔵 处理中</div>
+      <div class="detail-no">TSC202603300001</div>
+      <div class="detail-info-grid">
+        <div class="detail-info-item"><div class="k">事故时间</div><div class="v">2026-03-30 10:17</div></div>
+        <div class="detail-info-item"><div class="k">事故地点</div><div class="v">朝阳区东四环中路</div></div>
+        <div class="detail-info-item"><div class="k">责任划分</div><div class="v">全部责任</div></div>
+        <div class="detail-info-item"><div class="k">事故类型</div><div class="v">碰撞</div></div>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="info-card">
+        <div class="info-card-title">🚗 车辆信息</div>
+        <div class="info-row"><span class="k">车牌</span><span class="v">京A·D1234</span></div>
+        <div class="info-row"><span class="k">车型</span><span class="v">东风重卡 DFL1240</span></div>
+        <div class="info-row"><span class="k">企业</span><span class="v">北京XX运输有限公司</span></div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">👤 当事司机</div>
+        <div class="info-row"><span class="k">姓名</span><span class="v">张师傅</span></div>
+        <div class="info-row"><span class="k">电话</span><span class="v">138****6789</span></div>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button class="action-btn secondary" style="flex:1; font-size:12px;" onclick="toast('已拨打')">📞 联系司机</button>
+        </div>
+      </div>
+
+      <div class="info-card" id="cd-staff-card" style="display:none;">
+        <div class="info-card-title">👤 核损员信息</div>
+        <div class="staff-card">
+          <div class="staff-avatar">李</div>
+          <div class="staff-info">
+            <div class="staff-name">李建国</div>
+            <div class="staff-role">机构端核损员</div>
+          </div>
+          <button class="staff-phone" onclick="toast('已拨打')">📞 拨打</button>
+        </div>
+      </div>
+
+      <div class="info-card" id="cd-pay-card" style="display:none;">
+        <div class="info-card-title">💰 赔付信息</div>
+        <div class="pay-card">
+          <div class="pay-amount">¥3,200</div>
+          <div class="pay-label">互助给付款（已支付）</div>
+          <div class="pay-info-grid">
+            <div class="item"><div class="k">支付时间</div><div class="v">2026-03-16</div></div>
+            <div class="item"><div class="k">责任比例</div><div class="v">70%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="action-btn primary" style="width:100%; margin-bottom:10px;" onclick="showPage('supplement')">📝 补充报案信息</button>
+      <button class="action-btn secondary" style="width:100%;" onclick="showPage('home')">返回首页</button>
+    </div>
+  </div>
+
+  <!-- ===== 补充报案信息页 ===== -->
+  <div class="page page-supplement" id="page-supplement">
+    <div class="page-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('case-detail')">←</button>
+        <h2>补充报案信息</h2>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="info-card">
+        <div class="info-card-title">📋 基础报案（司机端提交）</div>
+        <div class="info-row"><span class="k">事故时间</span><span class="v">2026-03-30 10:17</span></div>
+        <div class="info-row"><span class="k">事故地点</span><span class="v">朝阳区东四环中路</span></div>
+        <div class="info-row"><span class="k">责任</span><span class="v">全部责任</span></div>
+        <div class="info-row"><span class="k">类型</span><span class="v">碰撞</span></div>
+        <div class="info-row" style="flex-direction:column; gap:4px;">
+          <span class="k">事故描述</span>
+          <span class="v" style="font-size:12px; color:#94a3b8; font-weight:400;">行驶中与前方货车发生追尾碰撞，前车紧急制动，我方反应不及导致前保险杠及大灯受损。</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">📷 现场补充照片 <span style="color:#ef4444;">*</span></div>
+        <div class="photo-grid" id="sup-photo-grid">
+          <div class="photo-item" id="sp-0" onclick="addSupPhoto(0)">+</div>
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-top:6px;">请上传：责任认定书 + 现场照 + 车损照</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">责任认定</label>
+        <div class="chip-group">
+          <span class="chip active" onclick="selectChipSup(this)">全部责任</span>
+          <span class="chip" onclick="selectChipSup(this)">主要责任</span>
+          <span class="chip" onclick="selectChipSup(this)">同等责任</span>
+          <span class="chip" onclick="selectChipSup(this)">次要责任</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">交警责任认定书</label>
+        <div style="background:#1e293b; border-radius:12px; padding:12px; display:flex; align-items:center; gap:8px; border:1px solid #334155;">
+          <span style="font-size:20px;">📋</span>
+          <span style="flex:1; font-size:13px; color:#94a3b8;" id="upload-file-name">已上传：责任认定书.pdf</span>
+          <span style="font-size:12px; color:#34d399;">✓</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">对方车辆信息</label>
+        <div class="form-row">
+          <div class="form-group">
+            <input class="form-input" id="sup-other-plate" placeholder="对方车牌">
+          </div>
+          <div class="form-group">
+            <input class="form-input" id="sup-other-phone" placeholder="对方电话">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-footer">
+      <button class="btn-cancel" onclick="showPage('case-detail')">取消</button>
+      <button class="btn-confirm" onclick="showPage('submit-success')">提交最终报案</button>
+    </div>
+  </div>
+
+  <!-- ===== 提交成功页 ===== -->
+  <div class="page page-submit-success" id="page-submit-success">
+    <div class="page-confirm">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-title">报案提交成功</div>
+      <div class="confirm-sub">TSC202603300001 已提交至机构端<br>机构端将在审核后受理案件</div>
+      <div class="confirm-detail">
+        <div class="row"><span class="k">报案编号</span><span class="v" style="font-size:12px;">TSC202603300001</span></div>
+        <div class="row"><span class="k">提交时间</span><span class="v">2026-03-30 13:52</span></div>
+        <div class="row"><span class="k">受理机构</span><span class="v">TSCS统筹机构</span></div>
+      </div>
+      <div class="confirm-btns">
+        <button class="btn-outline" onclick="showPage('home')">返回首页</button>
+        <button class="btn-fill" onclick="showPage('cases')">查看列表</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 理算确认页 ===== -->
+  <div class="page page-calc-confirm" id="page-calc-confirm">
+    <div class="page-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('home')">←</button>
+        <h2>互助理算确认</h2>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="info-card">
+        <div class="info-card-title">📋 给付计算详情</div>
+        <div class="info-row"><span class="k">案件编号</span><span class="v">TSC202603280065</span></div>
+        <div class="info-row"><span class="k">事故车辆</span><span class="v">京C·F9012</span></div>
+        <div class="info-row"><span class="k">核定损失</span><span class="v">¥4,200</span></div>
+        <div class="info-row"><span class="k">责任比例（主责）</span><span class="v">× 70%</span></div>
+        <div class="info-row"><span class="k">免给付额</span><span class="v">- ¥500</span></div>
+      </div>
+
+      <div class="confirm-detail" style="margin-bottom:16px;">
+        <div class="row total">
+          <span class="k">应付金额</span>
+          <span class="v">¥2,440</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-title">📄 审核材料</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <span style="color:#34d399;">✓</span><span style="color:#94a3b8;">交通事故责任认定书</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <span style="color:#34d399;">✓</span><span style="color:#94a3b8;">维修发票及清单</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+            <span style="color:#34d399;">✓</span><span style="color:#94a3b8;">现场照片</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button class="action-btn secondary" style="flex:1;" onclick="showPage('case-detail')">有异议</button>
+        <button class="action-btn primary" style="flex:2;" onclick="showPage('confirm-done')">✅ 确认无误</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 确认完成页 ===== -->
+  <div class="page page-confirm-done" id="page-confirm-done">
+    <div class="page-confirm">
+      <div class="confirm-icon">✓</div>
+      <div class="confirm-title">确认完成</div>
+      <div class="confirm-sub">互助理算单已确认<br>机构财务将执行互助给付打款</div>
+      <div class="confirm-detail">
+        <div class="row"><span class="k">案件编号</span><span class="v" style="font-size:12px;">TSC202603280065</span></div>
+        <div class="row"><span class="k">确认时间</span><span class="v" id="confirm-time">—</span></div>
+        <div class="row total">
+          <span class="k">给付金额</span>
+          <span class="v">¥2,440</span>
+        </div>
+      </div>
+      <div class="confirm-btns">
+        <button class="btn-fill" onclick="showPage('home')" style="flex:1;">返回首页</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 驾驶员管理页 ===== -->
+  <div class="page page-drivers" id="page-drivers">
+    <div class="page-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('home')">←</button>
+        <h2>驾驶员管理</h2>
+      </div>
+    </div>
+    <div class="page-body">
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input class="form-input" placeholder="搜索驾驶员..." style="flex:1;">
+      </div>
+
+      <div class="info-card" onclick="toast('查看驾驶员详情')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:15px; font-weight:700; color:#e2e8f0; margin-bottom:4px;">张师傅</div>
+            <div style="font-size:12px; color:#64748b;">🚗 京A·D1234 · 138****6789</div>
+            <div style="font-size:11px; color:#34d399; margin-top:4px;">驾驶评分：92分</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="info-card" onclick="toast('查看驾驶员详情')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:15px; font-weight:700; color:#e2e8f0; margin-bottom:4px;">李师傅</div>
+            <div style="font-size:12px; color:#64748b;">🚗 京B·E5678 · 139****2345</div>
+            <div style="font-size:11px; color:#fbbf24; margin-top:4px;">驾驶评分：78分</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="info-card" onclick="toast('查看驾驶员详情')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:15px; font-weight:700; color:#e2e8f0; margin-bottom:4px;">王师傅</div>
+            <div style="font-size:12px; color:#64748b;">🚗 京C·F9012 · 137****8769</div>
+            <div style="font-size:11px; color:#34d399; margin-top:4px;">驾驶评分：96分</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px; color:#475569; text-align:center; margin-top:8px;">* 添加/删除驾驶员请使用企业Web端</div>
+    </div>
+  </div>
+
+  <!-- ===== 车辆管理页 ===== -->
+  <div class="page page-vehicles" id="page-vehicles">
+    <div class="page-header">
+      <div class="top">
+        <button class="back-btn-dark" onclick="showPage('home')">←</button>
+        <h2>车辆管理</h2>
+      </div>
+    </div>
+    <div class="page-body">
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input class="form-input" placeholder="搜索车辆..." style="flex:1;">
+      </div>
+      <div style="font-size:11px; color:#475569; text-align:center; margin-bottom:8px;">* 增删改/绑定车辆请使用企业Web端</div>
+
+      <div class="info-card" onclick="toast('查看车辆详情')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:15px; font-weight:800; color:#e2e8f0; margin-bottom:4px;">京A·D1234</div>
+            <div style="font-size:12px; color:#64748b;">东风重卡 DFL1240 · 张师傅</div>
+            <div style="font-size:11px; color:#34d399; margin-top:4px;">✅ 统筹保障中</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="info-card" onclick="toast('查看车辆详情')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:15px; font-weight:800; color:#e2e8f0; margin-bottom:4px;">京B·E5678</div>
+            <div style="font-size:12px; color:#64748b;">陕汽重卡 SX4186 · 李师傅</div>
+            <div style="font-size:11px; color:#34d399; margin-top:4px;">✅ 统筹保障中</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="info-card" onclick="toast('查看车辆详情')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:15px; font-weight:800; color:#e2e8f0; margin-bottom:4px;">京C·F9012</div>
+            <div style="font-size:12px; color:#64748b;">解放重卡 CA1180 · 王师傅</div>
+            <div style="font-size:11px; color:#fbbf24; margin-top:4px;">⚠️ 统筹即将到期</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 我的页 ===== -->
+  <div class="page page-my" id="page-my">
+    <div class="my-header">
+      <div class="my-user">
+        <div class="my-avatar">👤</div>
+        <div>
+          <div class="my-name">王管理</div>
+          <div class="my-role">分司主管 · XX运输公司</div>
+        </div>
+      </div>
+    </div>
+    <div class="my-card" style="padding-bottom:8px;">
+      <div class="menu-item" onclick="toast('账号信息')">
+        <div class="menu-icon" style="background:#064e3b;">👤</div>
+        <div class="menu-text">账号信息</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('实名认证')">
+        <div class="menu-icon" style="background:#1f2d1c;">🪪</div>
+        <div class="menu-text">实名认证</div>
+        <span style="font-size:12px; color:#34d399; font-weight:600;">✓ 已认证</span>
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+    <div class="my-card">
+      <div class="menu-item" onclick="toast('消息通知设置')">
+        <div class="menu-icon" style="background:#064e3b;">🔔</div>
+        <div class="menu-text">消息通知设置</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('功能权限')">
+        <div class="menu-icon" style="background:#1e3a5f;">⚙️</div>
+        <div class="menu-text">功能权限</div>
+        <span style="font-size:11px; color:#64748b; margin-right:4px;">分司主管</span>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('联系客服')">
+        <div class="menu-icon" style="background:#1f2d1c;">📞</div>
+        <div class="menu-text">联系客服</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('帮助中心')">
+        <div class="menu-icon" style="background:#2a1f3a;">❓</div>
+        <div class="menu-text">帮助中心</div>
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="menu-item" onclick="toast('退出登录')">
+        <div class="menu-icon" style="background:#3a1a1a;">🚪</div>
+        <div class="menu-text" style="color:#f87171;">退出登录</div>
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部标签栏 -->
+  <div class="tabbar" id="tabbar">
+    <div class="tab-item active" onclick="tabBar(this,'home')"><span class="icon">🏠</span><span>首页</span></div>
+    <div class="tab-item" onclick="tabBar(this,'cases')"><span class="icon">📋</span><span>案件</span></div>
+    <div class="tab-item" onclick="tabBar(this,'drivers')"><span class="icon">🚛</span><span>司机</span></div>
+    <div class="tab-item" onclick="tabBar(this,'my')"><span class="icon">👤</span><span>我的</span></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 照片 =====
+let supPhotos = [];
+function addSupPhoto(index) {
+  const photos = ['📷','📋','🚗','💥'];
+  const el = document.getElementById('sp-' + index);
+  el.classList.add('has-img');
+  el.innerHTML = photos[Math.floor(Math.random()*photos.length)] + '<span class="del" onclick="removeSp('+index+')">×</span>';
+  supPhotos.push(index);
+  const nextId = supPhotos.length;
+  if (nextId < 9) {
+    const newEl = document.createElement('div');
+    newEl.className = 'photo-item';
+    newEl.id = 'sp-' + nextId;
+    newEl.onclick = () => addSupPhoto(nextId);
+    newEl.textContent = '+';
+    document.getElementById('sup-photo-grid').appendChild(newEl);
+  }
+}
+function removeSp(index) {
+  event.stopPropagation();
+  const el = document.getElementById('sp-' + index);
+  if (el) { el.classList.remove('has-img'); el.innerHTML = '+'; el.onclick = () => addSupPhoto(index); }
+}
+
+// ===== Chip选择 =====
+function selectChipSup(el) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ===== 案件筛选 =====
+function filterCases(el, type) {
+  el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  toast('筛选：' + type);
+}
+
+// ===== 页面导航 =====
+const tabHidePages = ['supplement','submit-success','calc-confirm','confirm-done','case-detail','cases','drivers','vehicles'];
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const tabMap = { home:0, cases:1, drivers:2, my:3 };
+  document.querySelectorAll('.tab-item').forEach((t,i) => t.classList.toggle('active', i===(tabMap[page]??-1)));
+  document.getElementById('tabbar').style.display = tabHidePages.includes(page) ? 'none' : 'flex';
+  // 更新确认时间
+  if (page === 'confirm-done') {
+    const now = new Date();
+    document.getElementById('confirm-time').textContent =
+      now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  }
+}
+function tabBar(el, page) { showPage(page); }
+
+// ===== Toast =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ===== 时间 =====
+function updateTime() {
+  const now = new Date();
+  document.getElementById('status-time').textContent = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+}
+updateTime();
+setInterval(updateTime, 60000);
+</script>
+
+</body>
+</html>

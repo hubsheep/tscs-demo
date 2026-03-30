@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交通安全统筹 - 企业端</title>
+<style>
+/***** 全局样式 *****/
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f0f2f5; color: #333; font-size: 14px; line-height: 1.5; }
+
+/***** 登录页 *****/
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%); }
+.login-box { background: #fff; padding: 44px; border-radius: 16px; width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+.login-box .logo { text-align: center; margin-bottom: 32px; }
+.login-box .logo .icon { width: 56px; height: 56px; background: linear-gradient(135deg, #1677ff, #0958d9); border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; margin-bottom: 12px; box-shadow: 0 8px 24px rgba(22,119,255,.35); }
+.login-box .logo h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; letter-spacing: 1px; }
+.login-form .form-item { margin-bottom: 20px; }
+.form-item label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+.form-item input { width: 100%; height: 44px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 14px; transition: border-color .2s; }
+.form-item input:focus { border-color: #1677ff; outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,.1); }
+.btn-login { width: 100%; height: 44px; background: linear-gradient(135deg, #1677ff, #0958d9); color: #fff; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; letter-spacing: 1px; box-shadow: 0 4px 16px rgba(22,119,255,.35); transition: all .2s; }
+.btn-login:hover { box-shadow: 0 6px 20px rgba(22,119,255,.45); transform: translateY(-1px); }
+.login-footer { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+.login-footer a { color: #1677ff; text-decoration: none; font-size: 14px; cursor: pointer; font-weight: 500; }
+
+/***** 主界面整体布局 *****/
+.main-page { display: none; }
+.main-page.active { display: block; }
+.main-header { background: #fff; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; box-shadow: 0 1px 4px rgba(0,0,0,.08); position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+.main-header .logo { display: flex; align-items: center; gap: 12px; }
+.main-header .logo .icon { width: 36px; height: 36px; background: linear-gradient(135deg, #1677ff, #0958d9); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+.main-header .logo .title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.main-header .user-info { display: flex; align-items: center; gap: 16px; }
+.main-header .user-info .avatar { width: 36px; height: 36px; background: linear-gradient(135deg, #1677ff, #0958d9); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 600; }
+.main-header .user-info .role { font-size: 12px; color: #999; }
+.main-header .msg-btn { position: relative; cursor: pointer; font-size: 20px; color: #666; }
+.main-header .msg-btn .badge { position: absolute; top: -4px; right: -4px; background: #ff4d4f; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 10px; }
+
+/***** 侧边栏 *****/
+.sidebar { width: 200px; background: #fff; position: fixed; top: 60px; left: 0; bottom: 0; box-shadow: 1px 0 4px rgba(0,0,0,.05); overflow-y: auto; }
+.sidebar .nav-item { display: flex; align-items: center; gap: 10px; padding: 13px 20px; color: #666; cursor: pointer; border-left: 3px solid transparent; transition: all .2s; }
+.sidebar .nav-item:hover { background: #f5f5f5; color: #333; }
+.sidebar .nav-item.active { background: #e6f4ff; color: #1677ff; border-left-color: #1677ff; font-weight: 600; }
+.sidebar .nav-item .icon { font-size: 18px; }
+
+/***** 主内容区 *****/
+.main-content { margin-left: 200px; margin-top: 60px; padding: 24px; min-height: calc(100vh - 60px); }
+.page-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; color: #1a1a1a; }
+
+/***** 统计卡片 *****/
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); cursor: pointer; transition: box-shadow .2s; }
+.stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+.stat-card .label { font-size: 14px; color: #999; margin-bottom: 8px; }
+.stat-card .value { font-size: 28px; font-weight: 700; color: #1a1a1a; }
+.stat-card .sub { font-size: 12px; color: #52c41a; margin-top: 4px; }
+.stat-card .sub.red { color: #ff4d4f; }
+
+/***** 卡片 *****/
+.card { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 16px; }
+.card .card-header { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+.card .card-header h3 { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.card .card-body { padding: 0; }
+
+/***** 表格 *****/
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; padding: 12px 16px; background: #fafafa; font-weight: 600; color: #666; font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+.table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #333; }
+.table tr:hover td { background: #fafafa; }
+.table tr:last-child td { border-bottom: none; }
+
+/***** 按钮 *****/
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: 1px solid #d9d9d9; background: #fff; color: #333; transition: all .2s; font-weight: 500; }
+.btn:hover { border-color: #1677ff; color: #1677ff; }
+.btn-primary { background: #1677ff; color: #fff; border: none; box-shadow: 0 2px 8px rgba(22,119,255,.3); }
+.btn-primary:hover { background: #4096ff; }
+.btn-sm { padding: 4px 12px; font-size: 13px; }
+
+/***** 标签 *****/
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+.tag-blue { background: #e6f4ff; color: #1677ff; }
+.tag-green { background: #f6ffed; color: #52c41a; }
+.tag-orange { background: #fff7e6; color: #fa8c16; }
+.tag-red { background: #fff1f0; color: #ff4d4f; }
+
+/***** 弹窗 *****/
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 1000; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 8px; width: 720px; max-height: 90vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+.modal-header { padding: 16px 24px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.modal-header .close { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 20px; transition: all .2s; }
+.modal-header .close:hover { background: #f5f5f5; color: #333; }
+.modal-body { padding: 24px; overflow-y: auto; max-height: calc(90vh - 130px); }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+/***** 入驻申请步骤条 *****/
+.step-bar { display: flex; align-items: center; margin-bottom: 32px; }
+.step-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.step-item:not(:last-child)::after { content: ''; position: absolute; top: 16px; left: calc(50% + 20px); right: calc(-50% + 20px); height: 2px; background: #d9d9d9; }
+.step-item.done:not(:last-child)::after { background: #1677ff; }
+.step-item .num { width: 32px; height: 32px; border-radius: 50%; background: #d9d9d9; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-bottom: 8px; z-index: 1; }
+.step-item.active .num, .step-item.done .num { background: #1677ff; }
+.step-item .label { font-size: 14px; color: #999; }
+.step-item.active .label, .step-item.done .label { color: #333; font-weight: 500; }
+
+/***** 入驻申请表单 *****/
+.reg-form .form-group { margin-bottom: 16px; }
+.reg-form .form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500; }
+.reg-form .form-group label .required { color: #ff4d4f; }
+.reg-form .form-control { width: 100%; height: 40px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 14px; transition: border-color .2s; }
+.reg-form .form-control:focus { border-color: #1677ff; outline: none; }
+.reg-form textarea.form-control { height: 100px; padding: 10px 12px; resize: vertical; }
+.reg-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.reg-form .photo-upload { display: flex; gap: 12px; flex-wrap: wrap; }
+.reg-form .photo-item { width: 100px; height: 100px; border: 2px dashed #d9d9d9; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 12px; gap: 4px; transition: all .2s; }
+.reg-form .photo-item:hover { border-color: #1677ff; color: #1677ff; }
+.reg-form .photo-item .icon { font-size: 24px; }
+.reg-form .btn-row { display: flex; justify-content: space-between; margin-top: 24px; }
+
+/***** 入驻成功页 *****/
+.success-box { text-align: center; padding: 40px 0; }
+.success-box .icon { width: 80px; height: 80px; background: #52c41a; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 40px; margin: 0 auto 24px; }
+.success-box h2 { font-size: 24px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px; }
+.success-box p { font-size: 14px; color: #666; margin-bottom: 8px; }
+.success-box .code { font-size: 18px; font-weight: 700; color: #1677ff; margin: 16px 0; }
+.success-box .btn { margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<!-- ========== 登录页 ========== -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <div class="logo">
+      <div class="icon">&#128664;</div>
+      <h1>交通安全统筹</h1>
+    </div>
+    <div class="login-form">
+      <div class="form-item">
+        <label>账号</label>
+        <input type="text" placeholder="请输入账号">
+      </div>
+      <div class="form-item">
+        <label>密码</label>
+        <input type="password" placeholder="请输入密码">
+      </div>
+      <button class="btn-login" onclick="showMain()">登 录</button>
+    </div>
+    <div class="login-footer">
+      <a onclick="showRegister()">参统申请</a>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 入驻申请页 ========== -->
+<div class="main-page" id="registerPage">
+  <div class="main-header">
+    <div class="logo">
+      <div class="icon">&#128664;</div>
+      <span class="title">交通安全统筹 - 入驻申请</span>
+    </div>
+    <div class="user-info">
+      <a onclick="showLogin()" style="color:#1677ff;text-decoration:none;cursor:pointer;">返回登录</a>
+    </div>
+  </div>
+  <div class="main-content" style="margin-left:0;">
+    <div style="max-width:800px;margin:0 auto;">
+
+      <!-- 步骤条 -->
+      <div class="step-bar">
+        <div class="step-item active" id="step1">
+          <div class="num">1</div>
+          <div class="label">阅读协议</div>
+        </div>
+        <div class="step-item" id="step2">
+          <div class="num">2</div>
+          <div class="label">填写信息</div>
+        </div>
+        <div class="step-item" id="step3">
+          <div class="num">3</div>
+          <div class="label">提交签约</div>
+        </div>
+      </div>
+
+      <!-- 步骤1：合同预览 -->
+      <div class="card" id="step-content-1">
+        <div class="card-header"><h3>第一步：阅读合同条款</h3></div>
+        <div class="card-body" style="padding:20px;">
+          <div style="height:280px;overflow-y:auto;border:1px solid #e8e8e8;border-radius:6px;padding:16px;background:#fafafa;font-size:14px;line-height:1.8;color:#666;margin-bottom:16px;">
+            <p style="font-weight:700;color:#333;margin-bottom:12px;font-size:16px;">交通安全统筹合作协议</p>
+            <p style="margin-bottom:12px;"><strong>第一条 总则</strong></p>
+            <p style="margin-bottom:16px;">为促进交通安全，保障运输企业及其车辆的合法权益，本着自愿、平等、互利的原则，经双方协商一致，签订本协议。</p>
+            <p style="margin-bottom:12px;"><strong>第二条 统筹范围</strong></p>
+            <p style="margin-bottom:16px;">本协议所称交通安全统筹互助，是指参统企业按规定缴纳统筹费用，在发生约定事故时获得损失补偿的互助保障机制。</p>
+            <p style="margin-bottom:12px;"><strong>第三条 统筹费用</strong></p>
+            <p>参统企业应按照平台公布的费率标准，按年度缴纳统筹费用。</p>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="agree1"> <span style="font-size:14px;color:#1677ff;font-weight:500;">我已阅读并同意以上协议</span>
+          </label>
+          <div class="btn-row">
+            <div></div>
+            <button class="btn btn-primary" onclick="goStep(2)">下一步</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤2：信息填写 -->
+      <div class="card" id="step-content-2" style="display:none;">
+        <div class="card-header"><h3>第二步：填写企业信息</h3></div>
+        <div class="card-body reg-form" style="padding:20px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>企业名称 <span class="required">*</span></label>
+              <input type="text" class="form-control" placeholder="请输入企业名称">
+            </div>
+            <div class="form-group">
+              <label>统一社会信用代码 <span class="required">*</span></label>
+              <input type="text" class="form-control" placeholder="请输入18位信用代码">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>联系人 <span class="required">*</span></label>
+              <input type="text" class="form-control" placeholder="请输入联系人姓名">
+            </div>
+            <div class="form-group">
+              <label>联系电话 <span class="required">*</span></label>
+              <input type="tel" class="form-control" placeholder="请输入手机号">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>所在地址 <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="请输入详细地址">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>道路运输许可证号 <span class="required">*</span></label>
+              <input type="text" class="form-control" placeholder="请输入许可证号">
+            </div>
+            <div class="form-group">
+              <label>开户行 <span class="required">*</span></label>
+              <input type="text" class="form-control" placeholder="请输入开户行">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>账号 <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="请输入对公账户号">
+          </div>
+          <div class="form-group">
+            <label>证照上传 <span class="required">*</span></label>
+            <div class="photo-upload">
+              <div class="photo-item">
+                <div class="icon">+</div>
+                <div>上传营业执照</div>
+              </div>
+              <div class="photo-item">
+                <div class="icon">+</div>
+                <div>上传许可证</div>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="goStep(1)">上一步</button>
+            <button class="btn btn-primary" onclick="goStep(3)">下一步</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 步骤3：提交签约 -->
+      <div class="card" id="step-content-3" style="display:none;">
+        <div class="card-header"><h3>第三步：参统车辆信息 + 签约</h3></div>
+        <div class="card-body reg-form" style="padding:20px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>参统车辆数量 <span class="required">*</span></label>
+              <input type="number" class="form-control" placeholder="请输入车辆数量" value="30">
+            </div>
+            <div class="form-group">
+              <label>预估年统筹费用</label>
+              <input type="text" class="form-control" value="¥360,000（仅供参考）" readonly style="background:#f5f5f5;color:#999;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>上传参统车辆Excel <span class="required">*</span></label>
+            <div class="photo-item" style="width:auto;height:auto;padding:24px;text-align:center;display:block;border-style:solid;">
+              <div class="icon" style="font-size:32px;margin-bottom:8px;">+</div>
+              <div>点击上传Excel文件</div>
+              <div style="font-size:12px;color:#999;margin-top:4px;">支持 xls、xlsx 格式</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>合同签署 <span class="required">*</span></label>
+            <div style="border:1px solid #e8e8e8;border-radius:6px;padding:24px;text-align:center;background:#fafafa;cursor:pointer;" onclick="alert('此处应打开手写签名板')">
+              <div style="color:#1677ff;font-size:14px;font-weight:500;margin-bottom:4px;">点击签名</div>
+              <div style="color:#999;font-size:12px;">请在下方手写签名</div>
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:16px;">
+            <input type="checkbox"> <span style="font-size:14px;">我确认以上信息真实有效，愿意签署本协议</span>
+          </label>
+          <div class="btn-row">
+            <button class="btn" onclick="goStep(2)">上一步</button>
+            <button class="btn btn-primary" onclick="showSuccess()">提交申请</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 提交成功 -->
+      <div class="card" id="step-success" style="display:none;">
+        <div class="card-body">
+          <div class="success-box">
+            <div class="icon">&#10003;</div>
+            <h2>提交成功！</h2>
+            <p>申请单号：<span class="code">APP2026032901</span></p>
+            <p>请等待机构审核，审核结果将于1-3个工作日内短信通知您。</p>
+            <p>审核通过后，将短信通知您登录账号和密码。</p>
+            <button class="btn btn-primary" onclick="showLogin()">返回登录</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 主界面 ========== -->
+<div class="main-page" id="mainPage">
+  <div class="main-header">
+    <div class="logo">
+      <div class="icon">&#128664;</div>
+      <span class="title">交通安全统筹</span>
+    </div>
+    <div class="user-info">
+      <div class="msg-btn">&#128241;<span class="badge">3</span></div>
+      <div>
+        <div>张经理</div>
+        <div class="role">分司负责人</div>
+      </div>
+      <div class="avatar">张</div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="nav-item active" onclick="showModule('dashboard')">&#127968; 工作台</div>
+    <div class="nav-item" onclick="showModule('vehicle')">&#128663; 车辆查看</div>
+    <div class="nav-item" onclick="showModule('driver')">&#128101; 司机管理</div>
+    <div class="nav-item" onclick="showModule('case')">&#128196; 事故报案 <span style="margin-left:auto;background:#ff4d4f;color:#fff;font-size:11px;padding:2px 6px;border-radius:10px;">3</span></div>
+    <div class="nav-item" onclick="showModule('safety')">&#128737; 安全管理</div>
+    <div class="nav-item" onclick="showModule('finance')">&#128176; 财务管理</div>
+    <div class="nav-item" onclick="showModule('enterprise')">&#127970; 企业信息</div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- 工作台 -->
+    <div id="module-dashboard">
+      <div class="page-title">工作台</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">待处理报案</div>
+          <div class="value">3</div>
+          <div class="sub red">需到场签到</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">待确认给付</div>
+          <div class="value">1</div>
+          <div class="sub">待您确认</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">即将到期凭证</div>
+          <div class="value">5</div>
+          <div class="sub">30天内</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">安全评分</div>
+          <div class="value">85分</div>
+          <div class="sub">较上月+3</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>待办事项</h3>
+          <a href="#" style="color:#1677ff;font-size:13px;font-weight:500;">全部(12)</a>
+        </div>
+        <div class="card-body">
+          <table class="table">
+            <tr>
+              <th>类型</th><th>车牌号</th><th>摘要</th><th>状态</th><th>时间</th><th>操作</th>
+            </tr>
+            <tr>
+              <td><span class="tag tag-blue">报案</span></td>
+              <td>京A12345</td>
+              <td>轻微碰撞 - 待到场签到</td>
+              <td><span class="tag tag-red">待处理</span></td>
+              <td>10分钟前</td>
+              <td><a href="#" onclick="showModule('case')" style="color:#1677ff;font-weight:500;">处理</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-orange">给付</span></td>
+              <td>京B67890</td>
+              <td>金额3,500 - 待确认</td>
+              <td><span class="tag tag-orange">待确认</span></td>
+              <td>30分钟前</td>
+              <td><a href="#" style="color:#1677ff;font-weight:500;">确认</a></td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-blue">报案</span></td>
+              <td>京C11111</td>
+              <td>人伤 - 待补充材料</td>
+              <td><span class="tag tag-orange">处理中</span></td>
+              <td>2小时前</td>
+              <td><a href="#" onclick="showModule('case')" style="color:#1677ff;font-weight:500;">处理</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>快捷操作</h3></div>
+        <div class="card-body" style="padding:16px 20px;display:flex;gap:12px;">
+          <button class="btn">到场签到</button>
+          <button class="btn">补充报案</button>
+          <button class="btn">案件查询</button>
+          <button class="btn">司机管理</button>
+          <button class="btn">查看凭证</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>最新通知</h3></div>
+        <div class="card-body" style="padding:0;">
+          <div style="padding:12px 20px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#666;">
+            <span style="color:#1677ff;">[系统]</span> 京A12345案件已结案，请查收给付
+            <span style="float:right;color:#999;font-size:12px;">03-29</span>
+          </div>
+          <div style="padding:12px 20px;font-size:14px;color:#666;">
+            <span style="color:#1677ff;">[通知]</span> 您有3辆车辆即将到期，请及时续统
+            <span style="float:right;color:#999;font-size:12px;">03-28</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 车辆查看 -->
+    <div id="module-vehicle" style="display:none;">
+      <div class="page-title">车辆查看</div>
+      <div class="card">
+        <div class="card-header"><h3>车辆列表</h3></div>
+        <div class="card-body">
+          <table class="table">
+            <tr>
+              <th>车牌号</th><th>车型</th><th>使用性质</th><th>统筹状态</th><th>有效期</th><th>绑定司机</th><th>操作</th>
+            </tr>
+            <tr>
+              <td>京A12345</td><td>重型货车</td><td>货运</td>
+              <td><span class="tag tag-green">在统</span></td>
+              <td>2027-03-01</td><td>张三</td>
+              <td><a href="#" onclick="showVehicleModal()" style="color:#1677ff;font-weight:500;">查看</a></td>
+            </tr>
+            <tr>
+              <td>京B67890</td><td>中型货车</td><td>货运</td>
+              <td><span class="tag tag-orange">即将到期</span></td>
+              <td>2026-04-15</td><td>李四</td>
+              <td><a href="#" onclick="showVehicleModal()" style="color:#1677ff;font-weight:500;">查看</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 司机管理 -->
+    <div id="module-driver" style="display:none;">
+      <div class="page-title">
+        司机管理
+        <div style="display:flex;gap:12px;">
+          <button class="btn">批量导入</button>
+          <button class="btn btn-primary">邀请加入</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <table class="table">
+            <tr>
+              <th>姓名</th><th>手机号</th><th>绑定车辆</th><th>驾驶评分</th><th>操作</th>
+            </tr>
+            <tr>
+              <td>张三</td><td>138****8001</td><td>京A12345</td>
+              <td><span style="color:#52c41a;font-weight:600;">92分</span></td>
+              <td>
+                <a href="#" style="color:#1677ff;font-weight:500;">详情</a>
+                <a href="#" style="color:#ff4d4f;margin-left:8px;">解绑</a>
+              </td>
+            </tr>
+            <tr>
+              <td>李四</td><td>138****8002</td><td>京B67890</td>
+              <td><span style="color:#fa8c16;font-weight:600;">78分</span></td>
+              <td>
+                <a href="#" style="color:#1677ff;font-weight:500;">详情</a>
+                <a href="#" style="color:#ff4d4f;margin-left:8px;">解绑</a>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 事故报案 -->
+    <div id="module-case" style="display:none;">
+      <div class="page-title">事故报案</div>
+      <div class="card">
+        <div class="card-body">
+          <table class="table">
+            <tr>
+              <th>报案号</th><th>车牌号</th><th>通道</th><th>状态</th><th>报案时间</th><th>操作</th>
+            </tr>
+            <tr>
+              <td>CASE20260301</td><td>京A12345</td>
+              <td><span class="tag tag-blue">标准通道</span></td>
+              <td><span class="tag tag-red">待到场签到</span></td>
+              <td>03-01 09:30</td>
+              <td><button class="btn btn-primary btn-sm" onclick="showCaseModal()">查看详情</button></td>
+            </tr>
+            <tr>
+              <td>CASE20260228</td><td>京B67890</td>
+              <td><span class="tag tag-green">快速通道</span></td>
+              <td><span class="tag tag-orange">待确认给付</span></td>
+              <td>02-28 14:20</td>
+              <td><button class="btn btn-sm">确认给付</button></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 安全管理 -->
+    <div id="module-safety" style="display:none;">
+      <div class="page-title">安全管理看板</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stat-card">
+          <div class="label">企业评分均值</div>
+          <div class="value">85分</div>
+          <div class="sub">较上月+2</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">本月事故数</div>
+          <div class="value">3</div>
+          <div class="sub red">较上月-1</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">风险司机</div>
+          <div class="value">2</div>
+          <div class="sub red">需关注</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>风险司机预警</h3></div>
+        <div class="card-body">
+          <table class="table">
+            <tr><th>姓名</th><th>评分</th><th>风险原因</th><th>操作</th></tr>
+            <tr>
+              <td>赵六</td>
+              <td style="color:#fa8c16;font-weight:600;">68分</td>
+              <td>连续2个月评分下降</td>
+              <td><a href="#" style="color:#1677ff;font-weight:500;">查看</a></td>
+            </tr>
+            <tr>
+              <td>钱七</td>
+              <td style="color:#ff4d4f;font-weight:600;">62分</td>
+              <td>近12个月2次全责事故</td>
+              <td><a href="#" style="color:#1677ff;font-weight:500;">查看</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 财务管理 -->
+    <div id="module-finance" style="display:none;">
+      <div class="page-title">财务管理</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(2,1fr);">
+        <div class="stat-card">
+          <div class="label">本期待缴</div>
+          <div class="value" style="color:#ff4d4f;">¥128,000</div>
+          <div class="sub red">逾期¥12,000</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">年度已缴</div>
+          <div class="value">¥256,000</div>
+          <div class="sub">目标¥360,000</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>缴费单列表</h3></div>
+        <div class="card-body">
+          <table class="table">
+            <tr><th>缴费单号</th><th>车辆数</th><th>金额</th><th>状态</th><th>有效期</th><th>操作</th></tr>
+            <tr>
+              <td>JF20260301</td><td>10辆</td><td>¥120,000</td>
+              <td><span class="tag tag-red">待缴费</span></td><td>2026-04-01</td>
+              <td><button class="btn btn-primary btn-sm">缴费</button></td>
+            </tr>
+            <tr>
+              <td>JF20260101</td><td>10辆</td><td>¥120,000</td>
+              <td><span class="tag tag-green">已缴</span></td><td>2026-01-01</td>
+              <td><a href="#" style="color:#1677ff;font-weight:500;font-size:13px;">查看</a></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 企业信息 -->
+    <div id="module-enterprise" style="display:none;">
+      <div class="page-title">企业信息</div>
+      <div class="card">
+        <div class="card-header"><h3>当前协议</h3></div>
+        <div class="card-body" style="padding:20px;">
+          <div style="background:#fafafa;border-radius:6px;padding:16px;margin-bottom:16px;">
+            <div style="font-size:14px;color:#666;margin-bottom:8px;">协议编号：TCXY-20260301</div>
+            <div style="font-size:14px;color:#666;margin-bottom:8px;">有效期：2026-03-01 ~ 2027-02-28</div>
+            <div style="font-size:14px;color:#666;">参统车辆：30辆 | 年度统筹费：¥360,000</div>
+          </div>
+          <button class="btn">下载PDF</button>
+          <button class="btn" style="margin-left:8px;">在线预览</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>操作日志</h3></div>
+        <div class="card-body">
+          <table class="table">
+            <tr><th>时间</th><th>操作人</th><th>操作内容</th></tr>
+            <tr>
+              <td>2026-03-29 10:30</td><td>张经理</td><td>登录系统</td>
+            </tr>
+            <tr>
+              <td>2026-03-29 10:31</td><td>张经理</td><td>查看工作台</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== 案件详情弹窗 ========== -->
+<div class="modal-overlay" id="caseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>案件详情 - CASE2026030101</h3>
+      <div class="close" onclick="closeModal('caseModal')">x</div>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+        <div style="background:#f0f7ff;padding:14px;border-radius:6px;">
+          <div style="font-size:12px;color:#999;margin-bottom:4px;">车牌号</div>
+          <div style="font-weight:600;font-size:15px;">京A12345</div>
+        </div>
+        <div style="background:#f0f7ff;padding:14px;border-radius:6px;">
+          <div style="font-size:12px;color:#999;margin-bottom:4px;">通道</div>
+          <div><span class="tag tag-blue">标准通道</span></div>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <h4 style="font-size:14px;color:#666;margin-bottom:12px;font-weight:600;">案件进度</h4>
+        <div style="padding-left:20px;border-left:2px solid #e8e8e8;margin-left:6px;">
+          <div style="position:relative;padding-left:24px;padding-bottom:16px;border-left:2px solid #52c41a;margin-left:6px;">
+            <div style="position:absolute;left:-7px;top:0;width:12px;height:12px;border-radius:50%;background:#52c41a;border:2px solid #fff;box-shadow:0 0 0 2px #52c41a;"></div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px;">03-01 09:30</div>
+            <div style="font-size:14px;">司机提交基础报案</div>
+          </div>
+          <div style="position:relative;padding-left:24px;padding-bottom:16px;border-left:2px solid #52c41a;margin-left:6px;">
+            <div style="position:absolute;left:-7px;top:0;width:12px;height:12px;border-radius:50%;background:#52c41a;border:2px solid #fff;box-shadow:0 0 0 2px #52c41a;"></div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px;">03-01 09:35</div>
+            <div style="font-size:14px;">企业收到报案通知</div>
+          </div>
+          <div style="position:relative;padding-left:24px;border-left:2px solid #1677ff;margin-left:6px;">
+            <div style="position:absolute;left:-7px;top:0;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #1677ff;box-shadow:0 0 0 4px rgba(22,119,255,.3);"></div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px;">当前</div>
+            <div style="font-size:14px;font-weight:600;color:#1677ff;">待到场签到、补充信息</div>
+          </div>
+        </div>
+      </div>
+      <div style="border-top:1px solid #f0f0f0;padding-top:16px;">
+        <h4 style="font-size:14px;color:#666;margin-bottom:12px;font-weight:600;">报案信息</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px;color:#666;background:#fafafa;padding:14px;border-radius:6px;">
+          <div>事故时间：2026-03-01 09:00</div>
+          <div>事故地点：北京市朝阳区某某路</div>
+          <div>责任划分：同等责任</div>
+          <div>人伤情况：无人伤</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('caseModal')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('caseModal')">补充信息</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/***** 登录/入驻申请/主页切换 *****/
+function showLogin() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('registerPage').classList.remove('active');
+  document.getElementById('mainPage').classList.remove('active');
+}
+function showRegister() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').classList.add('active');
+  document.getElementById('mainPage').classList.remove('active');
+  goStep(1);
+}
+function showMain() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').classList.remove('active');
+  document.getElementById('mainPage').classList.add('active');
+  showModule('dashboard');
+}
+
+/***** 入驻申请步骤切换 *****/
+function goStep(n) {
+  document.querySelectorAll('[id^="step-content-"]').forEach(function(el) { el.style.display = 'none'; });
+  document.querySelectorAll('.step-item').forEach(function(el) { el.className = 'step-item'; });
+  document.getElementById('step-content-' + n).style.display = 'block';
+  for (var i = 1; i < n; i++) {
+    document.getElementById('step' + i).classList.add('done');
+  }
+  document.getElementById('step' + n).classList.add('active');
+}
+function showSuccess() {
+  document.querySelectorAll('.card').forEach(function(el) { el.style.display = 'none'; });
+  document.getElementById('step-success').style.display = 'block';
+}
+
+/***** 主界面模块切换 *****/
+function showModule(name) {
+  document.querySelectorAll('[id^="module-"]').forEach(function(el) { el.style.display = 'none'; });
+  document.querySelectorAll('.sidebar .nav-item').forEach(function(el) { el.classList.remove('active'); });
+  document.getElementById('module-' + name).style.display = 'block';
+  event.currentTarget.classList.add('active');
+}
+
+/***** 弹窗 *****/
+function showCaseModal() { document.getElementById('caseModal').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+function showVehicleModal() { alert('车辆详情弹窗'); }
+document.getElementById('caseModal').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+</script>
+</body>
+</html>

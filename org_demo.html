@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交通安全统筹 - 机构端演示</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f0f2f5; color: #333; font-size: 14px; line-height: 1.5; }
+
+/* 顶部导航 */
+.header { background: #001529; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+.header .logo { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 16px; font-weight: 600; }
+.header .logo .icon { width: 36px; height: 36px; background: #1890ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+.header .user-info { display: flex; align-items: center; gap: 16px; color: #fff; }
+.header .user-info .avatar { width: 36px; height: 36px; background: #1890ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+.header .user-info .role { font-size: 12px; color: rgba(255,255,255,0.65); }
+
+/* 侧边栏 */
+.sidebar { width: 220px; background: #001529; position: fixed; top: 60px; left: 0; bottom: 0; overflow-y: auto; }
+.sidebar .nav-group { margin-bottom: 4px; }
+.sidebar .nav-title { padding: 12px 20px 8px; color: rgba(255,255,255,0.45); font-size: 12px; }
+.sidebar .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: rgba(255,255,255,0.75); cursor: pointer; transition: all .2s; border-left: 3px solid transparent; }
+.sidebar .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.sidebar .nav-item.active { background: #1890ff; color: #fff; border-left-color: #52c41a; }
+.sidebar .nav-item .icon { font-size: 16px; }
+.sidebar .nav-item .badge { margin-left: auto; background: #ff4d4f; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 10px; }
+.sidebar .nav-item .arrow { margin-left: auto; font-size: 12px; }
+
+/* 主内容区 */
+.main { margin-left: 220px; margin-top: 60px; padding: 24px; min-height: calc(100vh - 60px); }
+
+/* 登录页 */
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0; }
+.login-box { background: #fff; padding: 40px; border-radius: 12px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+.login-box .logo { text-align: center; margin-bottom: 32px; }
+.login-box .logo .icon { width: 56px; height: 56px; background: #1890ff; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; margin-bottom: 12px; }
+.login-box .logo h1 { font-size: 20px; font-weight: 600; color: #001529; }
+.login-box .logo p { font-size: 14px; color: #999; margin-top: 4px; }
+.login-form .form-item { margin-bottom: 20px; }
+.login-form label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+.login-form input { width: 100%; height: 42px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 14px; transition: border-color .2s; }
+.login-form input:focus { border-color: #1890ff; outline: none; }
+.login-form .btn-login { width: 100%; height: 42px; background: #1890ff; color: #fff; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+.login-form .btn-login:hover { background: #40a9ff; }
+
+/* 页面标题 */
+.page-title { font-size: 20px; font-weight: 600; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+.page-title .sub { font-size: 14px; color: #999; font-weight: normal; }
+
+/* 统计卡片 */
+.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.stat-card .label { font-size: 14px; color: #999; margin-bottom: 8px; }
+.stat-card .value { font-size: 28px; font-weight: 600; color: #333; }
+.stat-card .sub { font-size: 12px; color: #52c41a; margin-top: 4px; }
+.stat-card .sub.red { color: #ff4d4f; }
+.stat-card .sub.orange { color: #fa8c16; }
+
+/* 卡片 */
+.card { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 16px; overflow: hidden; }
+.card .card-header { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+.card .card-header h3 { font-size: 16px; font-weight: 500; }
+.card .card-body { padding: 0; }
+
+/* 表格 */
+.table { width: 100%; border-collapse: collapse; }
+.table th { text-align: left; padding: 12px 16px; background: #fafafa; font-weight: 500; color: #666; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+.table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+.table tr:hover { background: #fafafa; }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+.tag-blue { background: #e6f7ff; color: #1890ff; }
+.tag-green { background: #f6ffed; color: #52c41a; }
+.tag-orange { background: #fff7e6; color: #fa8c16; }
+.tag-red { background: #fff1f0; color: #ff4d4f; }
+.tag-purple { background: #f9f0ff; color: #722ed1; }
+
+/* 按钮 */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: 1px solid #d9d9d9; background: #fff; color: #333; transition: all .2s; }
+.btn:hover { border-color: #1890ff; color: #1890ff; }
+.btn-primary { background: #1890ff; color: #fff; border: none; }
+.btn-primary:hover { background: #40a9ff; }
+.btn-danger { background: #ff4d4f; color: #fff; border: none; }
+.btn-success { background: #52c41a; color: #fff; border: none; }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+
+/* 搜索栏 */
+.search-bar { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.search-bar select, .search-bar input { height: 36px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 14px; }
+.search-bar input { width: 180px; }
+.search-bar .search-item { display: flex; align-items: center; gap: 8px; }
+.search-bar label { font-size: 14px; color: #666; white-space: nowrap; }
+
+/* 标签页 */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid #f0f0f0; margin-bottom: 20px; background: #fff; padding: 0 20px; }
+.tab { padding: 14px 20px; font-size: 14px; color: #666; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab:hover { color: #333; }
+.tab.active { color: #1890ff; border-bottom-color: #1890ff; font-weight: 500; }
+
+/* 弹窗 */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 8px; width: 720px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal .modal-header { padding: 16px 24px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+.modal .modal-header h3 { font-size: 16px; font-weight: 500; }
+.modal .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.modal .modal-footer { padding: 16px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 12px; }
+
+/* 时间线 */
+.timeline { padding-left: 20px; }
+.timeline-item { position: relative; padding-left: 24px; padding-bottom: 20px; border-left: 2px solid #e8e8e8; margin-left: 6px; }
+.timeline-item:last-child { border-left-color: transparent; }
+.timeline-item::before { content: ''; position: absolute; left: -6px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: #d9d9d9; }
+.timeline-item.done::before { background: #52c41a; }
+.timeline-item.active::before { background: #1890ff; }
+.timeline-item .time { font-size: 12px; color: #999; margin-bottom: 4px; }
+.timeline-item .content { font-size: 14px; color: #333; }
+.timeline-item.active .content { font-weight: 500; }
+
+/* 表单 */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 14px; color: #666; margin-bottom: 8px; }
+.form-group label .required { color: #ff4d4f; }
+.form-control { width: 100%; height: 40px; border: 1px solid #d9d9d9; border-radius: 6px; padding: 0 12px; font-size: 14px; }
+.form-control:focus { border-color: #1890ff; outline: none; }
+textarea.form-control { height: 100px; padding: 10px 12px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.form-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* 徽章 */
+.badge { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; background: #ff4d4f; color: #fff; font-size: 12px; border-radius: 10px; padding: 0 6px; }
+
+/* 进度 */
+.progress-bar { height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+.progress-bar .fill { height: 100%; background: #1890ff; border-radius: 4px; transition: width .3s; }
+
+/* 步骤条 */
+.step-bar { display: flex; align-items: center; margin-bottom: 24px; }
+.step-item { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.step-item:not(:last-child)::after { content: ''; position: absolute; top: 16px; left: calc(50% + 20px); right: calc(-50% + 20px); height: 2px; background: #d9d9d9; }
+.step-item.done:not(:last-child)::after { background: #1890ff; }
+.step-item .num { width: 32px; height: 32px; border-radius: 50%; background: #d9d9d9; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-bottom: 8px; z-index: 1; }
+.step-item.active .num, .step-item.done .num { background: #1890ff; }
+.step-item .label { font-size: 14px; color: #999; }
+.step-item.active .label, .step-item.done .label { color: #333; font-weight: 500; }
+
+/* 统计小卡 */
+.mini-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.mini-stat { background: #f5f5f5; padding: 12px; border-radius: 6px; text-align: center; }
+.mini-stat .val { font-size: 20px; font-weight: 600; color: #333; }
+.mini-stat .lbl { font-size: 12px; color: #999; }
+
+/* 空状态 */
+.empty { text-align: center; padding: 60px 20px; color: #999; }
+.empty .icon { font-size: 48px; margin-bottom: 16px; color: #d9d9d9; }
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- 登录页 -->
+<div id="page-login" class="login-page">
+  <div class="login-box">
+    <div class="logo">
+      <div class="icon">统</div>
+      <h1>交通安全统筹</h1>
+      <p>机构管理端</p>
+    </div>
+    <div class="login-form">
+      <div class="form-item">
+        <label>账号</label>
+        <input type="text" placeholder="请输入账号">
+      </div>
+      <div class="form-item">
+        <label>密码</label>
+        <input type="password" placeholder="请输入密码">
+      </div>
+      <button class="btn-login" onclick="showMain()">登 录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 主后台 -->
+<div id="page-main" style="display:none;">
+  <!-- 顶部导航 -->
+  <div class="header">
+    <div class="logo">
+      <div class="icon">统</div>
+      <span>交通安全统筹 - 机构端</span>
+    </div>
+    <div class="user-info">
+      <span style="cursor:pointer;position:relative;">
+        <span style="font-size:18px;">&#128241;</span>
+        <span class="badge">5</span>
+      </span>
+      <div style="text-align:right;">
+        <div>管理员</div>
+        <div class="role">运营管理</div>
+      </div>
+      <div class="avatar">管</div>
+    </div>
+  </div>
+
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="nav-group">
+      <div class="nav-title">数据中心</div>
+      <div class="nav-item active" onclick="showModule('dashboard')">
+        <span class="icon">&#128202;</span>
+        <span>数据面板</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">企业管理</div>
+      <div class="nav-item" onclick="showModule('enterprise')">
+        <span class="icon">&#127970;</span>
+        <span>入驻审核</span>
+        <span class="badge">2</span>
+      </div>
+      <div class="nav-item" onclick="showModule('vehicle')">
+        <span class="icon">&#128663;</span>
+        <span>车辆录入</span>
+      </div>
+      <div class="nav-item" onclick="showModule('enterprise-list')">
+        <span class="icon">&#128101;</span>
+        <span>企业管理</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">业务管理</div>
+      <div class="nav-item" onclick="showModule('case')">
+        <span class="icon">&#128196;</span>
+        <span>事故报案</span>
+        <span class="badge">8</span>
+      </div>
+      <div class="nav-item" onclick="showModule('survey')">
+        <span class="icon">&#128270;</span>
+        <span>查勘管理</span>
+      </div>
+      <div class="nav-item" onclick="showModule('settlement')">
+        <span class="icon">&#128176;</span>
+        <span>互助给付</span>
+      </div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">系统</div>
+      <div class="nav-item" onclick="showModule('user')">
+        <span class="icon">&#128100;</span>
+        <span>用户管理</span>
+      </div>
+      <div class="nav-item" onclick="showModule('config')">
+        <span class="icon">&#9881;</span>
+        <span>系统配置</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="main">
+
+    <!-- ========== 数据面板 ========== -->
+    <div id="module-dashboard">
+      <div class="page-title">
+        数据面板
+        <span class="sub">今日数据概览</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">入驻企业</div>
+          <div class="value">15</div>
+          <div class="sub">+1 本月新增</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">参统车辆</div>
+          <div class="value">3,245</div>
+          <div class="sub">本月+120</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">本月新报案</div>
+          <div class="value">38</div>
+          <div class="sub red">较上月+5</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">本月给付</div>
+          <div class="value">¥28.5万</div>
+          <div class="sub orange">待处理¥12.3万</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">年度收入</div>
+          <div class="value">¥486万</div>
+          <div class="sub">目标¥600万</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;">
+        <div class="card">
+          <div class="card-header"><h3>近30天案件趋势</h3></div>
+          <div class="card-body" style="padding:20px;">
+            <div style="display:flex;align-items:flex-end;gap:8px;height:120px;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:60px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-01</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:45px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-05</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:80px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-10</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:55px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-15</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:90px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-20</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:70px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-25</span>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                <div style="height:50px;width:100%;background:#1890ff;border-radius:4px 4px 0 0;"></div>
+                <span style="font-size:11px;color:#999;">03-29</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>待处理事项</h3><a href="#" style="color:#1890ff;font-size:14px;">查看全部</a></div>
+          <div class="card-body" style="padding:0;">
+            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+              <div><span class="tag tag-red">待审核</span> 入驻申请</div>
+              <span style="color:#999;font-size:12px;">2 笔</span>
+            </div>
+            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+              <div><span class="tag tag-blue">待受理</span> 事故报案</div>
+              <span style="color:#999;font-size:12px;">5 笔</span>
+            </div>
+            <div style="padding:12px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
+              <div><span class="tag tag-orange">待审批</span> 给付申请</div>
+              <span style="color:#999;font-size:12px;">3 笔</span>
+            </div>
+            <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;">
+              <div><span class="tag tag-purple">待录入</span> 参统车辆</div>
+              <span style="color:#999;font-size:12px;">8 家企业</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>各企业对比</h3></div>
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>企业名称</th>
+                <th>车辆数</th>
+                <th>本月事故</th>
+                <th>给付率</th>
+                <th>评分均值</th>
+                <th>风控评级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>北京XX运输公司</td>
+                <td>320</td>
+                <td>5</td>
+                <td>35%</td>
+                <td><span style="color:#52c41a;">88分</span></td>
+                <td><span class="tag tag-green">A级</span></td>
+              </tr>
+              <tr>
+                <td>上海XX物流</td>
+                <td>256</td>
+                <td>3</td>
+                <td>42%</td>
+                <td><span style="color:#52c41a;">85分</span></td>
+                <td><span class="tag tag-green">A级</span></td>
+              </tr>
+              <tr>
+                <td>广州XX运输</td>
+                <td>189</td>
+                <td>4</td>
+                <td>58%</td>
+                <td><span style="color:#fa8c16;">76分</span></td>
+                <td><span class="tag tag-orange">B级</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 入驻审核 ========== -->
+    <div id="module-enterprise" style="display:none;">
+      <div class="page-title">
+        入驻审核
+        <span class="sub">共 2 条待审核申请</span>
+      </div>
+      <div class="tabs">
+        <div class="tab active">待审核 <span class="badge" style="margin-left:4px;">2</span></div>
+        <div class="tab">已通过</div>
+        <div class="tab">已驳回</div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>申请单号</th>
+                <th>企业名称</th>
+                <th>联系人</th>
+                <th>参统车辆数</th>
+                <th>预估费用</th>
+                <th>申请时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>APP2026032901</td>
+                <td>深圳XX运输有限公司</td>
+                <td>陈总 138****1234</td>
+                <td>45辆</td>
+                <td>¥54万/年</td>
+                <td>2026-03-29 10:30</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="showAuditModal()">审核</button>
+                </td>
+              </tr>
+              <tr>
+                <td>APP2026032802</td>
+                <td>成都XX物流公司</td>
+                <td>王经理 139****5678</td>
+                <td>28辆</td>
+                <td>¥33.6万/年</td>
+                <td>2026-03-28 14:20</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="showAuditModal()">审核</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 车辆录入 ========== -->
+    <div id="module-vehicle" style="display:none;">
+      <div class="page-title">
+        参统车辆批量录入
+        <span class="sub">共 3 家企业待录入</span>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>待录入企业</h3></div>
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>企业名称</th>
+                <th>申请单号</th>
+                <th>参统车辆数</th>
+                <th>Excel状态</th>
+                <th>录入进度</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>深圳XX运输有限公司</td>
+                <td>APP2026032901</td>
+                <td>45辆</td>
+                <td><span class="tag tag-green">已上传</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="progress-bar" style="width:100px;"><div class="fill" style="width:0%;"></div></div>
+                    <span style="color:#999;font-size:12px;">0/45</span>
+                  </div>
+                </td>
+                <td><button class="btn btn-sm btn-primary" onclick="showImportModal()">开始录入</button></td>
+              </tr>
+              <tr>
+                <td>成都XX物流公司</td>
+                <td>APP2026032802</td>
+                <td>28辆</td>
+                <td><span class="tag tag-green">已上传</span></td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="progress-bar" style="width:100px;"><div class="fill" style="width:35%;"></div></div>
+                    <span style="color:#999;font-size:12px;">10/28</span>
+                  </div>
+                </td>
+                <td><button class="btn btn-sm btn-primary" onclick="showImportModal()">继续录入</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 企业管理 ========== -->
+    <div id="module-enterprise-list" style="display:none;">
+      <div class="page-title">企业管理</div>
+      <div class="search-bar">
+        <div class="search-item">
+          <label>企业名称</label>
+          <input type="text" placeholder="搜索企业">
+        </div>
+        <select><option>全部状态</option><option>正常</option><option>待续约</option></select>
+        <button class="btn">搜索</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>企业名称</th>
+                <th>车辆数</th>
+                <th>参统费(年)</th>
+                <th>有效期至</th>
+                <th>风控评级</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>北京XX运输公司</td>
+                <td>320辆</td>
+                <td>¥384万</td>
+                <td>2027-03-01</td>
+                <td><span class="tag tag-green">A级</span></td>
+                <td><span class="tag tag-green">正常</span></td>
+                <td><a href="#" style="color:#1890ff;" onclick="showModule('enterprise-detail')">详情</a></td>
+              </tr>
+              <tr>
+                <td>上海XX物流</td>
+                <td>256辆</td>
+                <td>¥307万</td>
+                <td>2027-02-15</td>
+                <td><span class="tag tag-green">A级</span></td>
+                <td><span class="tag tag-green">正常</span></td>
+                <td><a href="#" style="color:#1890ff;" onclick="showModule('enterprise-detail')">详情</a></td>
+              </tr>
+              <tr>
+                <td>广州XX运输</td>
+                <td>189辆</td>
+                <td>¥226万</td>
+                <td>2026-04-10</td>
+                <td><span class="tag tag-orange">B级</span></td>
+                <td><span class="tag tag-orange">即将到期</span></td>
+                <td><a href="#" style="color:#1890ff;" onclick="showModule('enterprise-detail')">详情</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 事故报案 ========== -->
+    <div id="module-case" style="display:none;">
+      <div class="page-title">
+        事故报案
+        <span class="sub">共 8 条待处理</span>
+      </div>
+      <div class="tabs">
+        <div class="tab active">待受理 <span class="badge" style="margin-left:4px;">5</span></div>
+        <div class="tab">处理中</div>
+        <div class="tab">待给付</div>
+        <div class="tab">已结案</div>
+      </div>
+      <div class="search-bar">
+        <select><option>全部通道</option><option>快速通道</option><option>标准通道</option><option>大案通道</option></select>
+        <select><option>全部企业</option></select>
+        <input type="text" placeholder="报案号/车牌号">
+        <button class="btn">搜索</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>报案号</th>
+                <th>企业</th>
+                <th>车牌号</th>
+                <th>通道</th>
+                <th>状态</th>
+                <th>报案时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CASE2026032901</td>
+                <td>北京XX运输</td>
+                <td>京A12345</td>
+                <td><span class="tag tag-blue">标准通道</span></td>
+                <td><span class="tag tag-red">待受理</span></td>
+                <td>03-29 09:30</td>
+                <td><button class="btn btn-sm btn-primary" onclick="showCaseAcceptModal()">受理</button></td>
+              </tr>
+              <tr>
+                <td>CASE2026032802</td>
+                <td>上海XX物流</td>
+                <td>沪B67890</td>
+                <td><span class="tag tag-green">快速通道</span></td>
+                <td><span class="tag tag-blue">处理中</span></td>
+                <td>03-28 14:20</td>
+                <td><button class="btn btn-sm" onclick="showCaseDetailModal()">查看</button></td>
+              </tr>
+              <tr>
+                <td>CASE2026032703</td>
+                <td>广州XX运输</td>
+                <td>粤C11111</td>
+                <td><span class="tag tag-red">大案通道</span></td>
+                <td><span class="tag tag-orange">待给付</span></td>
+                <td>03-27 08:15</td>
+                <td><button class="btn btn-sm btn-primary" onclick="showSettlementModal()">给付</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 查勘管理 ========== -->
+    <div id="module-survey" style="display:none;">
+      <div class="page-title">
+        查勘管理
+        <span class="sub">今日任务 12 个</span>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>查勘任务列表</h3></div>
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>案件号</th>
+                <th>企业</th>
+                <th>地点</th>
+                <th>查勘员</th>
+                <th>任务状态</th>
+                <th>分配时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CASE2026032901</td>
+                <td>北京XX运输</td>
+                <td>北京市朝阳区</td>
+                <td>张查勘</td>
+                <td><span class="tag tag-blue">已出发</span></td>
+                <td>03-29 09:35</td>
+                <td><button class="btn btn-sm" onclick="showSurveyDetailModal()">查看</button></td>
+              </tr>
+              <tr>
+                <td>CASE2026032804</td>
+                <td>上海XX物流</td>
+                <td>上海市浦东新区</td>
+                <td>李查勘</td>
+                <td><span class="tag tag-orange">已到达</span></td>
+                <td>03-28 15:10</td>
+                <td><button class="btn btn-sm" onclick="showSurveyDetailModal()">查看</button></td>
+              </tr>
+              <tr>
+                <td>CASE2026032805</td>
+                <td>北京XX运输</td>
+                <td>北京市海淀区</td>
+                <td>王查勘</td>
+                <td><span class="tag tag-green">已完成</span></td>
+                <td>03-28 16:00</td>
+                <td><button class="btn btn-sm" onclick="showSurveyDetailModal()">查看</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 互助给付 ========== -->
+    <div id="module-settlement" style="display:none;">
+      <div class="page-title">
+        互助给付
+        <span class="sub">待处理 3 笔</span>
+      </div>
+      <div class="tabs">
+        <div class="tab active">待审核 <span class="badge" style="margin-left:4px;">2</span></div>
+        <div class="tab">待确认</div>
+        <div class="tab">待支付</div>
+        <div class="tab">已结案</div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>案件号</th>
+                <th>企业</th>
+                <th>车牌号</th>
+                <th>损失类型</th>
+                <th>给付金额</th>
+                <th>审批级别</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CASE2026032703</td>
+                <td>广州XX运输</td>
+                <td>粤C11111</td>
+                <td>人伤+财损</td>
+                <td style="color:#ff4d4f;font-weight:500;">¥58,000</td>
+                <td><span class="tag tag-red">经理级</span></td>
+                <td><button class="btn btn-sm btn-primary" onclick="showApproveModal()">审批</button></td>
+              </tr>
+              <tr>
+                <td>CASE2026032604</td>
+                <td>深圳XX运输</td>
+                <td>粤D22222</td>
+                <td>财损</td>
+                <td style="color:#ff4d4f;font-weight:500;">¥8,500</td>
+                <td><span class="tag tag-orange">主管级</span></td>
+                <td><button class="btn btn-sm btn-primary" onclick="showApproveModal()">审批</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 用户管理 ========== -->
+    <div id="module-user" style="display:none;">
+      <div class="page-title">
+        用户管理
+        <button class="btn btn-primary" onclick="showAddUserModal()">+ 新增用户</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>账号</th>
+                <th>角色</th>
+                <th>手机号</th>
+                <th>最后登录</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>管理员</td>
+                <td>admin</td>
+                <td>超级管理员</td>
+                <td>138****0001</td>
+                <td>2026-03-29 10:30</td>
+                <td><span class="tag tag-green">正常</span></td>
+                <td><a href="#" style="color:#999;cursor:not-allowed;">编辑</a></td>
+              </tr>
+              <tr>
+                <td>张调度</td>
+                <td>zhangdd</td>
+                <td>调度员</td>
+                <td>138****0002</td>
+                <td>2026-03-29 09:15</td>
+                <td><span class="tag tag-green">正常</span></td>
+                <td><a href="#" style="color:#1890ff;">编辑</a></td>
+              </tr>
+              <tr>
+                <td>李给付</td>
+                <td>ligf</td>
+                <td>给付员</td>
+                <td>138****0003</td>
+                <td>2026-03-28 18:00</td>
+                <td><span class="tag tag-green">正常</span></td>
+                <td><a href="#" style="color:#1890ff;">编辑</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 系统配置 ========== -->
+    <div id="module-config" style="display:none;">
+      <div class="page-title">系统配置</div>
+      <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:16px;">
+        <div class="card">
+          <div class="card-header"><h3>费率配置</h3><button class="btn btn-sm">编辑</button></div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">基础基准费率</span>
+              <span style="font-weight:500;">¥3,000/车/年</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">免给付额</span>
+              <span style="font-weight:500;">¥500/次</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span style="color:#666;">给付比例</span>
+              <span style="font-weight:500;">100%</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>审批阈值</h3><button class="btn btn-sm">编辑</button></div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">自动审批上限</span>
+              <span style="font-weight:500;">¥5,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">主管审批上限</span>
+              <span style="font-weight:500;">¥30,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span style="color:#666;">经理审批上限</span>
+              <span style="font-weight:500;">¥100,000</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>案件通道阈值</h3><button class="btn btn-sm">编辑</button></div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">快速通道上限</span>
+              <span style="font-weight:500;">≤¥2,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">标准通道范围</span>
+              <span style="font-weight:500;">¥2,000~30,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span style="color:#666;">大案通道</span>
+              <span style="font-weight:500;">>¥30,000 或人伤</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>通知配置</h3><button class="btn btn-sm">编辑</button></div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">续统提醒</span>
+              <span style="font-weight:500;">到期前30天</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+              <span style="color:#666;">报案超时</span>
+              <span style="font-weight:500;">48小时内</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span style="color:#666;">给付时效</span>
+              <span style="font-weight:500;">10个工作日</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 审核弹窗 -->
+<div class="modal-overlay" id="auditModal">
+  <div class="modal" style="width:700px;">
+    <div class="modal-header">
+      <h3>入驻申请审核 - APP2026032901</h3>
+      <span style="cursor:pointer;font-size:20px;" onclick="closeModal('auditModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>企业名称</label>
+          <input type="text" class="form-control" value="深圳XX运输有限公司" readonly>
+        </div>
+        <div class="form-group">
+          <label>联系人</label>
+          <input type="text" class="form-control" value="陈总 138****1234" readonly>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>参统车辆数</label>
+          <input type="text" class="form-control" value="45辆" readonly>
+        </div>
+        <div class="form-group">
+          <label>预估年统筹费</label>
+          <input type="text" class="form-control" value="¥540,000" readonly>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>证照材料</label>
+        <div style="display:flex;gap:12px;">
+          <div style="flex:1;background:#f5f5f5;padding:12px;border-radius:6px;text-align:center;">
+            <div style="color:#1890ff;margin-bottom:4px;">营业执照.jpg</div>
+            <div style="font-size:12px;color:#999;">已上传</div>
+          </div>
+          <div style="flex:1;background:#f5f5f5;padding:12px;border-radius:6px;text-align:center;">
+            <div style="color:#1890ff;margin-bottom:4px;">运输许可证.jpg</div>
+            <div style="font-size:12px;color:#999;">已上传</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>参统车辆Excel</label>
+        <div style="background:#f5f5f5;padding:12px;border-radius:6px;">
+          <span style="color:#1890ff;">车辆信息表.xlsx</span>
+          <span style="color:#999;font-size:12px;margin-left:8px;">45条记录</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>审核备注</label>
+        <textarea class="form-control" placeholder="请输入审核备注..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('auditModal')">取消</button>
+      <button class="btn" style="color:#ff4d4f;border-color:#ff4d4f;" onclick="closeModal('auditModal')">驳回</button>
+      <button class="btn btn-primary" onclick="closeModal('auditModal');alert('审核通过！请进行车辆录入。')">通过，录入车辆</button>
+    </div>
+  </div>
+</div>
+
+<!-- 案件受理弹窗 -->
+<div class="modal-overlay" id="caseAcceptModal">
+  <div class="modal" style="width:600px;">
+    <div class="modal-header">
+      <h3>案件受理 - CASE2026032901</h3>
+      <span style="cursor:pointer;font-size:20px;" onclick="closeModal('caseAcceptModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="val">京A12345</div><div class="lbl">车牌号</div></div>
+        <div class="mini-stat"><div class="val">标准</div><div class="lbl">通道</div></div>
+        <div class="mini-stat"><div class="val">同等</div><div class="lbl">责任</div></div>
+        <div class="mini-stat"><div class="val">¥3,500</div><div class="lbl">预估</div></div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <h4 style="font-size:14px;color:#666;margin-bottom:12px;">报案信息</h4>
+        <div style="background:#f5f5f5;padding:12px;border-radius:6px;font-size:14px;line-height:1.8;">
+          <div><span style="color:#999;">事故时间：</span>2026-03-29 09:00</div>
+          <div><span style="color:#999;">事故地点：</span>北京市朝阳区某某路</div>
+          <div><span style="color:#999;">事故描述：</span>两车相撞，轻微剐蹭</div>
+          <div><span style="color:#999;">现场照片：</span><span style="color:#1890ff;">查看 9 张</span></div>
+        </div>
+      </div>
+      <div style="background:#fff7e6;padding:12px;border-radius:6px;border:1px solid #ffe58f;margin-bottom:16px;">
+        <div style="color:#fa8c16;font-size:14px;font-weight:500;">⚠ 企业尚未提交最终报案</div>
+        <div style="color:#999;font-size:12px;margin-top:4px;">需等待企业在小程序提交最终报案后，方可受理</div>
+      </div>
+      <div class="form-group">
+        <label>受理备注</label>
+        <textarea class="form-control" placeholder="可选"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('caseAcceptModal')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('caseAcceptModal');alert('受理成功！已分配查勘任务。')">确认受理</button>
+    </div>
+  </div>
+</div>
+
+<!-- 给付审批弹窗 -->
+<div class="modal-overlay" id="approveModal">
+  <div class="modal" style="width:650px;">
+    <div class="modal-header">
+      <h3>给付审批 - CASE2026032703</h3>
+      <span style="cursor:pointer;font-size:20px;" onclick="closeModal('approveModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-row" style="margin-bottom:16px;">
+        <div style="background:#f5f5f5;padding:12px;border-radius:6px;">
+          <div style="color:#999;font-size:12px;margin-bottom:4px;">企业</div>
+          <div style="font-weight:500;">广州XX运输</div>
+        </div>
+        <div style="background:#f5f5f5;padding:12px;border-radius:6px;">
+          <div style="color:#999;font-size:12px;margin-bottom:4px;">车牌</div>
+          <div style="font-weight:500;">粤C11111</div>
+        </div>
+      </div>
+      <div style="background:#fff1f0;padding:16px;border-radius:6px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span>损失金额</span>
+          <span>¥65,000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span>责任比例</span>
+          <span>同等 50%</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span>免给付额</span>
+          <span>-¥500</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:600;font-size:16px;color:#ff4d4f;">
+          <span>给付金额</span>
+          <span>¥58,000</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>审批意见</label>
+        <textarea class="form-control" placeholder="请输入审批意见..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('approveModal')">取消</button>
+      <button class="btn btn-danger" onclick="closeModal('approveModal')">驳回</button>
+      <button class="btn btn-success" onclick="closeModal('approveModal');alert('审批通过！等待企业确认后执行支付。')">同意给付</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增用户弹窗 -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal" style="width:500px;">
+    <div class="modal-header">
+      <h3>新增用户</h3>
+      <span style="cursor:pointer;font-size:20px;" onclick="closeModal('addUserModal')">&times;</span>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>姓名 <span class="required">*</span></label>
+        <input type="text" class="form-control" placeholder="请输入姓名">
+      </div>
+      <div class="form-group">
+        <label>账号 <span class="required">*</span></label>
+        <input type="text" class="form-control" placeholder="请输入账号">
+      </div>
+      <div class="form-group">
+        <label>角色 <span class="required">*</span></label>
+        <select class="form-control">
+          <option>请选择角色</option>
+          <option>调度员</option>
+          <option>给付员</option>
+          <option>财务</option>
+          <option>运营</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>手机号 <span class="required">*</span></label>
+        <input type="tel" class="form-control" placeholder="请输入手机号">
+      </div>
+      <div class="form-group">
+        <label>初始密码</label>
+        <input type="password" class="form-control" placeholder="请输入初始密码" value="123456" readonly style="color:#999;">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('addUserModal')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('addUserModal');alert('用户创建成功！')">确认创建</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 页面切换
+function showPage(page) {
+  document.querySelectorAll('#page-login,#page-main').forEach(p => p.style.display = 'none');
+  document.getElementById(page).style.display = page === 'page-main' ? 'block' : 'block';
+}
+function showMain() {
+  showPage('page-main');
+  showModule('dashboard');
+}
+
+// 模块切换
+function showModule(name) {
+  document.querySelectorAll('[id^="module-"]').forEach(m => m.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('module-' + name).style.display = 'block';
+  // 高亮当前项
+  document.querySelectorAll('.nav-item').forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(name)) {
+      item.classList.add('active');
+    }
+  });
+}
+
+// 弹窗
+function showAuditModal() { document.getElementById('auditModal').classList.add('show'); }
+function showCaseAcceptModal() { document.getElementById('caseAcceptModal').classList.add('show'); }
+function showApproveModal() { document.getElementById('approveModal').classList.add('show'); }
+function showAddUserModal() { document.getElementById('addUserModal').classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// 点击空白关闭
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('show');
+  });
+});
+</script>
+</body>
+</html>
